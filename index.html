@@ -1,0 +1,1037 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>电气工程知识库</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg-primary: #0a0a12;
+  --bg-secondary: #111122;
+  --bg-card: #16162a;
+  --bg-hover: #1e1e3a;
+  --border: #2a2a4a;
+  --accent: #00f0ff;
+  --accent-dim: #0088aa;
+  --accent-green: #00ff88;
+  --accent-pink: #ff0088;
+  --accent-purple: #aa66ff;
+  --accent-orange: #ff8800;
+  --text-primary: #e0e0f0;
+  --text-secondary: #8888bb;
+  --text-dim: #555577;
+  --sidebar-width: 280px;
+  --font-mono: 'Cascadia Code', 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+  --font-sans: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+}
+html { font-size: 15px; }
+body {
+  font-family: var(--font-sans);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  display: flex;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg-primary); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--accent-dim); }
+
+.sidebar {
+  position: fixed;
+  top: 0; left: 0;
+  width: var(--sidebar-width);
+  height: 100vh;
+  background: var(--bg-secondary);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  z-index: 100;
+  overflow: hidden;
+}
+.sidebar-header {
+  padding: 20px 16px 12px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.sidebar-header h1 {
+  font-family: var(--font-mono);
+  font-size: 1rem;
+  color: var(--accent);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+.sidebar-header .subtitle {
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  font-family: var(--font-mono);
+}
+.sidebar-header .total-count {
+  margin-top: 8px;
+  font-size: 0.75rem;
+  color: var(--accent-green);
+  font-family: var(--font-mono);
+}
+.module-search {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.module-search input {
+  width: 100%;
+  padding: 8px 10px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.module-search input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 8px rgba(0,240,255,0.15);
+}
+.module-search input::placeholder { color: var(--text-dim); }
+.module-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px 0;
+}
+.module-item {
+  display: flex;
+  align-items: center;
+  padding: 10px 16px;
+  cursor: pointer;
+  transition: all 0.2s;
+  border-left: 3px solid transparent;
+  gap: 10px;
+}
+.module-item:hover {
+  background: var(--bg-hover);
+  border-left-color: var(--accent-dim);
+}
+.module-item.active {
+  background: rgba(0,240,255,0.08);
+  border-left-color: var(--accent);
+}
+.module-item .module-icon {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-family: var(--font-mono);
+  flex-shrink: 0;
+  border: 1px solid var(--border);
+}
+.module-item .module-info { flex: 1; min-width: 0; }
+.module-item .module-name {
+  font-size: 0.82rem;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.module-item .entry-count-badge {
+  background: var(--border);
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  padding: 2px 8px;
+  border-radius: 10px;
+  flex-shrink: 0;
+}
+.module-item.active .entry-count-badge {
+  background: var(--accent-dim);
+  color: #000;
+}
+
+.main {
+  margin-left: var(--sidebar-width);
+  flex: 1;
+  padding: 24px 32px 60px;
+  max-width: calc(100% - var(--sidebar-width));
+}
+.main-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.main-header h2 {
+  font-family: var(--font-mono);
+  font-size: 1.4rem;
+  color: var(--text-primary);
+}
+.main-header h2 .highlight { color: var(--accent); }
+.main-header .search-box {
+  flex: 1;
+  max-width: 400px;
+  min-width: 200px;
+  position: relative;
+}
+.main-header .search-box input {
+  width: 100%;
+  padding: 10px 14px;
+  padding-left: 36px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.main-header .search-box input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 12px rgba(0,240,255,0.1);
+}
+.main-header .search-box input::placeholder { color: var(--text-dim); }
+.main-header .search-box::before {
+  content: '>';
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--accent-dim);
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+}
+.search-stats {
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  font-family: var(--font-mono);
+  margin-bottom: 4px;
+}
+
+.module-section { margin-bottom: 32px; }
+.module-section-title {
+  font-family: var(--font-mono);
+  font-size: 1.1rem;
+  color: var(--accent);
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--accent-dim);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.module-section-title .badge {
+  font-size: 0.7rem;
+  background: var(--accent-dim);
+  color: #000;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-weight: bold;
+}
+
+.submodule-group { margin-bottom: 20px; }
+.submodule-title {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-bottom: 10px;
+  padding-left: 8px;
+  border-left: 2px solid var(--accent-dim);
+}
+
+.entry-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 16px 18px;
+  margin-bottom: 10px;
+  transition: all 0.2s;
+}
+.entry-card:hover {
+  border-color: rgba(0,240,255,0.3);
+  box-shadow: 0 0 16px rgba(0,240,255,0.05);
+  cursor: pointer;
+}
+.entry-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+.entry-title {
+  font-family: var(--font-mono);
+  font-size: 1.05rem;
+  color: var(--text-primary);
+  flex: 1;
+  min-width: 0;
+}
+.entry-id {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--text-dim);
+  background: var(--bg-primary);
+  padding: 2px 8px;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  flex-shrink: 0;
+  letter-spacing: 1px;
+}
+.entry-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-bottom: 8px;
+}
+.entry-tag {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  padding: 2px 8px;
+  border-radius: 3px;
+  background: rgba(0,240,255,0.08);
+  color: var(--accent);
+  border: 1px solid rgba(0,240,255,0.15);
+}
+.entry-content {
+  font-size: 0.88rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+  white-space: pre-wrap;
+}
+.entry-related {
+  font-size: 0.78rem;
+  color: var(--accent-dim);
+  font-family: var(--font-mono);
+}
+
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--text-dim);
+  font-family: var(--font-mono);
+}
+.empty-state .icon { font-size: 2rem; margin-bottom: 12px; opacity: 0.5; }
+.empty-state p { font-size: 0.85rem; line-height: 1.6; }
+
+.sidebar-toggle {
+  display: none;
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  z-index: 200;
+  width: 40px;
+  height: 40px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--accent);
+  font-size: 1.2rem;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+}
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  z-index: 99;
+}
+
+@media (max-width: 768px) {
+  .sidebar { transform: translateX(-100%); transition: transform 0.3s; }
+  .sidebar.open { transform: translateX(0); }
+  .sidebar-overlay.open { display: block; }
+  .sidebar-toggle { display: flex; }
+  .main { margin-left: 0; padding: 16px; max-width: 100%; padding-top: 60px; }
+  .main-header { flex-direction: column; align-items: stretch; }
+  .main-header .search-box { max-width: 100%; }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.entry-card { animation: fadeIn 0.3s ease-out; }
+
+/* Detail Modal */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.75);
+  z-index: 300;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  backdrop-filter: blur(4px);
+}
+.modal-overlay.open { display: flex; }
+.modal-content {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  max-width: 720px;
+  width: 100%;
+  max-height: 80vh;
+  overflow-y: auto;
+  padding: 28px 32px;
+  position: relative;
+  animation: fadeIn 0.2s ease-out;
+}
+.modal-close {
+  position: absolute;
+  top: 16px;
+  right: 20px;
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  font-size: 1.5rem;
+  cursor: pointer;
+  font-family: var(--font-mono);
+  transition: color 0.2s;
+  line-height: 1;
+}
+.modal-close:hover { color: var(--accent); }
+.modal-header { margin-bottom: 16px; }
+.modal-header .modal-module {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--accent-dim);
+  margin-bottom: 6px;
+}
+.modal-header .modal-title {
+  font-family: var(--font-mono);
+  font-size: 1.3rem;
+  color: var(--text-primary);
+}
+.modal-header .modal-id {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  background: var(--bg-primary);
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  margin-top: 8px;
+}
+.modal-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+.modal-tag {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  padding: 3px 10px;
+  border-radius: 3px;
+  background: rgba(0,240,255,0.08);
+  color: var(--accent);
+  border: 1px solid rgba(0,240,255,0.15);
+}
+.modal-section {
+  margin-bottom: 16px;
+}
+.modal-section-label {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 6px;
+}
+.modal-content-text {
+  font-size: 0.95rem;
+  line-height: 1.8;
+  color: var(--text-secondary);
+}
+.modal-related {
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  color: var(--accent-dim);
+  line-height: 1.6;
+}
+.modal-related a {
+  color: var(--accent);
+  text-decoration: none;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+.modal-related a:hover { color: var(--accent-green); text-decoration: underline; }
+.modal-submodule {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  padding: 8px 12px;
+  background: var(--bg-primary);
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  display: inline-block;
+}
+.modal-nav {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+  gap: 12px;
+}
+.modal-nav-btn {
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 8px 16px;
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.modal-nav-btn:hover {
+  border-color: var(--accent-dim);
+  color: var(--accent);
+}
+.modal-nav-btn:disabled {
+  opacity: 0.3;
+  cursor: default;
+  border-color: var(--border);
+  color: var(--text-dim);
+}
+.modal-nav-btn:disabled:hover {
+  border-color: var(--border);
+  color: var(--text-dim);
+}
+
+@media (max-width: 768px) {
+  .modal-content { padding: 20px 16px; max-height: 90vh; }
+  .modal-nav { flex-direction: column; }
+}
+
+.module-icon.m1 { color: var(--accent); border-color: var(--accent); }
+.module-icon.m2 { color: var(--accent-green); border-color: var(--accent-green); }
+.module-icon.m3 { color: var(--accent-pink); border-color: var(--accent-pink); }
+.module-icon.m4 { color: var(--accent-purple); border-color: var(--accent-purple); }
+.module-icon.m5 { color: var(--accent-orange); border-color: var(--accent-orange); }
+.module-icon.m6 { color: #ff4488; border-color: #ff4488; }
+.module-icon.m7 { color: #44ffaa; border-color: #44ffaa; }
+.module-icon.m8 { color: #ffaa44; border-color: #ffaa44; }
+.module-icon.m9 { color: #4488ff; border-color: #4488ff; }
+.module-icon.m10 { color: #ff44aa; border-color: #ff44aa; }
+</style>
+</head>
+<body>
+
+<button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle sidebar">&#9776;</button>
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <h1>// 电气工程</h1>
+    <div class="subtitle">knowledge base</div>
+    <div class="total-count">[ <span id="totalEntries">115</span> entries ]</div>
+  </div>
+  <div class="module-search">
+    <input type="text" id="moduleSearch" placeholder="filter modules..." autocomplete="off">
+  </div>
+  <div class="module-list" id="moduleList"></div>
+</nav>
+
+<main class="main">
+  <div class="main-header">
+    <h2><span class="highlight" id="currentModule">#</span> <span id="currentCount" style="font-size:0.8rem;color:var(--text-dim);font-family:var(--font-mono);"></span></h2>
+    <div class="search-box">
+      <input type="text" id="entrySearch" placeholder="search entries..." autocomplete="off">
+    </div>
+  </div>
+  <div class="search-stats" id="searchStats"></div>
+  <div id="entriesContainer"></div>
+</main>
+
+<!-- Detail Modal -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal-content">
+    <button class="modal-close" id="modalClose">&times;</button>
+    <div class="modal-header">
+      <div class="modal-module" id="modalModule"></div>
+      <div class="modal-title" id="modalTitle"></div>
+      <div class="modal-id" id="modalId"></div>
+    </div>
+    <div class="modal-tags" id="modalTags"></div>
+    <div class="modal-section">
+      <div class="modal-section-label">// content</div>
+      <div class="modal-content-text" id="modalContent"></div>
+    </div>
+    <div class="modal-section" id="modalRelatedSection" style="display:none">
+      <div class="modal-section-label">// related</div>
+      <div class="modal-related" id="modalRelated"></div>
+    </div>
+    <div class="modal-section">
+      <div class="modal-submodule" id="modalSubmodule"></div>
+    </div>
+    <div class="modal-nav">
+      <button class="modal-nav-btn" id="modalPrev">&#8592; prev</button>
+      <button class="modal-nav-btn" id="modalNext">next &#8594;</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const MODULES = [
+  { id: "m1", name: "电气基础理论", submodules: ["1.1 电路理论","1.2 电磁场理论","1.3 电机学","1.4 电力电子技术","1.5 信号与控制基础"], count: 15 },
+  { id: "m2", name: "电力系统", submodules: ["2.1 发电系统","2.2 输电系统","2.3 变电系统","2.4 配电系统","2.5 用电技术","2.6 电力系统分析","2.7 继电保护","2.8 调度自动化"], count: 17 },
+  { id: "m3", name: "电气自动化", submodules: ["3.1 PLC","3.2 变频器","3.3 伺服系统","3.4 DCS & SCADA","3.5 工业通信","3.6 组态软件","3.7 工业机器人"], count: 12 },
+  { id: "m4", name: "弱电与智能化", submodules: ["4.1 综合布线","4.2 安防系统","4.3 消防报警","4.4 楼宇自控","4.5 系统集成","4.6 智能照明","4.7 物联网IoT"], count: 12 },
+  { id: "m5", name: "新能源与储能", submodules: ["5.1 光伏发电","5.2 风力发电","5.3 储能技术","5.4 氢能与燃料电池","5.5 微电网","5.6 双碳政策"], count: 8 },
+  { id: "m6", name: "电能质量治理", submodules: ["6.1 问题分类","6.2 无功补偿","6.3 谐波治理","6.4 低电压治理","6.5 调压设备","6.6 柔性直流","6.7 工程案例库"], count: 13 },
+  { id: "m7", name: "工业电气成套", submodules: ["7.1 高低压开关柜","7.2 配电变压器","7.3 MCC","7.4 UPS/EPS","7.5 设计规范"], count: 8 },
+  { id: "m8", name: "规范与标准", submodules: ["8.1 国家标准","8.2 行业标准","8.3 国网企标","8.4 国际标准","8.5 施工验收","8.6 制图标准"], count: 8 },
+  { id: "m9", name: "产品知识库", submodules: ["9.1 高压开关产品","9.2 高压开关市场","9.3 储能设备","9.4 自动化设备","9.5 电能质量设备","9.6 竞品对比"], count: 16 },
+  { id: "m10", name: "项目与方案", submodules: ["10.1 设计方案模板","10.2 投标文件","10.3 国网项目流程","10.4 项目归档","10.5 技术报价"], count: 6 }
+];
+
+const MODULE_ICONS = { m1:"~", m2:"=", m3:"#", m4:"@", m5:"$", m6:"%", m7:"&", m8:"*", m9:"+", m10:"!" };
+
+const ENTRIES = [
+  // ===== m1: 电气基础理论 =====
+  { id:"2001", title:"基尔霍夫定律", tags:["KCL","KVL","电路定律"], content:"KCL（基尔霍夫电流定律）：∑I_in = ∑I_out，任意节点处流入电流之和等于流出电流之和。基于电荷守恒原理，适用于集总参数电路中的任何节点，是电路分析的第一基本定律。\nKVL（基尔霍夫电压定律）：∑U_rise = ∑U_drop，任意闭合回路中电压升之和等于电压降之和。基于能量守恒原理，适用于任何闭合回路。\n工程应用：支路电流法、网孔电流法、节点电压法均以KCL/KVL为核心。电路仿真SPICE使用修正节点分析法（MNA），本质是KCL/KVL的矩阵形式。PCB设计中电源完整性分析、故障诊断的电压测量验证均以此为基础。", module:"m1", submodule:"1.1 电路理论", related:[] },
+  { id:"2002", title:"戴维南定理", tags:["等效电路","戴维南"], content:"戴维南定理：任何线性有源二端网络可等效为一个电压源U_oc（开路电压）与一个电阻R_eq（等效内阻）串联。诺顿定理是对偶形式——电流源I_sc与电阻R_eq并联。\n求解步骤：(1)断开待求支路；(2)计算开路电压U_oc；(3)将所有独立源置零（电压源短路、电流源开路）；(4)计算等效电阻R_eq；(5)构建等效电路。\n工程应用：用于分析复杂网络中某一支路的电压电流，特别适合负载变化场景（如电源最大功率传输分析）。最大功率传输定理：当负载电阻等于源内阻时，负载获得最大功率。", module:"m1", submodule:"1.1 电路理论", related:[] },
+  { id:"2003", title:"叠加定理", tags:["叠加定理","线性电路"], content:"叠加定理：线性电路中多个独立源共同作用时，任一支路的响应（电压或电流）等于每个独立源单独作用时在该支路产生响应的代数和。\n使用规则：(1)每次只保留一个独立源，其余独立源置零（电压源短路、电流源开路）；(2)受控源始终保留，不置零；(3)功率不满足叠加性（功率是电压和电流的乘积，非线性关系）。\n工程意义：叠加定理是线性电路分析的核心工具，也是傅里叶分析和交流电路频域分析的理论基础。非正弦周期信号可分解为各次谐波分别计算再叠加，是谐波分析的基本方法。", module:"m1", submodule:"1.1 电路理论", related:[] },
+  { id:"2004", title:"正弦交流电路", tags:["交流","正弦","阻抗"], content:"正弦量三要素：幅值（U_m或I_m）、角频率（ω=2πf）、初相位（φ）。有效值=幅值/√2，我国工频f=50Hz，ω=314rad/s。\n相量表示：正弦量可用复数相量表示，将时域微分方程转化为复频域代数方程，大幅简化计算。阻抗Z=R+j(X_L-X_C)，其中X_L=ωL，X_C=1/ωC。\n工程应用：交流电路功率分析——有功功率P=UIcosφ，无功功率Q=UIsinφ，视在功率S=UI，功率因数cosφ=P/S。提高功率因数是电能质量治理的核心目标之一。", module:"m1", submodule:"1.1 电路理论", related:[] },
+  { id:"2005", title:"三相电路基本概念", tags:["三相","对称分量"], content:"对称三相电源：三个正弦电压幅值相等、频率相同、相位互差120°。星形（Y）接法：线电压=√3×相电压，线电流=相电流，中性点可引出。三角形（Δ）接法：线电压=相电压，线电流=√3×相电流。\n对称分量法：任意不对称三相系统可分解为正序、负序、零序三组对称分量。正序（ABC顺序）、负序（ACB顺序）、零序（同相位）。这是电力系统故障分析的核心方法。\n工程应用：三相电路总功率P=√3×U_l×I_l×cosφ。三相系统比单相系统传输效率更高、功率更平稳，是电力系统发输变配用的基本形式。", module:"m1", submodule:"1.1 电路理论", related:[] },
+  { id:"2013", title:"拉普拉斯变换在电路分析中的应用", tags:["拉普拉斯","复频域"], content:"拉普拉斯变换将时域微分方程转化为复频域（s域）代数方程，是分析动态电路暂态过程的核心工具。运算阻抗：电感Z_L=sL，电容Z_C=1/sC，电阻Z_R=R。\n应用方法：(1)建立时域微分方程；(2)对等式两边取拉氏变换，考虑初始条件；(3)求解s域代数方程；(4)取拉氏逆变换得时域响应。自由响应+强制响应=全响应。\n工程意义：传递函数H(s)=Y(s)/X(s)描述系统输入输出关系，是控制理论和滤波器设计的数学基础。极点决定系统稳定性，零点影响响应形状。实际应用中PSpice等仿真软件自动完成此计算。", module:"m1", submodule:"1.1 电路理论", related:[] },
+  { id:"3101", title:"中性点接地方式", tags:["中性点","消弧线圈"], content:"中性点接地方式是中压电网的关键技术选择，直接影响供电可靠性、过电压水平、继电保护配置和人身安全。\n三种方式：(1)不接地——3~35kV系统，单相接地故障可运行2h，电容电流<10A（电缆网络<30A）；(2)经消弧线圈接地——电容电流较大时补偿，熄弧效果好，降低故障点恢复电压；(3)直接接地——110kV及以上，单相短路电流大，保护快速切除。\n选型原则：35kV以下多采用不接地或经消弧线圈接地，保证供电连续性。110kV及以上采用直接接地，降低过电压水平。近年城市配网推广小电阻接地方式（100~400Ω），快速切除故障、限制过电压。", module:"m1", submodule:"1.1 电路理论", related:[] },
+  { id:"2006", title:"法拉第电磁感应定律", tags:["电磁感应","法拉第"], content:"法拉第电磁感应定律：感应电动势e=-NdΦ/dt，线圈中感应电动势与磁链变化率成正比，方向由楞次定律确定（反对磁通量变化）。这是发电机、变压器、电感器所有电磁设备的理论基础。\n物理本质：变化的磁场产生电场，是麦克斯韦方程组的核心内容之一。感应电动势的大小取决于磁通量变化率，与磁通量绝对值无关。\n工程应用：变压器原理——原边交变电流产生交变磁场，在副边感应出电动势，实现电压变换和电气隔离。电机原理——导体在磁场中运动切割磁力线产生感应电动势，实现机电能量转换。传感应用——电流互感器（CT）利用此原理将大电流转换为小电流。", module:"m1", submodule:"1.2 电磁场理论", related:[] },
+  { id:"2007", title:"麦克斯韦方程组", tags:["麦克斯韦","电磁场"], content:"麦克斯韦方程组由四个方程组成，是经典电磁理论的基石：\n(1)高斯电场定律：∇·D=ρ，电场线从正电荷出发终止于负电荷；(2)高斯磁场定律：∇·B=0，磁力线闭合无散度；(3)法拉第定律：∇×E=-∂B/∂t，变化的磁场产生电场；(4)安培环路定律（修正）：∇×H=J+∂D/∂t，电流和变化的电场产生磁场。\n工程意义：麦克斯韦方程组统一了电学、磁学和光学，预言了电磁波的存在。所有电磁场计算（天线设计、EMC电磁兼容分析、波导传输）均以此为基础。微分形式描述场的局部行为，积分形式描述场的全局行为。", module:"m1", submodule:"1.2 电磁场理论", related:[] },
+  { id:"2008", title:"变压器工作原理", tags:["变压器","变比"], content:"变压器基于电磁感应原理，原边交变电流在铁心中产生交变磁通，在副边绕组中感应出电动势。电压比U1/U2=N1/N2=k，电流比I1/I2=N2/N1=1/k。\n理想变压器条件：无漏磁、无损耗、磁导率无穷大。实际变压器存在铜损（绕组电阻热损耗）、铁损（磁滞损耗+涡流损耗）、漏磁等非理想因素。效率公式η=P2/P1×100%，大型变压器效率可达99%以上。\n主要参数：额定容量(kVA)、额定电压(kV)、空载电流(%)、短路阻抗(%)、联结组标号(Dyn11/Yyn0等)。并联运行需满足：变比相同、联结组相同、短路阻抗百分比相近。油浸式变压器采用瓦斯保护和温度保护，干式变压器采用温度传感器监测绕组温度。", module:"m1", submodule:"1.3 电机学", related:["→ 关联：工业电气成套 §7.2 配电变压器"] },
+  { id:"2009", title:"异步电动机", tags:["异步电机","转差率"], content:"异步电动机（感应电动机）工作原理：定子三相绕组通入对称交流电产生旋转磁场，转速n0=60f/p（同步转速）。转子导体切割旋转磁场产生感应电流，载流导体在磁场中受力形成电磁转矩，驱动转子旋转。转差率s=(n0-n)/n0，是异步电机的核心参数，额定运行时s≈2%~5%。\n分类：绕线型（转子有滑环和碳刷，可串电阻调速）和鼠笼型（转子铸铝或铜条，结构简单可靠性高）。鼠笼型占工业应用90%以上。\n启动特性：启动电流大（5~7倍额定电流），启动转矩较小（0.5~1.5倍额定转矩）。降压启动方法：星三角启动、自耦降压、软启动器。变频调速是当前主流调速方案。", module:"m1", submodule:"1.3 电机学", related:[] },
+  { id:"2010", title:"同步电动机", tags:["同步电机","功率因数"], content:"同步电动机转子转速与定子旋转磁场严格同步，n=60f/p，与负载大小无关（除非失步）。转子有励磁绕组（直流励磁产生恒定磁场）或永磁体。\n特性优势：可调节励磁电流改变功率因数——过励时呈容性（吸收超前无功），欠励时呈感性（吸收滞后无功）。过励运行的同步电机可补偿感性负载的滞后无功，改善电网功率因数，是同步调相机的基本原理。\n应用场景：恒速大功率场合（压缩机、球磨机、水泵）效率优于异步电机。永磁同步电机（PMSM）在伺服系统和电动汽车中广泛应用。启动需采用异步启动或变频启动方式。", module:"m1", submodule:"1.3 电机学", related:[] },
+  { id:"2011", title:"电力电子器件分类", tags:["IGBT","晶闸管","电力电子"], content:"电力电子器件按可控性分三类：(1)不可控器件——功率二极管（整流、续流、反并联）；(2)半控器件——晶闸管SCR（只能控制导通，不能控制关断，依靠主电路电流过零自然关断）；(3)全控器件——IGBT（目前应用最广）、MOSFET（高频）、GTO（大功率）、IGCT（中高压）。\nIGBT（绝缘栅双极型晶体管）：兼具MOSFET的电压驱动特性和BJT的低导通压降优势。电压等级600V~6500V，电流等级至3600A。是变频器、SVG、APF、风电变流器、光伏逆变器的核心器件。\n宽禁带半导体：SiC（碳化硅）和GaN（氮化镓）是下一代电力电子器件材料。SiC MOSFET耐压高、开关快、损耗低，在电动汽车充电桩和光伏逆变器中逐步取代Si IGBT。", module:"m1", submodule:"1.4 电力电子技术", related:["→ 关联：电能质量治理 — SVG、APF 均基于全控器件"] },
+  { id:"2012", title:"PWM整流器", tags:["PWM","整流","谐波"], content:"PWM整流器（脉宽调制整流器）采用全控器件（IGBT）和高频PWM控制，实现AC/DC双向能量变换。相比传统二极管/晶闸管整流，PWM整流器可实现单位功率因数（cosφ≈1）、网侧电流正弦化（THD<5%）、能量双向流动（整流/逆变）、直流电压可控。\n拓扑分类：(1)VSR电压型整流器——直流侧并联大电容，输出直流电压稳定，应用最广；(2)CSR电流型整流器——直流侧串联大电感，输出直流电流稳定。VSR是目前主流的PWM整流方案。\n控制策略：电压外环+电流内环的双闭环控制。电流环采用d-q旋转坐标系下的解耦控制，分别控制有功和无功分量。矢量控制、直接功率控制（DPC）是常用方法。", module:"m1", submodule:"1.4 电力电子技术", related:[] },
+  { id:"3103", title:"防雷接地系统", tags:["防雷","接地","SPD"], content:"防雷接地系统由三部分组成：接闪器（避雷针/避雷带/避雷网）、引下线（将雷电流导入大地）、接地装置（接地极/接地网）。核心参数：接地电阻值。变电所接地电阻R≤1Ω，建筑物防雷接地R≤4Ω，独立防雷针R≤10Ω（GB 50057）。\n浪涌保护器SPD（Surge Protective Device）：分级保护——Ⅰ级（10/350μs波形，用于LPZ0-LPZ1界面，如总配电柜，冲击电流Iimp≥12.5kA）、Ⅱ级（8/20μs波形，分配电柜，标称放电电流In≥20kA）、Ⅲ级（8/20μs波形，终端设备前，In≥10kA）。\n等电位连接：将进出建筑物的金属管道、结构钢筋、电缆金属护套等做等电位连接，防止电位差造成电击。接地系统形式：TN（TN-C/TN-S/TN-C-S）、TT、IT。建筑物防雷分类按年预计雷击次数分为一类/二类/三类。", module:"m1", submodule:"1.5 信号与控制基础", related:["→ 关联：规范与标准 §8.5 施工验收"] },
+
+  // ===== m2: 电力系统 =====
+  { id:"2101", title:"发电厂类型", tags:["发电厂","火电","水电","核电"], content:"发电厂按能源类型分类：(1)火力发电厂——燃煤/燃气/余热/生物质，利用燃料化学能加热水产生蒸汽驱动汽轮机发电。我国以煤电为主（约占总发电量60%），单机容量300MW~1000MW，超超临界机组效率45%以上。(2)水力发电厂——利用水的位能，分为坝后式（三峡2240万kW）、抽水蓄能（双向可逆式机组，用于电网调峰填谷）。\n(3)核电厂——核裂变能加热水产生蒸汽，压水堆PWR为主流（占核电70%以上），单机容量900~1700MWe。(4)新能源发电——光伏、风电（详见m5模块）。(5)其他——燃气轮机（启停快，用于调峰）、内燃机（应急备用）、地热/潮汐/光热。\n厂用电率：火电约5%~8%，水电约0.5%~2%，核电约4%~6%。发电厂电气主系统包括发电机出口断路器（GCB）、主变压器、厂用变压器、高压配电装置等。", module:"m2", submodule:"2.1 发电系统", related:["→ 关联：新能源与储能"] },
+  { id:"2112", title:"火力发电原理", tags:["火电","发电","锅炉"], content:"火力发电将燃料化学能转化为电能：燃料在锅炉中燃烧→化学能转为热能加热水产生高温高压蒸汽→蒸汽推动汽轮机叶片旋转→热能转为机械能→发电机转子旋转切割磁力线→机械能转为电能。\n主要设备：锅炉（煤粉炉/循环流化床CFB）、汽轮机（高压/中压/低压缸）、发电机（氢冷/水冷/空冷）、凝汽器（冷却排汽提高效率）、给水泵、烟气处理系统（脱硫/脱硝/除尘）。\n效率：亚临界机组（16.7MPa/538℃）效率约38%，超临界（24.1MPa/538℃）约42%，超超临界（>27MPa/580℃）可达45%以上。热电联产综合效率可达80%以上。厂用电率5%~8%，供电煤耗：超超临界<280g/kWh。", module:"m2", submodule:"2.1 发电系统", related:[] },
+  { id:"2102", title:"输电电压等级", tags:["电压等级","交流","直流"], content:"交流输电电压等级：我国标准电压等级——110kV（区域配电）、220kV（地区主网）、500kV（省网骨干，也是南方电网主网架）、750kV（西北电网）、1000kV（特高压交流试验示范）。直流输电电压等级：±400kV（背靠背联网）、±500kV（远距离大容量）、±800kV（特高压直流，如向家坝-上海±800kV，输送容量640万kW）、±1100kV（昌吉-古泉，输送容量1200万kW，输电距离3324km）。\n选择原则：输电距离越长、容量越大，电压等级越高。500kV交流经济输电距离约500~800km，±800kV直流可达2000km以上。直流输电适合远距离大容量点对点输送、海缆输电、异步联网等场景。高压输电可降低线路损耗（P=I²R），相同功率下提高电压可减小电流和线路损耗。", module:"m2", submodule:"2.2 输电系统", related:[] },
+  { id:"2103", title:"变电站类型", tags:["变电站","GIS","智能站"], content:"变电站按电压等级和技术形式分类：(1)GIS变电站——采用SF6全封闭组合电器，占地小（约为敞开站的1/10）、可靠性高、维护量少，适用于城市中心、高海拔、环境恶劣等场景。110kV~1100kV均有应用。(2)敞开式AIS变电站——设备绝缘裸露在空气中，造价低、检修方便，适用于土地充足的郊外变电站。\n(3)智能变电站——采用IEC 61850标准，全站GOOSE网络跳闸，电子式互感器（ECT/EVT）+智能终端+合并单元。过程层/间隔层/站控层三层架构，光纤通信替代传统电缆接线。(4)模块化预制舱式变电站——工厂预制、现场拼装，建设周期缩短50%以上，用于新能源升压站和临时供电。\n按功能分：升压站（发电厂侧）、降压站（负荷中心）、开关站（无变压器，用于线路分段）、牵引变电所（电气化铁路专用）。", module:"m2", submodule:"2.3 变电系统", related:[] },
+  { id:"2113", title:"变电站主接线形式", tags:["主接线","双母线","桥形接线"], content:"主接线是变电站电气设计的核心，决定系统的可靠性、灵活性和经济性。主要形式：\n(1)单母线接线——简单经济，但母线故障全站停电，适用于三级负荷或小型变电站。(2)单母线分段——用断路器将母线分段，一段母线故障仅停该段，提高供电可靠性。(3)双母线接线——两组母线互为备用，可轮流检修，可靠性高。出线回路多时广泛采用。(4)双母线分段——更高可靠性，用于500kV及以上枢纽变电站。\n(5)桥形接线——内桥（变压器回路只一台断路器，线路回路两台断路器，成本低且切换灵活，适用于出线多变压器少的长距离输电场景）和外桥（适用于入线少变压器切换频繁的场景）。(6)一个半断路器接线（3/2接线）——每两个出线回路用3台断路器，N-1故障时不影响供电，可靠性最高，用于500kV及以上电压等级。\n选择依据：可靠性（N-1原则）、灵活性（运行方式切换、检修）、经济性（设备投资）。", module:"m2", submodule:"2.3 变电系统", related:[] },
+  { id:"2114", title:"GIS气体绝缘组合电器", tags:["GIS","SF6","组合电器"], content:"GIS（Gas Insulated Switchgear）将断路器、隔离开关、接地开关、快速接地开关、电流互感器、电压互感器、母线等元件全封闭在充有SF6气体的金属壳体内。SF6气体具有优异的绝缘和灭弧性能（绝缘强度为空气的3倍，灭弧能力为空气的100倍）。\n优势：占地面积小（约为AIS的1/10）、可靠性高（不受大气环境影响）、维护工作量少、安全性好（带电部分全封闭）、电磁辐射低。适用于城市变电站、水电站地下厂房、高海拔地区、污染严重地区等。\n关键参数：额定电压126~1100kV，额定电流2000~6300A，额定短路开断电流40~63kA，SF6气体额定压力0.5~0.7MPa（20℃）。根据GB 7674和IEC 622271标准设计制造。泄漏率≤0.5%/年。", module:"m2", submodule:"2.3 变电系统", related:["→ 关联：产品知识库 §9.1 — 特高压GIS产品"] },
+  { id:"2104", title:"配电网接线方式", tags:["配网","环网","辐射"], content:"配电网接线方式直接影响供电可靠性：(1)放射式——从变电站引出单回线路至用户，结构简单、投资低，但线路故障时全部停电。适用于三级负荷。(2)树干式——从主干线引出分支至各用户，经济性好但可靠性低。\n(3)环网式——线路两端均接至电源，开环运行（正常情况下中间断开，一端故障可从另一端供电）。N-1原则是配网规划基础——任何单一元件故障不影响正常供电。(4)双电源供电——来自不同变电站的两路独立电源，用于一级负荷。\n我国中压配网以10kV为主，大城市推进20kV。低压配网380/220V三相四线制。配电网中性点接地方式：经小电阻接地（城市电缆网）、经消弧线圈接地（架空线混合网）、不接地（农村电网）。", module:"m2", submodule:"2.4 配电系统", related:[] },
+  { id:"2115", title:"电缆选型原则", tags:["电缆选型","载流量","XLPE"], content:"电缆截面选择需综合三个因素：(1)载流量——根据负荷电流选择截面，考虑环境温度、敷设方式（空气中/土壤中/桥架内/穿管）、多根并列等校正系数。IEC 60364和GB 50217有详细载流量表。(2)电压降——长线路需验算电压降ΔU≤5%，ΔU=I×L×(Rcosφ+Xsinφ)。(3)短路热稳定——校验短路电流下的热容量S≥I_k×√t/C。\n绝缘类型选用：PVC（普通70℃，不阻燃场景逐步淘汰）、XLPE交联聚乙烯（90℃，目前最常用，载流量大、耐温高）、EPR乙丙橡胶（柔软、用于特殊场合）、矿物质MI（防火，用于消防回路）。\n施工要点：电缆弯曲半径≥12D（铠装）/≥15D（无铠装），电缆终端头和中间接头制作需严格按工艺要求，电缆试验包括绝缘电阻测试和耐压试验（直流耐压或串联谐振交流耐压35kV及以上）。", module:"m2", submodule:"2.4 配电系统", related:[] },
+  { id:"2116", title:"电气安全防护", tags:["安全防护","漏电保护","安全电压"], content:"电气安全防护分直接接触防护和间接接触防护两类：\n直接接触防护：(1)绝缘——导线绝缘层、设备绝缘外壳；(2)遮栏/外护物——配电柜门、防护网；(3)距离——带电体与人体保持安全距离，10kV安全距离0.7m，110kV为1.5m。\n间接接触防护：(1)接地系统——TN系统（设备外壳接保护中性线PEN或保护线PE），当设备漏电时形成单相短路，促使保护装置动作；(2)漏电保护RCD——检测剩余电流，动作电流30mA（人身安全）、100mA（兼防火）、300mA（防火）；(3)安全电压——特低电压ELV，干燥环境≤50V，潮湿环境≤25V，特别潮湿≤12V；(4)双重绝缘/加强绝缘——Ⅱ类设备（回形符号）。(5)电气隔离。\n防电击措施配合使用：接地是基础，RCD是后备，安全电压用于手持电动工具等危险场景。", module:"m2", submodule:"2.5 用电技术", related:["→ 关联：电气基础理论 §1.5 — 防雷接地系统"] },
+  { id:"2105", title:"潮流计算", tags:["潮流","牛顿-拉夫逊"], content:"潮流计算是电力系统稳态分析的核心工具，用于计算各节点电压幅值/相角、支路功率分布及网络损耗。潮流计算结果是系统规划、运行方式制定、无功优化、安全评估的基础。\n主要算法：(1)牛顿-拉夫逊法——收敛速度快（平方收敛），迭代次数少（3~5次即可收敛），但对初值敏感。极坐标形式最常用，修正方程维度为(2n-1)阶。(2)PQ分解法——基于有功与电压相角、无功与电压幅值之间的弱耦合关系，将雅可比矩阵简化为常数矩阵，每次迭代计算量大幅减小，适用于高压输电网（高X/R比）。P-Q分解法的简化版本BX方案和XB方案在实际工程中广泛应用。(3)高斯-赛德尔法——收敛速度慢但编程简单，常用于配电网潮流，结合PV节点处理。\n应用场景：(1)运行方式分析——N-1校核是规划必备，验证任一线路或变压器停运后系统是否过载或电压越限；(2)无功优化——以网损最小为目标调整发电机端电压、变压器分接头、无功补偿容量；(3)安全评估——计算故障后潮流分布，评估系统安全水平。PV节点（有功和无功可调的发电机节点）和PQ节点（负荷节点）的设定直接影响计算结果。", module:"m2", submodule:"2.6 电力系统分析", related:[] },
+  { id:"2106", title:"短路电流计算", tags:["短路","对称","不对称"], content:"短路电流计算是电力系统设计和设备选型的基础依据。短路类型分对称短路（三相短路）和不对称短路（单相接地/两相短路/两相接地短路）。\n三相短路计算：三相短路是对称故障，产生的短路电流最大，包含周期分量（按系统阻抗决定幅值）和非周期分量（衰减时间常数由X/R比决定）。冲击电流i_sh=√2×I_k×K_sh，冲击系数K_sh一般取1.8（对应X/R大系统），用于校验设备动稳定。短路电流有效值I_k用于校验设备热稳定。\n不对称短路计算：采用对称分量法将abc三相系统分解为正序、负序、零序三个独立系统。正序网络（三相对称电势源）、负序网络（无源，负序阻抗=正序阻抗）、零序网络（零序阻抗与接地方式和变压器接线有关，Δ接法侧零序开路）。单相接地短路电流I_k1=3E/(Z1+Z2+Z0)，两相短路电流I_k2=√3×E/(Z1+Z2)，两相接地短路介于两者之间。\n工程应用：(1)设备选型——断路器的额定短路开断电流必须大于安装处的最大短路电流有效值；(2)保护整定——继电保护的动作值和动作时间基于短路电流计算结果；(3)接地网设计——单相短路电流用于校验接地网热稳定和接触电势/跨步电势。短路电流计算标准依据GB/T 15544（IEC 60909）。", module:"m2", submodule:"2.6 电力系统分析", related:[] },
+  { id:"2107", title:"电力系统稳定性", tags:["暂态","功角","低频振荡"], content:"电力系统稳定性指系统在遭受扰动后恢复到正常运行状态的能力，是电力系统安全运行的核心问题。按物理特性分三类：\n功角稳定（角度稳定）：(1)静态稳定——系统在小扰动下恢复同步的能力，与同步功率系数dP/dδ正相关，可通过励磁系统提高。(2)暂态稳定——系统遭受大扰动（短路、甩负荷、切机）后维持同步的能力，采用等面积定则分析。加速面积>减速面积时失步。提高暂态稳定的措施：快速切除故障、自动重合闸、电气制动、快关汽门、强励。(3)动态稳定——关注低频振荡（0.1~2Hz），弱阻尼互联系统在扰动后的持续振荡，PSS（电力系统稳定器）是最有效的抑制手段。\n频率稳定：系统有功功率不平衡导致频率偏离额定值（50Hz±0.2Hz正常范围，±0.5Hz为极限）。一次调频（调速器，响应时间秒级，有差调节，调差系数4%~5%）、二次调频（AGC自动发电控制，响应分钟级，无差调节）。低频减载（UFLS）是防止频率崩溃的最后防线。\n电压稳定：系统在扰动后维持各节点电压在可接受范围的能力。电压崩溃通常发生在重负荷系统受端电网，具有局部性。静态电压稳定分析采用P-V曲线和V-Q曲线，鼻点（鞍结分岔点）对应极限输送功率。动态电压稳定关注OLTC有载调压、发电机过励限制等慢速动态元件的相互作用。\n新能源影响：高比例新能源接入降低了系统惯量（同步发电机被电力电子变流器替代），频率响应变差，暂态功角特性改变，电压支撑能力下降。构网型变流器（Grid-forming）是解决新能源并网稳定性的关键技术方向。", module:"m2", submodule:"2.6 电力系统分析", related:["→ 关联：新能源与储能 — 新能源并网影响系统稳定性"] },
+  { id:"2108", title:"继电保护基本原理", tags:["继保","四性","主保护"], content:"继电保护的基本任务是：当电力系统发生故障或不正常运行状态时，迅速切除故障设备或发出报警信号，保证非故障部分继续正常运行。继电保护的四项基本要求（四性）：\n(1)选择性——故障时仅切除故障元件，尽量缩小停电范围。主保护和后备保护的配合、上下级保护之间的级差配合是选择性实现的关键。(2)速动性——快速切除故障，减小故障持续时间对设备的损害和系统稳定性的影响。要求保护动作时间+断路器跳闸时间尽可能短，一般110kV及以上快速保护动作时间<30ms。(3)灵敏性——保护对故障的反应能力，用灵敏系数K_sen衡量。要求K_sen≥1.5~2.0（根据保护类型和规程要求不同）。(4)可靠性——保护在应动作时不拒动、不应动作时不误动。双重化配置是提高可靠性的基本措施。\n保护配置原则：主保护（快速、有选择性切除被保护范围内的故障）+后备保护（主保护拒动或断路器失灵时动作，分远后备和近后备）。\n三段式电流保护——最经典的线路保护形式：Ⅰ段（电流速断）无时限，保护线路一部分（约80%），按躲过最大短路电流整定；Ⅱ段（限时电流速断）带0.3~0.5s时限，保护线路全长并有延时段配合；Ⅲ段（过电流保护）定时限或反时限，作为本线路和相邻元件的后备保护。\n距离保护——利用阻抗继电器测量故障点到保护安装处的阻抗（正比于距离）。三段式距离保护：Ⅰ段（保护线路80%~85%，无延时）、Ⅱ段（保护全长，延时0.3~0.5s）、Ⅲ段（后备保护）。受系统振荡影响，需配置振荡闭锁。\n差动保护——基于基尔霍夫电流定律，比较被保护元件两端或多端的电流相量和，区分内部故障和外部故障。灵敏度高、选择性好，是变压器、母线、发电机的主保护。", module:"m2", submodule:"2.7 继电保护", related:[] },
+  { id:"2109", title:"微机型继电保护装置", tags:["微机保护","算法"], content:"微机保护装置基于DSP（数字信号处理器）或MCU实现保护的数字化。相比传统的整流型/晶体管型/集成电路型保护，微机保护在灵活性、精度、通信能力、事件记录等方面有质的飞跃。\n硬件架构：模拟量输入回路（CT/PT→变换器→低通滤波→ADC采样）→DSP/CPU核心板（保护算法计算、逻辑判断、故障决策）→开入开出回路（开关量输入检测、跳闸合闸出口）→通信接口（以太网/RS485/光纤，支持IEC 61850/IEC 103/Modbus等协议）→人机交互（液晶显示、键盘操作）。\n软件工作流程：采样（每周期24/32/48/80点，每周波采样率N取决于保护精度要求，80点/周波每周波采样间隔250μs）→数字滤波（傅里叶算法FFT提取基波分量，去除谐波和直流衰减分量）→保护算法计算（差分/阻抗/电流幅值等特征量计算）→逻辑判断（与门/或门/延时等保护逻辑组合）→出口动作（跳闸/合闸/报警/事件记录）。\n高级功能：(1)故障录波——记录故障前后各周波的波形数据，用于故障分析；(2)事件顺序记录SOE——记录各开关量的动作时刻（分辨率1ms），便于事故追溯；(3)自诊断——装置上电和运行中周期性自检，发现异常自动闭锁并告警；(4)通信联网——支持远方定值修改、远方复归、保护信息管理子站上传。\n发展趋势：集成化（保护+测控+录波一体化）、智能化（自适应整定、智能告警分析）、网络化（GOOSE/SV全站网络化跳闸采样，取消传统电缆接线）。", module:"m2", submodule:"2.7 继电保护", related:[] },
+  { id:"2117", title:"变压器差动保护", tags:["差动保护","变压器","励磁涌流"], content:"变压器差动保护是变压器内部故障（匝间短路、相间短路、接地短路）的主保护，基于比较变压器各侧电流的相量和。理想运行情况下，变压器各侧电流折算到同一电压等级后相量和为零（流入=流出）。\n关键技术问题：(1)CT变比匹配——变压器各侧额定电流不同，需通过CT变比和平衡系数进行调整，使正常运行时的差流接近零。(2)相位补偿——Y/Δ接线变压器两侧电流相位差30°，通过软件算法进行相位校正（Y侧电流减相邻相电流再除以√3，或Δ侧电流进行角度旋转）。(3)励磁涌流——变压器空载合闸或外部故障切除后电压恢复时，由于铁心磁饱和产生的大电流（可达额定电流的6~8倍），仅流过电源侧，表现为差流，可能引起差动保护误动。励磁涌流特征：含大量二次谐波（基波的15%~50%）、间断角明显、衰减时间数秒（大型变压器可达数十秒）。\n制动措施：(1)二次谐波制动——检测差流中二次谐波分量占比，超过整定值（通常15%~20%）时闭锁差动保护，防止励磁涌流误动，是目前最有效最广泛使用的方法。(2)间断角原理——检测电流波形中每周期无电流的角度，间断角>65°时闭锁。(3)波形对称识别——比较电流波形的工频半波前后对称性，励磁涌流波形不对称。\n比率制动特性：差动保护的核心特性——动作电流随穿越性电流增大而增大，在外部故障大电流穿越时具有制动能力，防止CT饱和导致的误动。典型斜率：初始段0.2~0.5，拐点后0.5~0.8。差动速断段：差流超过一定值（通常4~6倍额定电流）不带任何闭锁直接动作，用于快速切除严重内部故障。", module:"m2", submodule:"2.7 继电保护", related:["→ 关联：电气基础理论 §1.3 — 变压器工作原理"] },
+  { id:"2110", title:"SCADA系统", tags:["SCADA","RTU","遥测"], content:"SCADA（Supervisory Control And Data Acquisition，监控与数据采集系统）是电力系统调度自动化的基础平台，实现对电网运行状态的实时监视和控制。\n四遥功能：(1)遥测YC（Telemetry）——模拟量采集，包括电压、电流、有功功率、无功功率、频率、温度等电气和非电气量。通过RTU/测控装置以固定周期（通常1~5s）上传至调度主站。(2)遥信YX（Teleindication）——开关量采集，包括断路器位置（分/合）、隔离开关位置、保护动作信号、告警信号、设备状态等。状态变化触发变位上传（SOE时标精度1ms）。(3)遥控YK（Telecommand）——远程控制操作，包括断路器分合闸、电动隔离开关、电容器投切、变压器分接头调节等。遥控操作需经过选择→返校→执行的三步安全流程。(4)遥调YT（Teleadjustment）——远程参数设定，如变压器有载调压分接头档位设定、发电机有功/无功出力设定值等。\n采集终端设备：(1)RTU（Remote Terminal Unit）——传统的远动终端，用于变电站/发电厂的数据采集和监控，功能固定、可靠性高。(2)FTU（Feeder Terminal Unit）——馈线终端，用于配电网线路分段开关/联络开关的监控，支持配网自动化FA功能和故障检测。(3)TTU（Transformer Terminal Unit）——配电变压器终端，用于柱上变压器或箱式变的监测，采集电压/电流/有功/无功/功率因数等运行参数。\n通信协议：远动协议经历了CDT（循环式）、Polling（问答式，如部颁101规约）、IEC 61850三个阶段的发展。现代SCADA系统以IEC 61850和IEC 104（TCP/IP网络版101）为主流。", module:"m2", submodule:"2.8 调度自动化", related:["→ 关联：电气自动化 §3.5 工业通信协议"] },
+  { id:"2111", title:"EMS能量管理系统", tags:["EMS","状态估计","调度"], content:"EMS（Energy Management System，能量管理系统）是电网调度中心的核心系统，在SCADA数据采集基础上提供更高层次的分析、优化和控制功能。DMS（配电管理系统）是EMS在配电网侧的延伸。EMS/DMS的边界随调度一体化趋势日益模糊。\n核心功能模块：(1)状态估计（State Estimation）——利用SCADA采集的实时量测数据（遥测和遥信），结合网络拓扑分析和加权最小二乘算法，估计出全网的完整运行状态（各节点电压幅值/相角、线路潮流）。功能：剔除不良数据、补充缺失量测、提高数据精度。可观测性分析是状态估计的前提。(2)自动发电控制AGC（Automatic Generation Control）——根据系统频率偏差和联络线交换功率偏差，自动调整发电机出力，维持频率在额定值和联络线功率在计划值。CPS（Control Performance Standard）标准用于评价AGC性能（北美NERC标准和中国两个细则标准）。(3)无功电压控制AVC（Automatic Voltage Control）——基于三级电压控制体系：一级为发电机AVR本地控制，二级为区域VQC协调（变电站层），三级为全网无功优化（调度中心层）。以网损最小或电压质量最优为目标，优化调整发电机端电压/无功出力、变压器分接头、电容器/电抗器投切。\n高级应用软件（PAS，Power Application Software）：(1)安全分析（SA）——N-1静态安全分析，预想故障集扫描，识别过载和电压越限；(2)调度员潮流（DPF）——在线潮流计算，用于操作前的模拟校核；(3)负荷预测（LF）——超短期（分钟级，用于AGC）、短期（日内至次日，用于发电计划和日前市场）、中期（月至年，用于检修和燃料计划）。神经网络和时间序列分析是最常用的预测方法。", module:"m2", submodule:"2.8 调度自动化", related:[] },
+
+  // ===== m3: 电气自动化 =====
+  { id:"2201", title:"PLC工作原理", tags:["PLC","扫描周期"], content:"PLC（可编程逻辑控制器）采用循环扫描工作方式：输入采样→程序执行→输出刷新。每扫描周期包含三个阶段：\n(1)输入采样阶段——CPU读取所有输入模块的信号状态（DI数字量/DO模拟量），存入输入映像区。此阶段输入状态在整个扫描周期内保持不变（即使外部输入变化也不影响）。(2)程序执行阶段——CPU从第一条指令开始依次执行用户程序，基于输入映像区和内部寄存器状态进行逻辑运算和算术运算，结果存入输出映像区。梯形图/LAD、功能块图/FBD、结构化文本/ST、指令表/IL、顺序功能图/SFC是五种标准编程语言（IEC 61131-3）。(3)输出刷新阶段——将输出映像区的状态一次性传送到输出模块，驱动外部设备（继电器/接触器/指示灯/电磁阀等）。\n扫描周期：扫描周期（Scan Time）=输入扫描时间+程序执行时间+输出刷新时间+通信处理时间+系统自检时间。典型扫描周期10~100ms，程序越大、指令越复杂则扫描周期越长。扫描周期直接影响系统实时性——周期越短实时响应越快。中断功能（硬件中断、定时中断、通信中断）可突破扫描周期的限制，在特定事件发生时立即执行。\n选型考虑：CPU处理速度（位指令执行时间ns级）、程序存储器容量（KB~MB）、DI/DO/AI/AO点数及扩展能力、通信接口类型和数量（以太网/RS485/Profibus/Profinet）。主流品牌：西门子S7系列（S7-1200/1500）、三菱FX/L系列、欧姆龙CJ/NJ系列、罗克韦尔ControlLogix/CompactLogix、汇川AM/AC系列。", module:"m3", submodule:"3.1 PLC", related:[] },
+  { id:"2202", title:"PLC选型", tags:["PLC","选型","I/O"], content:"PLC选型需综合技术指标和工程需求：\n(1)I/O点数和类型——统计DI（按钮/限位开关/继电器触点/接近开关等）、DO（接触器线圈/电磁阀/指示灯等）、AI（4~20mA模拟量/PT100热电阻/热电偶等）、AO（调节阀/变频器给定等）的实际点数，预留15%~20%余量。I/O模块类型包括：DI（直流24V/48V，交流110V/220V）、DO（继电器输出/晶体管输出/晶闸管输出）、AI（电流4~20mA/电压0~10V/热电阻RTD/热电偶TC）、AO（电流4~20mA/电压0~10V）。(2)扫描速度——位指令执行时间（ns/指令）、浮点运算能力。高速处理需求（如运动控制、高速计数）需选择专用CPU或功能模块。(3)通信接口——现场总线（Profibus-DP/DeviceNet/CC-Link）、工业以太网（Profinet/EtherNet/IP/EtherCAT）、串口（RS232/RS485/RS422）。通信协议兼容性是选型关键。(4)扩展能力——本地扩展机架最大I/O点数、远程IO站支持（通过Profibus/Profinet等总线）。\n选型流程：控制需求分析→I/O点统计→确定PLC系列→选择CPU→选配I/O模块→配置通信模块→考虑电源模块→确定编程软件。\n主流品牌及特点：(1)西门子——S7-1200（小规模，支持Profinet，TIA Portal集成开发）、S7-1500（中大规模，高性能，支持多语言编程，安全集成）。(2)三菱——FX5U（小型，性价比高，CC-Link IE现场网络）、L系列（中型，性能介于FX和Q之间）、R系列（大型，高性能CPU，适合复杂控制）。(3)欧姆龙——NJ/NX系列（支持EtherCAT运动控制）。(4)罗克韦尔——CompactLogix（中小型，Logix平台统一编程）。(5)汇川——AM系列（中型PLC，EtherCAT总线，伺服运控一体化，性价比突出），AC系列（小型PLC，替代三菱FX）。", module:"m3", submodule:"3.1 PLC", related:["→ 关联：产品知识库 §9.6 — 汇川竞品"] },
+  { id:"2210", title:"PID控制算法", tags:["PID","闭环控制","参数整定"], content:"PID控制器是工业控制中最广泛应用的闭环控制算法（占工业控制回路的90%以上）。\n数学表达式：u(t)=K_p×e(t)+K_i×∫e(τ)dτ+K_d×de(t)/dt。其中e(t)=SP-PV为偏差（设定值SP-过程值PV）。\n三个分量作用：(1)P（比例）——响应当前误差，e(t)增大则输出增大。K_p越大响应越快，但过大会引起振荡。纯比例控制存在静差（余差）。(2)I（积分）——消除静差，累积历史误差。积分时间T_i越小积分作用越强。积分饱和（Integral Windup）是重要问题——当执行器饱和时积分项持续累积导致超调，需采用抗积分饱和措施（条件积分/积分限幅/反馈跟踪）。(3)D（微分）——预测误差变化趋势（抑制超调）。微分时间T_d越大微分作用越强。纯粹的微分作用对噪声敏感（噪声放大效应），实际应用中采用不完全微分或一阶滞后滤波。\n参数整定方法：(1)Ziegler-Nichols整定法——基于阶跃响应曲线确定临界增益K_u和临界周期T_u，按ZN表格计算K_p/T_i/T_d。简单有效，适合一阶滞后系统（FOPDT），但整定结果可能导致较大超调（约50%）。(2)试凑法——先调P（消除大部分误差），再加I（消除静差），最后加D（抑制超调）。经验口诀：P大响应快但超调大，I小消除静差但积分慢，D大抑制超调但噪声敏感。(3)自整定——现代控制器内置自动整定功能（如西门子PLC的PID自整定块），通过继电器法或阶跃响应法自动获取参数。\n改进型PID：积分分离PID（误差大时取消积分作用避免超调，误差小时引入积分消除静差）、不完全微分PID（微分环节串联一阶惯性滤波，抑制高频噪声）、模糊PID（模糊逻辑在线调整PID参数，适应非线性时变系统）、串级PID（内环+外环，内环快速响应扰动，外环精细控制主变量）。在PLC/DCS中PID功能通常为标准功能块，用户只需配置参数即可使用。", module:"m3", submodule:"3.1 PLC", related:[] },
+  { id:"2203", title:"变频器原理", tags:["VFD","V/F","矢量控制"], content:"变频器（VFD，Variable-frequency Drive）通过将工频交流电变换为频率和电压可调的交流电，实现交流电动机的调速运行。主电路拓扑采用交-直-交电压型结构：\n(1)整流部分——三相不可控整流桥（6脉波/12脉波），将工频交流电变为脉动直流。6脉波整流产生5次/7次特征谐波（流经电网，使输入电流THD可达30%~40%），12脉波整流主要产生11次/13次谐波（需配置整流变压器移相30°）。(2)中间电路——电解电容滤波平滑直流电压（支撑电容），充电电阻+接触器构成软启动电路，直流电抗器（选配）提高功率因数并降低谐波。制动单元（内含制动IGBT管+外接制动电阻）用于快速停机时的能量消耗，电动运行时IGBT管截止断开制动电阻的连接。(3)逆变部分——IGBT三相桥式逆变电路（PWM脉宽调制），将直流电逆变为频率和电压可调的交流电供给电机。\n控制方式：\n(1)V/F控制（恒压频比，Scalar Control）——保持U/f=常数，使电机磁通保持恒定（额定频率以下恒转矩，额定频率以上恒功率弱磁升速）。简单、低成本，适用于风机水泵等平方转矩负载（低压变频器基本标配V/F控制方式），但低速转矩小、动态响应差。(2)矢量控制（Vector Control，Field-Oriented Control）——将定子电流分解为励磁分量（产生磁通）和转矩分量（产生转矩），实现解耦控制。FOC在同步旋转d-q坐标系下对电流闭环调节，性能接近直流调速系统。无速度传感器矢量控制（不带编码器反馈，通过反电势观测器估计转速）适用于常规调速，有速度传感器矢量控制（带编码器PG卡反馈）适用于高精度场合。(3)直接转矩控制DTC——将定子磁链和转矩直接作为被控量（采用Bang-Bang控制：利用滞环比较器在误差超过允许范围时切换电压矢量），不进行旋转坐标变换和电流解耦，结构简单、动态响应最快（转矩响应时间<2ms）。主要代表为ABB的DTC技术。\n应用注意事项：变频器是主要的谐波源（需要配置进线电抗器/直流电抗器/输出电抗器抑制谐波和dV/dt），电机需考虑轴电流和绝缘问题（长线电缆传输时电压反射会加倍，导致冲击电压加于电机绕组首端，一般要求变频器输出端的电机电缆长度不超过限定值，超长电缆建议配置输出电抗器或du/dt滤波器），变频器输出侧不能连接电容器补偿。", module:"m3", submodule:"3.2 变频器", related:["→ 关联：电能质量治理 §6.3 — 变频器是主要谐波源"] },
+  { id:"2204", title:"变频器选型", tags:["变频器","选型"], content:"变频器选型需综合考虑电机参数、负载类型、使用环境和技术要求：\n(1)电流匹配——变频器额定输出电流≥电机额定电流×1.1~1.2倍。重载应用（恒转矩负载如传送带、挤出机、压缩机）需进一步加大容量以提供足够的过载能力（通常以150%额定电流60s为典型过载能力）。轻载应用（平方转矩负载如风机、水泵）可适当降低变频器额定输出电流裕量。(2)过载能力——重载型（HD，Heavy Duty）—150%额定电流60s，轻载型（ND，Normal Duty）—110%额定电流60s。选型时必须明确区分。(3)电压等级——低压变频器三相380V/400V（主流应用范围，适配国内标准电压）、三相690V（大功率电机，适用于煤炭/石化等行业）、中压变频器3kV/6kV/10kV（高压变频器，采用功率单元级联多电平方案，适配大功率电机，一台高压变频器包含多个功率单元，每个功率单元为三相输入单相输出的低压PWM变频器）。\n谐波抑制配置：(1)进线电抗器（AC Input Reactor，2%~4%压降）——抑制高次谐波、限制浪涌电流、改善功率因数，一般标配。(2)直流电抗器（DC Link Reactor）——串联在直流母线中，对谐波抑制效果优于交流电抗器，显著降低输入电流THD（约从80%~100%降至30%~40%）。(3)EMC滤波器——用于抑制变频器产生的传导电磁干扰（满足EN 55011标准）。\n其他选型要素：(1)控制方式选择（V/F/矢量/转矩控制）；(2)通信接口需求（标配RS485 Modbus，可选Profinet/EtherNet/IP/EtherCAT/Profibus-DP等通讯扩展卡）；(3)制动单元和制动电阻（快速停机/位能负载下放时使用，制动斩波管导通时将再生能量消耗在制动电阻上，能量回馈型变频器可将再生能量回馈电网）；(4)使用环境（防护等级IP20/IP54，环境温度，海拔降容）。主流品牌：西门子（G120/S120）、ABB（ACS580/880）、丹佛斯（FC302/FCD300）、三菱（FR-F800/FR-A800）、汇川（MD500/MD800/HD9X系列高压变频器）。", module:"m3", submodule:"3.2 变频器", related:[] },
+  { id:"2205", title:"伺服系统组成", tags:["伺服","编码器","闭环"], content:"伺服系统（Servo System）是以位置、速度、转矩为控制量的高精度闭环控制系统，广泛应用于工业机器人、数控机床、电子制造、包装机械等需要精确定位和快速响应的场合。\n系统组成三要素：(1)伺服驱动器——接收上位控制器（PLC/运动控制器）的位置指令或速度转矩指令，完成三环控制和功率放大。驱动器内部完成位置环、速度环、转矩环的全部或部分运算（根据控制模式和应用分配决定），输出PWM波驱动伺服电机。(2)伺服电机——永磁同步电机（PMSM，转子上贴有永磁体，无需励磁电流，效率高、发热小）为主流。低压伺服（DC24~220V，AC220V，小功率应用<3kW）和高压伺服（AC380V，大功率应用）。电机尾部安装编码器用于反馈。(3)编码器（反馈元件）——增量式编码器（输出A/B/Z脉冲，AB两相正交脉冲信号，Z相零位脉冲，断电位置丢失）或绝对值编码器（单圈/多圈，串行通信协议如BiSS/C、EnDat、SSI/Hiperface DSL，多圈绝对值编码器圈数为4096圈，断电保持位置记忆），分辨率从17bit到23bit甚至更高。\n三环控制架构：从内到外依次为电流环→速度环→位置环，内环响应速度最快、带宽最宽（电流环带宽约1~3kHz），外环响应最慢（速度环带宽约100~500Hz，位置环带宽约数十Hz），三环串联共同保证位置精度、响应速度和系统稳定性。\n通信接口：脉冲/方向（Pulse/Direction，传统方式，最高脉冲频率约500kHz~4MHz）、模拟量速度转矩给定（±10V，0~±10V模拟量对应-额定转速~+额定转速，0~±10V模拟量对应0~额定转矩）、总线控制（EtherCAT——运动控制总线的最主流选择，最小循环周期可达125μs~250μs，数十个伺服轴可在1ms内完成同步位置刷新、Profinet IRT——西门子驱动系统首选，等时同步实时模式抖动<1μs、MECHATROLINK——安川/三菱/松下支持、CANopen CIA402协议、Modbus RTU等）。\n关键指标：响应频率（Hz，典型1~3kHz）、速度波动率（<0.01%）、定位精度（取决于编码器分辨率）、过载能力（3倍峰值电流/3倍过载转矩，持续时间3s）。主流品牌：安川（Σ-7系列）、三菱（MR-JE/J4/J5）、松下（MINAS A6/A7）、西门子（V90/S120）、汇川（SV660/SV680）、台达（ASDA-A3/B3）。", module:"m3", submodule:"3.3 伺服系统", related:[] },
+  { id:"2206", title:"伺服电机类型", tags:["伺服电机","永磁"], content:"伺服电机是实现精准控制的执行元件。主流类型为永磁同步伺服电机（PMSM），部分大功率特殊场合使用直流无刷电机或异步伺服电机。\n永磁同步伺服电机工作原理：定子多极绕组通入正弦交流电产生旋转磁场（采用SPWM或SVPWM调制，绕组为分布式或集中式，极化常采用分数槽集中绕组以减小齿槽转矩），转子永磁体产生恒定磁场（常用的永磁体材料为钕铁硼NdFeB——剩磁高、矫顽力高，或钐钴SmCo——耐高温、高居里点但价格昂贵），定转子磁场同步旋转。定转子磁场相互作用产生电磁转矩。\n按结构分类：(1)表贴式SPM（Surface-mounted PM）——永磁体贴在转子铁心外表面，制造简单、d轴和q轴电感相等或接近（L_d≈L_q），反电势波形为正弦波，适用于中小功率通用伺服（一般3000rpm以下额定转速应用）。(2)内嵌式IPM（Interior PM）——永磁体嵌入转子铁心内部（V型或U型或W型排列），d轴和q轴电感差异大（L_q>L_d），能产生磁阻转矩（利用d-q电感差产生的磁阻转矩提升转矩密度），适用于高速和大功率场合，反电势波形仍为正弦波。\n按电压等级：(1)低压伺服电机——DC24~220V或AC220V供电，功率范围50W~3kW，广泛应用于电子制造设备3C行业、自动化装配线、包装设备、医疗器械等中小功率精准定位场合。(2)高压伺服电机——AC380V供电，功率范围1kW~15kW以上，应用于大负载设备（注塑机、折弯机、冲压设备、机器人等），电流小、线缆长距离传输降压小。\n关键参数：额定转速（1000~6000rpm，通常3000rpm、1500/2000rpm为最常规额定转速）、额定转矩（0.16~48+Nm，系列化产品）、峰值转矩（3倍额定转矩，持续约3s）、转动惯量（与加速响应速度成反比，低惯量电机适合快速启停场合）、反电势常数Ke[V/krpm]和转矩常数Kt[Nm/A]（二者成比例关系）、齿槽转矩（应低于额定转矩的1%~2%，设计上通过斜槽或磁钢错位或定子齿辅助槽等方法抑制齿槽转矩）、防护等级（IP54/IP65/IP67）、绝缘等级（F级155℃/H级180℃）。", module:"m3", submodule:"3.3 伺服系统", related:[] },
+  { id:"2207", title:"DCS集散控制系统", tags:["DCS","分散控制","集中管理"], content:"DCS（Distributed Control System，集散控制系统）采用分散控制、集中管理的设计理念，将控制功能分散到各现场控制站，将监视操作集中到中央控制室，尤其适合大型流程工业的连续生产过程控制。\n系统架构（四层）：(1)现场层——传感器、变送器、执行器（阀门定位器、变频器、电机等）。(2)控制层——控制站（冗余控制器+IO卡件），完成数据采集、回路控制（PID调节回路）、顺序控制、联锁保护等功能。控制器冗余配置（1:1热备冗余，主控制器故障时备用控制器在1~2个控制周期内无缝切换，保证控制不中断），IO卡件支持带电热插拔。控制站按工艺区域分散布置。支持多种IO类型：AI/AO/DI/DO/RTD/TC/PI脉冲输入。(3)操作层——操作员站（HMI，人机界面，实时监控工艺流程图、趋势曲线、报警管理、历史记录查询）、工程师站（系统组态、控制回路图编程、逻辑组态、画面开发、数据库管理、系统维护诊断）、历史站（存储归档历史数据，通常保存1年以上）。操作站和工程师站冗余服务器（可互为备用，容错切换）。(4)管理层——实时数据库、先进控制APC（Advanced Process Control: 先进过程控制，包括多变量预测控制MPC、软测量、优化控制等）、生产执行系统MES（Manufacturing Execution System）接口，连接企业资源计划ERP。\n典型品牌和适用领域：(1)艾默生——DeltaV（过程工业，流程优化和先进控制能力强大，主要应用于石油天然气、炼油化工等连续过程），Ovation（电力行业专用，市场占有率高）。(2)中控——ECS-700（国产DCS龙头，国内市场占有率连续多年第一），WebField系列（化工、炼油、煤化工等流程工业应用广泛）。(3)ABB——System 800xA（高端DCS系统，电气和过程控制一体化集成，安全仪表系统SIS可选TüV认证）。(4)西门子——PCS 7（传统西门子DCS，以SIMATIC Manager为组态平台，过程工业和电力均有应用），PCS neo（新一代基于Web的DCS系统，全浏览器访问，资产管理和数字化集成创新）。(5)和利时——MACS K系列/6系列（中低端DCS市场，在热电、化工等成本敏感领域有好的性价比）。\nDCS与PLC的区别：DCS侧重过程控制（连续调节回路多，PID控制是核心）、冗余可靠性（控制站控制器双冗余、电源冗余、通信网络冗余，系统级冗余配置全面）、I/O规模大（成千上万点），系统组态强调画面美观和操作友好。DCS组态侧重流程图绘制（操作员可直观看到带实时数据和动态效果的工艺画面）和趋势报警历史记录。PLC侧重逻辑控制和快速响应（运动控制、高速计数等），典型扫描周期短，编程灵活（梯形图等），在制造自动化中占主导。现代DCS和PLC的功能边界在模糊——大型PLC系统也可完成回路控制，DCS也支持逻辑控制。", module:"m3", submodule:"3.4 DCS & SCADA", related:["→ 关联：弱电与智能化 §4.4 BAS — 架构理念相似"] },
+  { id:"2211", title:"SCADA系统架构", tags:["SCADA","RTU","四遥"], content:"SCADA（监控与数据采集系统）分为调度主站、通信通道和远方终端三层架构。在本模块中侧重通用SCADA架构和功能描述（电力调度专用SCADA详见m2 §2.8）。\n(1)调度主站层——服务器（实时数据服务器/历史数据库服务器/通信前置服务器/WEB服务器）和工作站（调度员工作站/维护工作站/报表工作站）。前置机是主站与RTU/测控装置通信的枢纽，完成规约转换和数据预处理，一般双机冗余布置。(2)通信通道——光纤以太网（主通道，OPGW/ADSS光缆，TCP/IP协议协议栈承载IEC 104/DNP3规约）、GPRS/4G/5G无线（备用通道，用于偏远站点和移动监控目标）、载波/微波（老旧线路尚有保留）。通道需具备冗余和自动切换能力。(3)远方终端层——RTU/FTU/TTU/测控装置/保护管理机，分散安装在各厂站和线路节点，负责信号采集和命令执行。\n四遥功能：遥测YC（模拟量采集，通过A/D转换将传感器和变送器的4~20mA/0~10V/电压电流互感器二次值等模拟量转换为数字量上传）、遥信YX（开关量采集，光电隔离输入，采集断路器/隔离开关/继电器触点的通断状态，SOE分辨率1ms）、遥控YK（远程命令执行，通过DO输出控制继电器或直接驱动操作回路，遥控选择→返校→执行三步操作流程）、遥调YT（设定值远程下发，如变压器分接头档位或有功出力目标值的远方设定）。\n性能指标：遥测精度≤0.5%（0.5级，标准电力远动装置精度要求），全站数据刷新周期<1~5s（模拟量）/<1s（开关量变位变位时主动上传，变位传输延时<1s）、遥控动作成功率≥99.99%、系统可用率≥99.9%。SCADA系统拓展能包括馈线自动化FA、分布式电源监控、需求侧响应、配电自动化等高级应用。", module:"m3", submodule:"3.4 DCS & SCADA", related:["→ 关联：电力系统 §2.8 — SCADA在调度自动化中的应用"] },
+  { id:"2208", title:"工业通信协议", tags:["工业以太网","Profinet","Modbus"], content:"工业通信协议是工业自动化的神经系统，分现场总线（Fieldbus）和工业以太网（Industrial Ethernet）两大类。\n现场总线协议：(1)Modbus RTU/ASCII（施耐德电气1979年推出，是应用最广泛、最基础的总线协议）——主从架构（单主站，多从站，最多247个从站地址），物理层RS232（点对点，距离15m）、RS485（差分信号，支持多站，距离1200m，波特率9.6k~115.2kbps，典型的Modbus RTU都采用RS485物理层）。功能码：01（读线圈）、02（读离散输入）、03（读保持寄存器）、04（读输入寄存器）、05（写单线圈）、06（写单寄存器）、15（写多线圈）、16（写多寄存器）。RTU模式二进制传输（CRC16校验），ASCII模式文本传输（LRC校验）。(2)Profibus-DP（西门子主导，主要用于西门子PLC与分布式IO/驱动器之间的高速通信）——RS485物理层，传输速率最高12Mbps（速率越高，传输距离越短，12Mbps时最长传输距离100m，加中继器可扩展至1900m），最多126个站点。DP（Decentralized Periphery）特指分布式外围设备通信协议，PA（Process Automation）扩展用于本质安全过程自动化。(3)CANopen（基于CAN总线，广泛应用于运动控制、车辆、电梯等实时通信场景）——对象字典OD（Object Dictionary）机制，PDO（过程数据对象，广播模式，高优先级用于实时性要求高的周期性数据交换）和SDO（服务数据对象，客户端/服务器模式，低优先级用于参数配置和非周期性数据交换）两种通信模式。(4)CC-Link（三菱电机主导，主要在亚洲市场使用广泛）——1对N的广播-轮询通信方式，循环数据通信和瞬时传输，传输速率10Mbps。\n工业以太网协议：(1)Profinet（西门子主导，是Profinet家族系列网络应用层最广泛推广的成员）——分为RT（实时通信，典型周期1~10ms，用于工厂自动化大部分应用）和IRT（等时实时，抖动<1μs，用于运动控制多轴同步，如T-CPU+S120方案）。基于标准以太网IEEE 802.3，100Mbps全双工，支持星形/环形（环网冗余MRP协议）/树形拓扑。最小循环周期：RT~1ms，IRT~250μs。(2)EtherNet/IP（罗克韦尔/ODVA主导，以标准TCP/IP/UDP/IP封装CIP协议）——基于CIP协议的应用层一致性。标准以太网硬件，TCP封装CIP用于显式报文（参数设置、配置、诊断组态等非实时数据通信），UDP封装CIP用于隐式报文（IO数据实时通信）。采用生产者-消费者模型实现多站同步。(3)EtherCAT（倍福Beckhoff主导，超高速性能越来越成为运动控制首选协议）——处理数据“On the Fly”：以太网帧经过每个从站时，从站读取并插入自己的数据，帧延时可短至ns级别。最小循环周期可达125μs（1000个数字IO分布式处理）、12.5μs（运动控制典型应用，50μs循环周期可支持100个伺服轴），是运动控制实时性最高的工业以太网协议之一。(4)CC-Link IE（三菱主导，基于千兆以太网）——1Gbps带宽，现场网络CC-Link IE Field和控制器网络CC-Link IE Control。性能可达千兆级带宽。\n趋势：工业以太网已逐步取代传统现场总线。OPC UA（平台无关的通信架构，数据建模统一，安全机制完善，支持信息模型，是工业4.0的推荐通信架构）和TSN（时间敏感网络，在标准以太网基础上提供确定性低延时，是实现统一网络IT与OT融合融合的网络基础）是下一代工业通信的重要方向。", module:"m3", submodule:"3.5 工业通信", related:["→ 关联：弱电与智能化 §4.5 系统集成 · 电力系统 §2.7 SCADA"] },
+  { id:"2209", title:"组态软件", tags:["HMI","组态","人机界面"], content:"组态软件（HMI/SCADA组态软件）用于创建人机界面（HMI，Human-Machine Interface），实现生产过程的可视化监控、操作和控制。\n核心功能：(1)可视化界面——工艺流程图的绘制和动画（管道流动、电机旋转、液位变化、数值动态刷新），支持丰富的图库和自定义图元。开发时画图组态：利用图库素材/自定义元件绘制工艺画面，绑定变量，配置动态效果（颜色变化/移动/闪烁/数值动态显示等用户帮助理解的视觉反馈）。(2)数据采集——通过通信驱动与PLC/DCS/仪表等控制器连接（支持多品牌多协议同时通信——OPC DA/UA、Modbus TCP/RTU、Profinet、Siemens S7 MPI/PROFINET、Mitsubishi MC协议、Omron FINS等），实时读取标签变量并在画面显示。(3)报警——变量越限、开关状态变化触发报警。分级（一级紧急/二级重要/三级一般/信息），需确认，记录归档（报警日志，保存不少于90天或6个月），支持声音报警、短信通知、邮件通知（通过OPC报警与事件接口实现和SCADA系统的报警数据一致性管理）。(4)趋势曲线——实时趋势（滚动刷新显示多变量的当前时间曲线，便于监视变量的短期变化趋势和调节响应）和历史趋势（调用历史数据库回放特定时间段变量的变化曲线，便于事后分析和统计），支持多变量同图比较。(5)数据记录——数据库存储（SQL Server/MySQL/SQLite等关系数据库或专用的实时/历史库），支持查询/分析/导出（Excel报表等数据导出功能，支持日报/月报/年报和班报）。\n主流产品：(1)WinCC（西门子）——功能全面（支持脚本/VBS、多语言、报警归档、变量归档、报表、用户管理等功能完整的SCADA），与TIA Portal深度集成，支持面板/PC/Web多种部署方式。WinCC Unified是最新一代，基于Web的HMI，全浏览器访问，现代UI。WinCC Professional适合中型到大型SCADA应用。(2)iFix（GE/艾默生）——在电力行业（电厂监控、变电站监控）市场份额高，SCADA能力强（尤其分布式SCADA结构，远程站点管理稳定），支持VBA脚本和强大的报警管理。(3)组态王 KingView（亚控科技）——国产组态软件龙头，性价比高，支持设备驱动丰富，中低端市场占有率高。主要应用于中小型自动化项目。KingSCADA是全新升级的SCADA平台。(4)其他——Intouch（施耐德电气/Wonderware）历史悠久，用户基础广泛，应用程序开发环境Arena集成开发环境；Citect（施耐德）在矿业和冶金领域有较强应用经验和技术积累；KEPServerEX（OPC统一服务器，为所有组态软件提供统一的数据连接平台）。\n发展趋势：Web化（HTML5浏览器访问，无需安装客户端，改进系统易用性和远程访问能力——WinCC Unified/iFix WebSpace/组态王WEB版均采用B/S架构）、移动化（移动巡检app，支持手机/平板浏览监控画面）、云化（与AWS/Azure/阿里云集成实现远程数据存储和分析，如西门子MindSphere和Insight Hub）。", module:"m3", submodule:"3.6 组态软件", related:[] },
+  { id:"2212", title:"工业机器人分类", tags:["机器人","六轴","SCARA"], content:"工业机器人是面向工业领域的多关节机械手或多自由度的自动化装置，在制造业中承担焊接、搬运、装配、喷涂、打磨、分拣等多种工艺任务。\n按机械结构分类：(1)六轴关节型机器人（6-axis articulated robot）——最通用、最灵活的工业机器人，6个关节（J1回旋、J2大臂、J3小臂、J4腕部旋转、J5腕部摆动、J6腕部旋转，六个自由度实现工作空间内任意位置任意姿态可达）提供6自由度运动。工作域近似球形（可达范围取决于臂长），能到达工作空间内的任意位置和姿态。典型负载6~500kg（等级划分：6kg小型、10~50kg中型、100kg以上大型、500kg超大型码垛专用），臂展0.7~4m。广泛应用于弧焊、点焊、搬运、码垛、喷涂、装配等。(2)SCARA机器人（Selective Compliance Assembly Robot Arm，平面关节型机器人）——4轴（Z轴升降+Z轴旋转+大臂旋转+小臂旋转），水平面内柔顺性好（水平方向可灵活移动）、垂直方向刚性好（适合垂直插入动作）。速度快（循环时间<0.5s）、定位精度高（±0.01~0.02mm），主要用于电子元件的平面贴装/装配/分拣/高速搬运工作。SCARA在3C制造行业（手机组装、芯片封装等精细作业）应用极其广泛。(3)并联机器人（Delta型）——3轴（三根主动臂+三根从动臂）或4轴（+末端旋转），末端通过三根并联的驱动臂同时动作，高速轻载。最大速度可达10m/s（标准6轴机器人速度约1~2m/s），加速度可达100m/s²以上。适用于食品分拣、药品包装、电子元件高速拾放等快速取放（Pick & Place）场合。(4)协作机器人（Cobot）——轻量化、带力觉传感（各轴均内置力矩传感器，检测碰撞力，碰撞检测灵敏度<50N甚至更低）、安全性高（满足ISO 10218-1和最新的ISO/TS 15066技术规范——力/力矩限制安全要求），可与人同区域工作无需安全围栏或仅需较低安全围栏。负载3~16kg，臂展0.5~1.3m。典型品牌：优傲UR（Universal Robots，协作机器人先驱）、发那科CRX系列、ABB GoFa、遨博Aubo、节卡JAKA、艾利特Eli等。(5)直角坐标机器人（Cartesian/Gantry）——3个直线运动轴（XYZ），刚性好、定位精度高、成本低，但体积较大（工作空间为矩形立方体，由导轨长度决定），常用于码垛和机床上下料。(6)圆柱坐标机器人（Polar/Cylindrical）——2个直线轴+1个旋转轴，臂展大但精度一般，应用逐步减少。\n关键指标：自由度（典型4~6~7轴，7轴冗余自由度可达空间内避障）、重复定位精度（±0.02~0.1mm六轴典型，±0.01~0.02mmSCARA典型）、最大负载（kg）、工作半径（mm）、运动速度（°/s各关节，m/s末端线速度）、防护等级（IP54/IP65/IP67标准，铸造版可选IP67及以上重载防护）。\n主流品牌：发那科FANUC（六轴出货量最大）、库卡KUKA（汽车制造焊装线占有率强）、ABB（IRB系列，控制柜技术领先，精雕焊接优势明显）、安川Yaskawa（Motoman系列，弧焊应用领域优势明显）、川崎Kawasaki（大型机器人比例高）、埃斯顿Estun（国产工业机器人销量第一梯队）、汇川/众为兴（SCARA出货量领先国产）、新松SIASUN（中科院背景，产品线广）。", module:"m3", submodule:"3.7 工业机器人", related:["→ 关联：电气自动化 §3.3 伺服系统 — 机器人驱动基础"] },
+
+  // ===== m4: 弱电与智能化 =====
+  { id:"2301", title:"综合布线系统", tags:["布线","光纤","六类"], content:"综合布线系统（Premises Distributed System, PDS）是智能建筑的基础传输网络，按EIA/TIA 568标准和ISO/IEC 11801规范设计，将语音、数据、图像等信号的传输线缆统一规划敷设。\n六大子系统（按EIA/TIA 568B定义）：(1)工作区子系统——信息插座（RJ45面板/地插/光纤面板）、终端设备连接跳线。水平信息点间距3~5m，每个工作区配置不少于2个信息点（1语音+1数据）。(2)水平子系统——从楼层配线架FD到信息插座的线缆。六类非屏蔽双绞线UTP（Cat6，250MHz，支持千兆以太网，铜缆布线实际最大水平距离90m，屏蔽层接地需良好，屏蔽F/UTP在抗干扰要求高的场景推荐使用），超六类（Cat6A，500MHz，10GBase-T万兆传输距离可达100m，是当前新建布线工程的首选推荐等级），八类线（Cat8，2000MHz，30m之内支持25G/40GBase-T短距离高速传输，用于数据中心交换机内部TOR交换机-服务器互联）。(3)垂直干线子系统——连接各楼层配线架FD和主配线架BD的骨干线缆。光纤为主（单模OS2长距离大容量，多模OM3/OM4/OM5短距离高速率）＋大对数语音电缆（25/50/100对三类线用作电话干线备份）。(4)设备间子系统——安装主配线架BD、核心交换机、PBX电话程控交换机、服务器机柜等。设备间需满足温湿度（18~27℃，30%~50%）、接地（接地电阻<1Ω）、防静电、防雷、UPS不间断供电条件。(5)管理子系统——分配线架FD和管理跳线。配线架端口与信息点一一对应，标签管理（TIA/EIA-606-A标签标准规范），水平配线架宜采用模块化结构，方便维护和调整。(6)建筑群子系统——连接多栋建筑的主干光缆（室外单模光纤，地埋穿管或架空敷设）和大对数铜缆（不建议室外采用金属电缆，应加装防雷和浪涌保护器SPD）。\n光纤分类：单模OS2（G.652.D/G.657，1310nm/1550nm传输窗口，10km以上超长距离高速传输，10G/40G/100G/400G均可，数据中心和运营商骨干网首选）和多模（OM3 — 300m@10Gb/s，OM4 — 550m@10Gb/s / 150m@40/100Gb/s，OM5宽带多模专为SWDM短波波分复用优化，在4对40/100Gb/s传输中降低光纤数量）。\n通道测试：(1)永久链路测试——线缆施工完成后按GB 50312国家标准测试Cat6及以上等级的布线必须使用认证级数字电缆分析仪（如Fluke DSX系列）按标准中的永久链路+信道方案进行连接性测试（T568B线序、长度、近端串扰NEXT、衰减、回波损耗RL、综合等效远端串扰PS-ELFEXT、传输时延、时延偏移等参数测试，所有项目指标符合标准规定为通过，由测试仪出具测试报告作为竣工验收文档）。(2)光纤链路测试——OTDR光时域反射仪插入法或远端环回法，1310nm/1550nm波长双向测试损耗和长度，光源光功率计双波长单/双向测试插入损耗。多模光纤优选850nm/1300nm窗口，单模光纤优选1310nm/1550nm窗口。", module:"m4", submodule:"4.1 综合布线", related:[] },
+  { id:"2303", title:"安防系统组成", tags:["CCTV","门禁","入侵"], content:"安防系统（Security System，SAS）是智能建筑的基本子系统，包含视频监控、门禁控制、入侵报警、电子巡更、周界防范和停车管理等多个子系统，通过综合安防管理平台统一集成。\n(1)视频监控CCTV——前端摄像机（模拟摄像机BNC同轴已逐步淘汰，IP网络摄像机为主流。分辨率从720P/1080P到5MP/4K/8K，枪机/半球/球机/全景鱼眼/云台PTZ。按照芯片靶面尺寸定义低照度性能和夜视能力，内置AI的视频分析边缘处理能力，人脸抓拍、车牌识别、烟火检测、物品遗留）。传输POE供电（IEEE 802.3af 15.4W/at 30W/bt 60~90W）＋以太网线缆（六类线），远距离光纤传输（核心交换机至NVR/管理平台）。NVR网络录像机存储（H.265压缩算法，存储周期30~90天，存储容量计算公式：总码率(Mbps)×3600×24×存储天数÷8÷1024=TB。典型4M主码流+1M子码流）。(2)门禁控制ACS——读卡器（IC卡/Mifare/NFC识别——刷卡碰卡识别，生物识别——指纹/人脸/掌纹。读卡器内置于门禁一体机或分离式设计）、控制器（TCP/IP联网或RS485总线，每个控制器带2~4门，门数多的大型项目采用两门控制器单元拼装方案）、电磁锁（断电开/通电开型选型，280kg/600lb拉力选型）、出门按钮、门磁传感器。TCP/IP联网架构（控制器与主控服务器之间以以太网通信，远程实时管理、脱机事件缓存上传、开门权限管理、实时刷卡记录查看、远程开门）。\n(3)入侵报警——探测器（被动红外PIR探测——人体热辐射感应，双鉴探测器在被动红外基础上增加微波模块对共同感应确定入侵以减少误报——PIR+微波双技术，玻璃破碎探测器、振动探测器、门磁。周界探测：红外对射/激光对射/脉冲电子围栏/振动光纤）。报警控制器带多个防区，支持布防/撤防（键盘/遥控器/远程APP），报警输出联动视频录像、声光警号、短信通知。系统响应时间<2s，误报率需控制在较低水平。(4)电子巡更——离线式巡更（巡更棒+信息纽扣，巡更人员携带巡更棒到各巡更点触碰信息纽扣记录时间，按时上传数据）或在线式巡更（利用门禁读卡器兼作巡更点，直接联网，可实时监督巡更路线完成情况）。(5)周界防范——红外对射/脉冲电子围栏（对地绝缘立杆+合金线+脉冲高压主机，产生的脉冲高压具有威慑作用，误报率低）/振动光纤/视频周界AI分析。\n综合安防管理平台：集成视频、门禁、报警、巡更、消防（仅接收火灾报警信号联动周边摄像机录像）等子系统，统一管控、联动策略。安防系统控制中心设置安保人员值班坐席，大屏显示拼接（液晶拼接屏/小间距LED 显示各子系统界面和实时告警弹窗）。标准规范：GB 50348安全防范工程技术标准、GB 50394/GB 50395/GB 50396。", module:"m4", submodule:"4.2 安防系统", related:[] },
+  { id:"2309", title:"视频监控系统", tags:["监控","IPCamera","NVR"], content:"视频监控系统是安防系统的核心可视化组成部分，经历模拟时代（DVR）到全IP数字高清时代（NVR）的跨越式发展。\n前端摄像机：(1)枪式（固定焦距或电动变焦，外形为长方体，适用监控固定区域，如楼道口、办公楼大厅、收费站等，配补光灯实现夜视）。(2)半球（吸顶或壁装，造型美观，适用室内场景，内置红外LED实现夜视0Lux补光）。(3)球机PTZ（云台控制，支持360°水平旋转+90°垂直旋转，自动巡航+预置位+花样扫描，适用大范围场景，如广场/园区/操场）。(4)全景鱼眼——单台摄像机可覆盖360°全景或180°全景，全景拼接画面输出，监控大范围无盲区，一个鱼眼可代替4~6个普通枪机。分辨率主流200万/500万/800万像素，编码H.265/H.265+（智能编码，可节省50%~70%存储空间，在H.264编码基础上存储减半，系统改造存储升级时码率及容量重新核算）。智能分析功能：越界闯入检测、区域入侵、目标追踪、物品遗留/丢失检测、人数统计、人脸检测抓拍比对、车牌识别、烟火检测、视频诊断（视频遮挡/信号丢失/图像模糊/场景变更检测均在检测范围内）。\n传输：摄像机通过网线连接到PoE交换机供电和数据一体传输（IEEE 802.3af/at/bt标准，无源PoE交换机无法兼容所有摄像机，优质PoE交换机自动PD协商，最大供电距离100m），远距离采用光纤收发器（单模1310nm，20km）+交换机级联。骨干网核心交换机连接所有NVR和存储阵列及视频管理平台服务器。\n存储：(1)NVR网络录像机——前端摄像机通过局域网接入NVR，NVR直接录像存储和管理。根据摄像机接入数量（16路/32路/64路/128路）和存储容量、录像存储周期来确定NVR硬盘配置（通常4~16块SATA/SAS硬盘，总容量可达80TB以上硬盘单盘最大支持16~22TB）。录像存储周期：普通场景≥30天，重点区域≥90天（GB 50348安防工程技术规范）。(2)视频管理平台——对接入的摄像机/NVR进行统一管理、授权控制、流媒体转发（客户端取流和录像回放的多用户并发取流管理）、报警联动、设备运维、大屏上墙控制、移动端（手机App/Web浏览器）远程查看。(3)视频智能分析服务器——独立的GPU服务器（多路视频流并行实时分析），部署人脸识别算法/结构化分析/行为分析等算法。边缘计算为AI摄像机前端分析场景，中心服务器集中大规模数据分析处理。\n标准规范：GA/T 367视频监控联网系统信息传输、交换、控制技术要求，GB 35114公共安全视频监控联网信息安全技术要求（含视频加密和安全认证）。", module:"m4", submodule:"4.2 安防系统", related:[] },
+  { id:"2310", title:"门禁系统", tags:["门禁","生物识别","电磁锁"], content:"门禁系统实现对出入口的授权管理，记录出入事件，防止未授权人员进入受控区域。\n系统组成：(1)前端识别设备——读卡器（IC/Mifare/NFC读卡，CPU卡安全等级高、可双向认证。读卡频率13.56MHz，读卡距离3~8cm，也可选用密码键盘读卡器）。生物识别（指纹仪——光学/电容/射频指纹扫描，人脸识别门禁一体机——近红外活体检测+人脸比对算法，指静脉识别——安全等级最高，无法复制，适用于高安全等级场景，静脉识别读取手指内部血管纹理结构）。二维码/蓝牙/手机NFC门禁常用于访客预约系统。身份识别组合可以实行单因子（刷卡）或者双因子（刷卡+密码或刷卡+指纹，较高安全防护场景采用双因子+组合验证）的门禁认证。(2)门禁控制器——每个控制器控制1~4门（大型项目通常每个门区配置一台两门控制器以利灵活布点）。脱机工作能力：当与管理服务器通信中断时，控制器内置存储单元可存储10万条以上事件记录，保证本地开门功能正常，在网络恢复后自动上传事件记录。RS485总线联网或TCP/IP联网。重要项目建议配置TCP/IP+RS485双总线冗余，TCP/IP为主通道，RS485为备用通道。(3)电锁——电磁锁（断电开/通电开，断电开型符合消防要求——火灾时自动断电解锁，方便逃生，但安防逻辑要求加装门磁检测，断电开型是常态，通电开型用于特殊场景如高安全等级的金库机房）。电插锁（用于玻璃门、木门等）。灵性锁（可用于双开门，支持多种开门信号）。(4)出门设备——出门按钮（单开/双开设计）、红外/微波双鉴出门传感器（自动感应开门，适用人行通道，带防尾随逻辑）。\n系统架构：控制器→通信网络→管理服务器→管理客户端。上层管理软件完成人员授权管理（人员信息库+通行权限分组+时段分组+区域分级）、实时监控（刷卡事件/门状态/报警事件/远程开门/反潜回/多人开门/首卡开门/消防联动/互锁监控）、事件记录查询、系统联动（与消防联动：火警信号联动控制器断电开锁。与CCTV联动：门异常打开抓拍报警）。权限控制粒度可以做到人员群组/时间段/门点/权限例外。\n安全等级：按GB/T 32581入侵和紧急报警系统技术要求，高安全场景需要防拆（门禁控制器/读卡器自身带有防拆开关）、防撬、防复制（CPU卡加密、生物识别活体检测）。系统需支持胁迫报警功能——在胁迫状态下输入特殊密码/特定开门方式+自动静默报警。", module:"m4", submodule:"4.2 安防系统", related:[] },
+  { id:"2302", title:"火灾自动报警系统", tags:["FAS","探测器","联动"], content:"火灾自动报警系统（FAS，Fire Alarm System）是建筑消防的核心，通过探测器实时监测火灾初期的烟雾、火焰、温度等特征参量，早期发现火灾并自动联动消防设备，是GB 50116《火灾自动报警系统设计规范》的核心设计内容。\n探测器类型：(1)感烟探测器——离子式（对阴燃火敏感，含微量放射源）和光电式（对明火敏感，散射光原理，是主流。光电感烟探测器迷宫结构，LED发射器+接收器，烟雾颗粒进入迷宫使进入接收器的散射光增强，达到阈值联动报警）。吸气式极早期感烟探测器（极早期报警——空气采样管+高灵敏度激光腔，分区报警级别I/II/III/IV级，适用于数据中心、洁净室、通信机房等对早期火灾烟雾检测灵敏度极高、需提前预警的场合）。(2)感温探测器——定温/差温/差定温复合式。适用于厨房/锅炉房/烘干房/车库等平时有粉尘水汽烟雾的场所（避免非火警烟雾颗粒造成感烟探测器误报）。热敏电阻NTC作为温度检测元件，根据具体型号和工艺差别，出厂标定报警动作温度值（典型57℃/70℃/93℃）。(3)火焰探测器——紫外UV/红外IR/双频红外IR3/三重红外IR4。适用于石化、油库、燃气站等易燃易爆场所。响应速度快（毫秒级），对明火敏感，误报率低（多红外频谱+人工智能算法结合火焰特征波形）。(4)气体探测器——CO、H₂、CH₄、LPG、H₂S等可燃气/有毒气体探测。\n报警控制器：(1)区域报警控制器——设在保护区域内，接收该区域的探测器信号，独立管理楼层或防火分区。(2)集中报警控制器——接收各区域报警控制器的信号，联动控制全楼消防设备（消防泵、喷淋泵、防排烟风机、应急照明、疏散广播等）。海湾/北京利达/泰和安/泛海三江是国产的市场主流。报警控制器按回路容量分为回路/模块/设备编址通过总线回路（S型回路，通常每个回路≤242个地址点）连接前端探测器和联动模块。\n联动控制（GB 50116要求）：(1)消防水泵——消火栓按钮启动（硬线联动或总线联动）+消防泵控制柜自动状态联锁启动启泵，反馈运行状态；(2)喷淋泵——湿式报警阀压力开关联动启动喷淋泵喷淋增压稳压；(3)防排烟系统——接收火警信号联动开启排烟阀（280℃熔断关闭）、启动排烟风机/正压送风机（风机应能在消防控制室手动直接控制启停，信号反馈）；(4)应急照明——联动切断非消防电源（强切），强制启动消防应急照明和疏散指示系统（GB 51309《消防应急照明和疏散指示系统技术标准》）；(5)消防广播——联动启动消防应急广播系统（火灾确认后自动切换至消防广播，先疏散警报声再播放疏散语音提示，按照GB 50116的编程逻辑和分区播报）；(6)防火卷帘——联动控制防火分区防火卷帘下降（一步降/二步降——首次降至距地1.8m，第二次在温控器信号或延时后降至底部）。\n系统类型：区域报警系统（小规模独立楼宇适用）、集中报警系统（高层/超高层建筑、大型综合体的标准配置）、控制中心报警系统（建筑群，多个消控室之间的联网和主从调度，联网主机通信协议和显示一致性重点关注）按GB 50116分类与分级。", module:"m4", submodule:"4.3 消防报警", related:[] },
+  { id:"2304", title:"BAS楼宇自控系统", tags:["BAS","DDC","暖通"], content:"BAS（Building Automation System，楼宇自控系统）是智能建筑的核心系统之一，对建筑内的机电设备进行自动化监控和管理，实现安全运行、节能降耗、环境舒适的目标。\n监控范围：(1)暖通空调HVAC——冷热源（冷水机组/热泵/锅炉，冷冻水出水/回水供回水温度压力监测、冷却水温度监测、启停控制和运行状态、故障报警）、空调机组AHU（送风温度/回风温度、温湿度传感器，调节冷/热水阀开度调节水温，调节风阀开度调节新风量/混风比例，变频器控制送风机转速调节风量）、新风机组/风机盘管末端、通风系统（送排风机启停、CO₂浓度/CO浓度传感器联动调节新风和通风工况、启停风机）、冷却塔风机（冷却水出水温度，启停台数和变频器转速控制冷却水温度回水温度）。(2)给排水系统——生活水泵（变频恒压供水，根据供水管网压力变频调节泵转速）、污水泵/集水坑液位联动水泵启停、水箱液位监测与报警。(3)电梯——运行状态、故障报警、火灾应急控制（FAS联动电梯迫降首层或指定转换层）。(4)照明——公共区域照明（走廊/大堂/室外景观照明）的定时开关控制、照度感应控制，可与智能照明系统对接。\n控制网络架构（三层）：(1)管理层——以太网TCP/IP，管理服务器、操作站、WEB服务器、历史数据服务器（能耗分析/报表）。通信协议BACnet/IP。管理层工作站运行整套楼宇自控管理软件（如霍尼韦尔EBI、江森Metasys、西门子Desigo CC、施耐德EcoStruxure Building Operation）。(2)自动层——DDC控制器（直接数字控制器），区域级/楼宇级。主流DDC控制器品牌：江森（Metasys系统控制器）、霍尼韦尔（Spyder/Excel Web控制器）、西门子（PXC/POL系列）、施耐德（TAC Vista/Andover Continuum）、国产厂家海林节能/同方泰德。DDC可独立运行控制程序（内置PWM/0-10V控制信号，可PID自整定调节，典型控制程序扫描周期：0.2~2s），不依赖上位机独立控制，上位机仅用于实时集中监视、参数下载和历史数据存储。(3)现场层——传感器（温度/湿度/压力/压差/流量/液位/CO₂/CO等）和执行器（电动调节阀/风阀执行器/变频器/接触器）。典型现场总线协议：BACnet MS/TP（RS485物理层，BACnet楼宇自控协议默认的现场总线低速层方案，大量采用）、Modbus RTU、LonWorks（已逐步边缘化）。\n控制策略：(1)回风温度PID控制——根据回风温度偏差调节冷/热水阀开度。(2)新风节能控制——焓值控制：比较室外空气焓值与回风焓值，当室外焓值低于回风焓值且满足其他条件时加大新风比例。（3)夜间通风预冷——夏季夜间利用室外低温空气对建筑结构进行预冷，减少次日空调峰值负荷。(4)变水量VWV/变风量VAV——根据负荷变化自动调节水泵/风机转速节能，VAV末端根据室温调节一次风风阀开度和再热加热。\n节能效果：BAS可使建筑能耗降低15%~30%，投资回收期2~4年。标准规范：GB 50189公共建筑节能设计标准、GB/T 50314智能建筑设计标准、GB 50339智能建筑工程质量验收规范。", module:"m4", submodule:"4.4 楼宇自控", related:["→ 关联：电气自动化 §3.4 DCS — 两者架构理念相似"] },
+  { id:"2305", title:"能耗监测系统", tags:["能耗监测","分项计量"], content:"能耗监测系统采用分项计量的方式，对建筑/企业的各类能源消耗进行分类、分项实时监测与分析统计，是建筑节能管理和政府能耗监管的首要数据基础。\n分项计量分类（JGJ/T 285公共建筑能耗监测系统技术规范）：(1)照明插座用电（末端照明和插座回路，电表计量）——应占总能耗的详细比重拆分，独立回路照明采用分项计量表计。(2)空调用电（冷水机组、冷冻泵/冷却泵、冷却塔风机、空调箱/新风机组等用电，电表+冷热量表）——空调系统电耗较大，重点监测制冷机房总箱、冷却塔风机各回路等等。应能分项拆分出制冷主机、冷冻水泵、冷却水泵和冷却塔风机的电耗。(3)动力用电（电梯、水泵、风机等动力设备的末端配电箱出线回路）——风机、水泵等动力设备是最主要电耗，按系统分项如送排风机、给排水泵等均应独立回路以监测。(4)特殊用电（厨房、信息机房、洗衣房、游泳池等非HVAC常规用电）——特殊区域单独设表。分项计量最细粒度要求：照明和插座、空调、动力、特殊用电独立回路监测。\n硬件设备：(1)远传智能电表（多功能电力仪表或智能电能表，精度等级有功0.5S/1.0，无功2.0级，计量数据三相电压/三相电流/有功功率/无功功率/功率因数/有功电度/无功电度/频率/需量。通信接口RS485 Modbus RTU/DL/T 645多功能电能表通信规约，或以太网。三相四线电子式电能表，直接接入式(≤60A)或经CT接入式(>60A)。分项计量系统应在高低压配电室、楼层照明总箱、动力配电箱、空调机房的配电箱出线回路处安装远传电能表和数据采集终端。数据采集后通过4G/以太网上传能耗管理平台）。(2)数据网关/采集器（RS485总线转换为以太网/4G，Modbus RTU/DL/T 645规约统一转换为MODBUS TCP/MQTT/HTTP上报到平台，每条RS485总线上挂载的智能表数量不超过32台）。(3)能耗管理平台（数据存储、统计、分析、展示、报表、超限报警。平台以能耗统计结果指导节能管理工作持续改进。北京、天津、深圳等大型城市要求国家机关办公建筑和大型公共建筑均需上传能耗数据到市级/国家级政府能耗监测平台。\n关键指标：分项计量覆盖率（应达100%）、数据采集间隔（≤15min，推荐5分钟或以下采集间隔）、数据完整性率（≥95%）、计量数据传输准确率。目标节能效果：通过能耗监测系统分析发现用能漏洞和管理上的节能空间10%~30%。典型平台服务商：深圳达实智能、深圳华为、上海联元、研华、西门子能源管理和数字化平台等。\n标准规范：(1)GB/T 29149公共建筑能耗远程监测系统技术规程；(2)JGJ/T 285公共建筑能耗监测系统技术规范；(3)国家机关办公建筑和大型公共建筑能耗监测系统（住建部）——分项能耗数据采集技术导则。", module:"m4", submodule:"4.4 楼宇自控", related:[] },
+  { id:"2306", title:"智能建筑系统集成", tags:["IBMS","集成平台"], content:"IBMS（Intelligent Building Management System，智能建筑管理系统）通过统一软件平台，将建筑内各弱电子系统（BAS/FAS/SAS/OAS/智能照明/停车场等）集成到同一界面进行集中监控和管理，实现跨系统联动、全局优化和信息共享。\n集成层级：(1)网络集成——保证各子系统接入IBMS网络的物理连通性（各子系统以独立的局域网与IBMS集成服务器相连，网络边界设置防火墙策略）。(2)数据集成——通过标准协议实现数据互通。OPC DA/UA（OPC DA基于DCOM，Windows与Windows系统互操作；OPC UA支持跨平台，是OPC体系架构的演进和替代，数据建模、安全认证、跨平台完整功能，是目前IBMS集成的最主流方式）、BACnet/IP（楼宇自控集成首选，实现各楼宇自控系统子系统的互联互通和数据互操作，符合GB/T 50314智能建筑设计标准要求）、Modbus TCP（通用设备集成，如智能照明系统、能源管理系统、智能电表、水表、变配电监控系统等支持Modbus TCP协议的设备集成和对接）、专有协议网关（子系统接入网关或协议转换器，完成协议转换和数据映射，无法直接开放协议时由厂家SDK/API对接后由网关转换为基础Modbus或BACnet协议。OAP（开放自动化协议）/KH Station接口机接入)。(3)应用集成——IBMS平台提供统一的人机界面（图形化显示楼宇三维/二维地图+设备图标状态实时刷新，报警管理界面，跨系统联动策略配置界面----如火警联动：FAS报警→IBMS触发→CCTV摄像机监控自动弹出现场画面→门禁断电开锁→BAS电梯控制迫降→广播播报疏散→照明应急照明强启。能耗超标联动|超过报警值→分级告警→短信通知运维主管）、统一的报警管理、统一的报表统计。\n核心功能：(1)集中监控——在统一UI上浏览全部受控设备状态；(2)跨系统联动——多系统事件触发响应（FAS+安防+BAS+智能照明+门禁等按预设逻辑联动），同时支持逻辑手动触发/定时触发/条件联动；(3)能源管理——分项能耗统计、能效分析、节能措施建议；(4)运维管理——设备台账、报修派单、维护计划、保养提醒、备品备件管理；(5)数据分析与优化——系统运行历史数据趋势曲线、对比分析、数据挖掘寻找优化空间；(6)移动端管理——手机APP/微信小程序远程监控和告警接收。\n主流IBMS平台产品：霍尼韦尔EBI（Enterprise Buildings Integrator）、西门子Desigo CC、江森Metasys、施耐德EcoStruxure Building Operation、同方泰德Techcon、中控智慧建筑IBMS、达实AIoT智能物联网管控平台。\n标准规范：GB/T 50314智能建筑设计标准，GB 50339智能建筑工程质量验收规范。", module:"m4", submodule:"4.5 系统集成", related:["→ 关联：电气自动化 §3.5 工业通信协议"] },
+  { id:"2307", title:"智能照明控制", tags:["DALI","调光","KNX"], content:"智能照明控制通过总线通信技术实现对照明灯具的集中管理、场景设置、自动调光和节能运行，是绿色建筑和智能建筑的重要组成部分。\n控制协议和标准：(1)DALI协议（Digital Addressable Lighting Interface，数字可寻址照明接口，IEC 62386标准）——基于数字总线，双向通信（DALI系统不仅可发送指令，还能读取灯具的状态信息），每回路最多64个地址（每个DALI驱动器在系统配置时分配唯一的短地址），可分组（16组）和场景（16个场景）。DALI-2（IEC 62386第2版）增加了输入设备（传感器、面板）和控制设备（网关、控制器）的标准，实现了设备间互操作性，各厂家DALI产品通用。每个DALI总线回路可独立控制64个灯具的调光/开关/场景配置。DALI-2：控制设备（应用程序控制器+总线供电电源）+输入设备（传感器、控制面板）+总线供电电源。DALI DT8（Device Type 8）支持色温调谐（可调色温灯具的颜色白色调谐控制，混合白光2700K~6500K）。(2)0-10V调光——模拟量调光，控制线电压从0~10V对应灯具亮度从0~100%，是最基础的调光方法。布线：开关火线+控制线对0-10V。相对于DALI调光，0-10V调光是单向模拟控制（仅从一个方向持续发送模拟信号），控制精度一般，难以精准逐个寻址调光。(3)KNX总线——欧洲标准（EN 50090，ISO/IEC 14543），基于分布式总线（每个KNX设备自带CPU，不依赖中央控制器），支持多种传输介质（双绞线TP、电力线PL、射频RF、以太网IP）。KNX设备可以通过ETS（Engineering Tool Software，工程工具软件，是KNX系统的全局唯一的标准化配置软件）统一编程组态。KNX在住宅和楼宇综合控制（除智能照明外，还可控制窗帘、遮阳、空调、地暖、通风、安防等）中应用广泛。\n控制策略：(1)场景控制——一键切换预设灯光组合（如会议模式/投影模式/演讲模式/休会模式/全亮模式）。(2)定时控制——按时间表自动开关灯，用于定时上下班分区断电。(3)感应控制——人员移动传感器（红外/超声波/微波雷达）+照度传感器，人来自动开灯、人走延时关灯，并根据自然光强度自动调节灯光亮度。（4)恒照度控制——传感器检测工作面的照度，自动调节灯光亮度，使受控区域的照度稳定在一定照度值（如500lux、300lux）。自然采光增大照度时自动调低电光亮度，以平衡照度值减少能耗，适用办公室、教室等长期工作的场所。(5)群组控制——一个控制区域开关/调光触发整组灯具联动。\n节能效果：智能照明比传统手动控制节能30%~60%，延长灯具寿命2~4倍（LED灯具的寿命受调光开关影响较小，频繁开关调光对LED影响相对较小，仍有延长使用寿命的效果）。标准规范：GB 50034建筑照明设计标准、JGJ 16-2008（民规插接件章节）民用建筑电气设计规范。", module:"m4", submodule:"4.6 智能照明", related:[] },
+  { id:"2308", title:"LED照明驱动", tags:["LED","驱动电源"], content:"LED驱动电源是LED照明的核心组件，将交流电网电压转换为恒定的直流电流提供给LED灯珠，其性能和可靠性直接影响LED灯具的光效、寿命和安全性。\n拓扑结构：AC-DC+DC-DC两级拓扑。第一级AC-DC（整流+PFC），第二级DC-DC（恒流控制）。(1)非隔离拓扑——Buck降压型，结构简单、效率高（可达90%以上）、成本低，但输入和输出不隔离（灯珠和外壳需考虑触电风险，不适合可接触灯具）。适用于吸顶灯、筒灯、射灯等内置驱动的灯具。(2)隔离拓扑——Flyback反激型（中小功率<100W通用性最广，器件少成本适中）和LLC半桥谐振型（100~300W中大功率，效率高到95%）。隔离型驱动安全（初次级电气隔离，满足CE/SAA/UL安规爬电距离要求），用于面板灯、工矿灯、路灯、隧道灯等需要人可接触外露金属外壳的灯具。\n关键参数：(1)功率因数PF——PF≥0.9（GB 17625.1谐波标准强制要求，LED驱动电源30W以下PF>0.5，30W以上PF>0.9才能通过CCC认证和出口欧美的CE/UL相关能效等级）。(2)效率η——≥87%（更优≥90%），效率高发热小（驱动电源内部电解电容寿命与工作温度成反比，每降低10℃，寿命延长一倍）。(3)输出电流精度——恒流精度±3%~5%。电流精度直接决定灯具的亮度一致性。(4)寿命——驱动电源寿命通常标称30000~50000h，失效的主要因素为电解电容寿命（电解电容干涸导致输出纹波变大，影响灯具寿命和光品质），长寿命设计可采用长寿命电解电容（如红宝石/黑金刚/尼吉康，105℃ 8000~10000h系列）或固态电容。(5)防护等级——室内IP20，户外IP65/IP67。\n调光接口：(1)三端双向可控硅调光（TRIAC dimming，前端切相调光，兼容传统白炽灯可控硅调光器，调光深度10%~100%，LED灯珠在低亮度时的闪烁问题必须满足TRIAC调光器的最小负载要求，需加泄放电阻或匹配TRIAC调光器版调光曲线）。(2)0-10V调光（模拟调光信号，0~10V对应0%~100%亮度，是商业照明调光的主流。驱动控制接口为两条0-10V信号线，阻抗匹配需注意，恒流输出端配合PWM控制调节输出电流，信号线不宜长距离平行敷设避免信号衰减干扰）。(3)PWM调光（数字调光，高频PWM信号控制恒流输出管的导通占空比实现电流斩波调光，频率>1kHz以避免人耳可闻噪音和可见频闪）。(4)DALI调光（数字寻址调光，如DALI DT6/DALI DT8，详见4.6智能照明控制）。\n发展趋势：高功率密度、小型化（GaN功率器件使开关频率MHz级、变压器体积减小），长寿命（无电解电容或长寿命电解电容设计），智能化和数字电源（调光兼容性和数字通信协议集成方案），多合一调光（TRIAC/0-10V/DALI多合一兼容）。", module:"m4", submodule:"4.6 智能照明", related:[] },
+  { id:"2311", title:"LoRa物联网通信", tags:["LoRa","LPWAN","IoT"], content:"LoRa（Long Range，远距离无线通信技术）是Semtech公司推出的低功耗广域网（LPWAN）无线通信技术，在Sub-1GHz ISM免授权频段运行。凭借扩频调制技术，LoRa在距离、功耗和成本之间取得良好平衡，已成为物联网基础设施无线接入技术的主要选择。\n技术特点：(1)传输距离——城市环境2~5km，郊区/农村开阔场地10~15km。LoRa信号穿透能力强，可以在地下室、超高层楼宇内部覆盖到无线终端。(2)功耗——接收电流约10mA，休眠电流<2μA。一节18650锂亚电池（3.6V/19Ah）可支持终端工作3~10年（取决于数据上报频率和方案优化，如采集温度、压力、水电表数据每15分钟上报一次上报，理论使用时间可达5+年）。终端设备远程休眠/唤醒调度，平台级管理节点状态。(3)数据速率——0.3~50kbps（扩频因子SF7~SF12选择，速率、灵敏度和传输时间三者折中正交扩频码元数量。低速率SF12对应最高灵敏度-136dBm。速率越低灵敏度越高覆盖距离越远)。(4)频段——中国CN470~510MHz（中国区域Sub-1GHz监管频段，功率限值），EU868/EU433，US915，AS923。\nLoRaWAN网络架构：终端节点（End Device，LoRa射频芯片模组）→网关（Gateway，也称集中器/基站基站的射频版，一台网关可以接收数百到数千个终端节点的LoRa上行信号，GW将以太网/4G/5G回传至网络服务器）→网络服务器NS（Network Server，解密、去重、MAC命令处理、数据包校验、速率自适应ADR等，LoRaWAN协议MLME和MCPS服务处理）→应用服务器AS（Application Server，数据解析、存储转发、业务逻辑处理，MQTT/HTTP/REST API接口与应用平台对接）。支持设备双向通信，支持确认/非确认模式。LoRaWAN MAC层支持三种通信模式（Class A/B/C）。Class A：ALOHA随机接入方式，上行后紧跟两个短暂的下行接收窗口RX1/RX2，终端下行接收依靠上行后打开的双向接收窗口，电池最省。Class B：比Class A额外增加一个周期性下行接收窗口，通过信标实现同步，可预测终端可达。Class C：终端一直打开接收窗口，延迟最小，适合有持续供电条件且需低延迟下行的应用场景。\n应用场景：(1)表计类——智能水表、电表、燃气表、热量表远传采集替代人工抄表。智能水表：DN15~DN200全系列远传水表，光电直读/无磁/超声波原理。(2)传感采集类——环境监测（温湿度/CO₂/PM2.5/甲醛）、智慧路灯控制（单灯控制器/集中控制器，按路段经纬度时控开关策略，调光控制）、智能垃圾桶（满溢检测传感器，满溢告警和最优路线规划）、智慧停车（地磁车检器）。(3)工业类——设备状态监测（振动/温度/压力）、管廊环境监测、电力井盖监测（井盖异动监测传感器+浸水检测模块）。\nLoRa对比其他LPWAN技术：NB-IoT（运营商蜂窝物联网，授权频段，需SIM卡，覆盖广但功耗略高，适合高速移动和连续发送和可靠实时响应应用场景如智能水务集中器、市政路灯控制器），LoRa（非授权频段，企业可自建专网，终端成本低、硬件自主可控、电池持续工作年限长、数据私有不出公网，适合企业级/园区级/行业私有物联网部署）。\n标准规范：工信部无[2019]518号文关于微功率短距离无线电发射设备管理。LoRaWAN 1.0.4标准规范由LoRa联盟维护。", module:"m4", submodule:"4.7 物联网IoT", related:[] },
+  { id:"2312", title:"边缘计算在电力中的应用", tags:["边缘计算","配电物联网"], content:"边缘计算（Edge Computing）将数据处理和分析能力从云端下沉到网络边缘侧（靠近数据源和用户侧），在电力系统中特别适用于配电物联网、变电站智能巡检和综合能源服务等场景，能有效降低数据传输延迟、减少对主站的带宽压力、保障本地业务独立性。\n应用架构（云-管-边-端）：(1)云端——电力云主站（生产控制大区/管理信息大区），AI训练模型下发，统一运维管理（应用远程部署和更新，OTA远程升级和固件补丁更新）。南方电网南网云、国家电网国网云，PMS设备管理系统，IoT平台套件。(2)管——5G/4G无线公网或光纤专网。配电侧逐步采用5G切片专网或APN专线实时可靠通信。(3)边——边缘智能网关/融合终端（就地安装在配电室/开关站/环网柜/箱变等配电站房内，采集各类智能终端和设备的数据，进行预处理和本地判断（就地控制逻辑，断网自维持正常运行，并上送告警到主站），实现本地决策执行和异常主动上报向云端平台，如台区智能融合终端TTU、配电站房智能网关、输电线监测边缘代理）。(4)端——智能传感器（配变监测、开关状态、环境温湿度/水浸/烟感、电缆测温，智能微断/智能塑壳、局放传感器等）。\n应用场景：(1)配电室/配电站房智能化改造——环境监测（温湿度/水浸/SF6/O₂/烟感，多合一传感器环境监测单元组柜安装）、安防监控（门禁/视频/红外双鉴，联动触发）、设备状态监测（变压器绕组温度、开关柜触头温度、电缆接头温度在线监测。无线测温传感器安装于母排接点/断路器触臂/电缆搭接头等发热易发位置，温度值LoRa/ZigBee上传至智能网关）、边缘网关本地自主决策（数据采集、规约转换、数据预处理存储断链续传、对时、联动控制，标准协议DL/T 645/Modbus/IEC 61850/IEC 104转MQTT/HTTP上送，本地配置自动化联动逻辑：温度超限告警+跳闸出口或灯控照明自动开启）。\n(2)设备预测维护（Predictive Maintenance）——边缘网关采集设备振动和温度数据，内置轻量级AI模型进行故障预判（异常检测和早期故障识别，边缘AI模型以云侧更新下发、边缘推理执行的方式工作），只有异常数据压缩后上送云端分析。减少4G流量和平台压力。典型监测对象：变压器（油色谱、顶层油温、铁心接地电流、局部放电）、开关柜（局部放电TEV超声波联合检测、触头温度、断路器机械特性监测）、电缆（护层环流、局部放电、分布式光纤测温DTS）。(3)分布式电源接入管理——光伏逆变器、风电变流器、储能PCS通过边缘网关接入配电自动化系统，实现分布式能源可视可测可控。（4)源网荷储协调控制——边缘计算执行本地策略（分布式光伏AVC/AGC，就地消纳策略，防反送电、防过电压、主动参与配网调压调频），根据实时电价和负荷预测，自动管理充电桩和储能系统充放电时间，实现需求侧响应。\n标准规范：DL/T 721配电网自动化技术导则（含终端和主站）、国家电网企标Q/GDW 11612配电自动化终端/子站标准化设计技术规范。南方电网标准V3.0智能配电站/智能开关站/智能台架变系列技术规范。", module:"m4", submodule:"4.7 物联网IoT", related:["→ 关联：电力系统 §2.4 配电系统"] },
+
+  // ===== m5: 新能源与储能 =====
+  { id:"2401", title:"光伏发电原理", tags:["光伏","电池片","逆变器"], content:"光伏发电基于光生伏特效应（Photovoltaic Effect，当太阳光照射到半导体P-N结上时，光子在半导体材料内激发非平衡电子-空穴对，在P-N结内建电场的作用下N区收集电子、P区收集空穴分离，从而在P区和N区之间产生光生电动势），将太阳能直接转换为电能。\n电池片分类：(1)单晶硅电池——效率最高（实验室26.7%，量产24%~25%），黑色均匀外观，成本较高。市场份额约80%以上。单晶PERC（发射极钝化背面电池）是过去几年主流技术，但目前已被TOPCon（隧穿氧化层钝化接触）取代成为新一代高效电池主流。单晶硅的掺镓技术已经取代掺硼电池（解决LID光致衰减的问题）。(2)多晶硅电池——效率较低（量产18%~20%），蓝色花斑外观，成本低但市场份额已快速缩小至10%以下，产线基本关停。(3)薄膜电池——碲化镉CdTe（First Solar为代表，效率10%~17%，弱光好，适合BIPV建筑光伏一体化，对光吸收率高，膜层极薄仅数微米）、铜铟镓硒CIGS（效率达21%~23%，柔性可弯曲）、非晶硅a-Si（效率低约6%~8%，但弱光响应好适合计算器/玩具/小型应用）。\n组件构成：钢化玻璃（低铁超白高透光率3.2mm/2.0mm半钢化玻璃）→EVA/POE胶膜（封装材料，340~460g/m²）+电池片（串焊互联，M10（182mm）/G12（210mm）硅片尺寸，60片/66片/72片/78片封装标准组件）→背板（玻璃/含氟背板TPT/TPE/KPK）→铝边框（阳极氧化铝合金6063 T5）。组件接线盒内装旁路二极管（防止热斑效应）。\n逆变器：将光伏组件发出的直流电（DC）转换为符合电网质量要求的交流电（AC）。核心功能：(1)MPPT最大功率点跟踪——在日照强度和环境温度变化下使光伏组件始终工作在最大功率输出点。扰动观察法P&O、电导增量法INC是主要算法。(2)并网逆变——输出电流与电网电压同频同相（单位功率因数并网），支持无功调节（逆变器可发容性及感性无功，参与AVC无功电压调节）。(3)孤岛检测——电网失电时逆变器自动停止供电，保证检修安全（过/欠压、过/欠频被动检测法和主动频移AFD/主动功率扰动法）。\n系统形式：(1)并网系统——光伏组件+逆变器+电网，不配储能，余电上网。适用于户用/工商业屋顶。(2)离网系统——光伏组件+充电控制器+蓄电池+逆变器，独立供电，适用于无电网区域。(3)混合系统——光伏+储能+电网，支持自发自用/余电上网/备电。\n关键指标：组件效率=（组件峰值功率Wp）/（组件面积m²×1000W/m²）；系统PR（Performance Ratio，系统发电性能比率）=实际发电量/理论发电量，优质系统PR可达80%~85%；年衰减率：首年≤2%，后续线性≤0.55%/年。标准：IEC 61215组件设计鉴定、IEC 61730组件安全鉴定。", module:"m5", submodule:"5.1 光伏发电", related:[] },
+  { id:"2402", title:"光伏逆变器分类", tags:["光伏逆变器","组串式"], content:"光伏逆变器按技术架构和应用场景分为三类：(1)集中式逆变器——单机功率MW级（500kW~3.15MW/台），适用于大型地面电站（戈壁/沙漠光伏项目）。多路光伏组串并联输入后汇流至直流母线，经一台大功率逆变器逆变并网。优点：单瓦成本低（0.04~0.08元/W）、功率密度高、系统结构简单。缺点：MPPT路数少（集中式通常只有1~2路MPPT），组串失配损失（一个组串的阴影遮挡或故障将导致整条MPPT支路出力下降）；故障影响面大，检修时需整机停机。(2)组串式逆变器——单机功率10~350kW，适用于工商业分布式/大型地面电站（是目前市场绝对主流，占新增装机70%以上）。每台逆变器带几路MPPT（单路MPPT对应1~2串光伏组串，组串级MPPT最大限度减小阴影遮挡和组件朝向差异造成的失配损失），各台逆变器独立并联接入电网。优点：MPPT精度高、灵活扩展、故障影响小（单台故障不影响其他）。华为和阳光电源的组串式逆变器全球出货量最大。关键参数：最大效率≥98.5%（Si IGBT）、≥99%（SiC MOSFET逐步扩大应用），中国效率认证≥98%。防护等级IP66/C5防腐。(3)微型逆变器——组件级功率优化（每块组件配一台300W~2kW微型逆变器，每块组件独立MPPT和并网，彻底解决组串失配和阴影遮挡。组件间无直流高压，符合美国NEC 2017快速关断要求（AFCI和RSD快速关断，30s内将直流电压降到30V以下安全保障）。缺点：单瓦成本高（0.5~1.0元/W），适用于户用（欧洲/北美市场为主）。Enphase（美国微型逆变器龙头）全球市场份额高，禾迈/Hoymiles（杭州禾迈股份，中国微型逆变器头部企业，出货量多）。\n关键技术参数：额定输出功率（kW）、最大效率/中国效率（%）、MPPT电压范围（V，典型200~1000V/200~1500V）、MPPT路数和每路输入组串数量、最大直流输入电压（V，组串式1100V/1500V，集中式1500V为大型电站标准DC电压等级）、交流输出制式（三相380V//400V模块支持三相四线或三相三线。（公共电网并网一般采用三相三线制接线））。保护功能：防孤岛保护、极性反接保护、交流过欠压保护、直流过欠压保护、绝缘阻抗检测（IEC 62109标准要求）、漏电流保护。通信：RS485/WiFi/4G/PLC，对接监控云平台。\n选型建议：户用推荐组串式（5~50kW），组件级优化关注级优化器（SolarEdge为代表）/微型逆变器（适用于欧洲/澳洲户用屋顶，复杂屋顶、多朝向的分布式场景特别合适）；工商业推荐组串式（100~350kW）；大型地面电站推荐组串式（175~350kW+多台并联）+ 可选集中式（技术成熟稳定，适用于基础条件良好的平坦场地）。", module:"m5", submodule:"5.1 光伏发电", related:["→ 关联：产品知识库 §9.6 — 华为、阳光电源竞品"] },
+  { id:"2403", title:"风力发电原理", tags:["风电","双馈","直驱"], content:"风力发电将风的动能转换为机械能再转换为电能：风能→叶片旋转→主轴增速/直驱→发电机发电。切入风速3~4m/s（风机开始并网发电的最低风速），额定风速10~15m/s（达到额定功率），切出风速25m/s（保护停机，超过此风速时变桨收桨，叶片顺桨90°以保护风机不受损坏）。\n主流机型：(1)双馈异步发电机（DFIG，Doubly-Fed Induction Generator）——定子直接并网，转子通过背靠背PWM变流器（转子侧变流器RSC+网侧变流器GSC）接入电网（四象限变频器，功率为发电机额定功率的1/3，双向能量流动）。变流器容量小（约机组容量的30%），成本低。转速可调范围±30%同步速，即0.7~1.3pu。齿轮箱升速（低速轴~15rpm→高速轴1500rpm，典型增速比1:100左右）。(2)直驱永磁同步发电机（DD-PMSG，Direct Drive Permanent Magnet Synchronous Generator）——无齿轮箱（风机叶轮直接连接低速永磁同步发电机，发电机极数极多）+全功率变流器。发电机为多极永磁同步机（100~200极，转子外径很大），通过全功率变流器（机组容量100%）并网。全功率变流器电网适应性更好（LVRT高电压穿越/低电压穿越能力更强、全功率范围有功无功解耦控制）。优点：可靠性高（无齿轮箱故障点）、维护成本低、效率高（低速同样保持高效率）；缺点：发电机体积大重量大（永磁材料用量大，成本受稀土价格影响大）、全功率变流器成本高。主流大型机组制造商推荐大容量海上风机用半直驱混合型（中速传动比1:10~30，永磁发电机+一级行星齿轮增速箱，保留了直驱和双驱的双向优势，如金风科技中速永磁（GP21系列/6S平台）。\n海上风电关键设备：(1)海上风电机组——单机容量从3MW发展到8~10MW（海上），16MW已投运，20MW正在研发。海上风机防腐要求C5-M/ CX（IEC 61400标准要求含海上环境高防腐保护），IP防护等级高。(2)海上升压站——汇集海上风电场各风机发出的中压电能（35kV/66kV），升压至220kV/330kV（升压变压器容量可达500MVA）并通过海缆送出。(3)海底电缆——220kV交流XLPE海缆（海上交流送出常用，距离<80km以内），±200kV/±320kV/±525kV柔性直流海缆（远距离海缆输电场景，如海上风电场离岸距离>80~100km时采用柔直送出方案）。\n控制技术：变桨控制（调节叶片攻角控制风能捕获量，叶片通过变桨轴承与轮毂连接，液压变桨或电动变桨执行机构）、偏航控制（机舱自动对风，风速风向仪信号驱动偏航电机带动回转轴承使机舱对准风向）、转矩控制（根据当前风速确定发电机转矩转速最优Cp风能利用系数曲线，在Cp最大曲线下最优追踪风力）。\n风电场接入：大规模风电场需满足GB/T 19963风电场接入电力系统技术规定和国网/南网风电场并网导则要求，具备低电压穿越LVRT（L和H标准型用用风电场在端电压降低不同程度时保证风机不脱网运行的能力曲线）和高电压穿越HVRT能力（高压线故障或机组本身造成的过电压穿越能力）。", module:"m5", submodule:"5.2 风力发电", related:[] },
+  { id:"2404", title:"磷酸铁锂电池储能", tags:["LFP","储能","电池"], content:"磷酸铁锂电池（LiFePO₄，LFP电池）是当前电化学储能电站的主流技术路线（新增储能装机占比>95%），因其高安全性、长循环寿命和低成本优势成为储能领域的首选。\n电化学特性：正极材料为磷酸铁锂（橄榄石结构），负极材料为石墨。标称电压3.2V，工作电压范围2.5~3.65V。能量密度：电芯级140~180Wh/kg（磷酸铁锂电芯能量密度已接近理论极限170~180Wh/kg，系统级需乘以电芯成组效率——pack成组效率约70%~80%，液冷pack+Cells+Busbar等结构配重后系统级能量密度约100~130Wh/kg。（对比三元锂NCM/NCA电芯级200~280Wh/kg））。循环寿命：3000~8000次（100% DOD放电深度，即每次放电到最低允许电压。三元锂典型为2000~3000次。浅充浅放策略会进一步延长电池日历寿命到15~20年，等效储能系统设计寿命预期）。热稳定性好（分解温度>500℃），不易发生热失控（三元锂NCM热失控阈值温度约180℃），安全性显著优于三元锂电池。\n储能系统组成：(1)电池簇——电池模组（每个模组由多只电芯（8~24串/1P8S~1P24S）通过串联+并联方式组成，含CMU电芯级监控单元）+高压盒（含主正继电器、主负继电器、预充继电器和预充电阻、熔断器）+电池管理系统BMU（电池簇管理单元，采集模组电压温度数据，计算SOC/SOH）。电池簇通过直流汇流柜汇流后接入PCS变流器直流侧。(2)电池管理系统BMS——三级架构：①从控/采集板（电芯级电压温度采集、均衡控制（被动均衡，功耗几十mW/节））；②主控（簇级，SOC计算、充放电管理和报警保护、通信上送）；③总控（阵列级，与PCS/EMS通信调度、汇集管理）。BMS核心功能：SOC/SOH估算（卡尔曼滤波/安时积分法+开路电压修正）、过压/欠压/过温/低温/过流保护、均衡管理（被动均衡为主，电流30~120mA）、绝缘监测（直流母线与地之间的绝缘电阻监测，低于规范阈值报警停机）。(3)温控系统——液冷（冷板式/BTU水冷机组，冷却液乙二醇水溶液，温控效果好温差<5℃，是目前10MWh以上储能系统方案的主流，工厂预装液冷管路的液冷pack，减少现场工程量）或风冷（空调直吹/风道，简单但温差较大（>8℃）且散热效率低，主要应用在小功率储能系统）。\n标准规范：GB/T 36276电力储能用锂离子电池、GB/T 36548电化学储能系统接入电网测试规范、GB/T 36558电力系统电化学储能系统通用技术条件。电池运输需满足UN 38.3（锂电池航空/陆路/海运运输安全要求）。", module:"m5", submodule:"5.3 储能技术", related:["→ 关联：产品知识库 §9.3 储能设备"] },
+  { id:"2405", title:"储能PCS变流器", tags:["PCS","储能变流器"], content:"PCS（Power Conversion System，储能变流器）是储能系统的核心设备，作为电池与电网之间的接口（接口在直流侧接入电池柜汇流，交流侧通过并网变压器（隔离变压器/非隔离）接入电网），实现AC/DC双向能量变换和功率控制。\n工作原理：PCS采用IGBT全控器件+VSC电压源型变流器拓扑，双向四象限运行（PWM整流/逆变、功率因数可调）。充电工况：PCS运行于整流模式（电网AC→直流母线DC→电池，PCS控制直流输出电流/电压给电池充电）。放电工况：PCS运行于逆变模式（电池DC→直流母线→电网AC，PCS控制交流侧有功和无功输出）。线路拓扑：AC/DC双向变流器（两电平拓扑，适用低压小功率. 三电平NPC/I型/NPC T型拓扑适合中大功率，提高效率降低输出谐波和du/dt——开关管承受电压为母线电压一半）+ LC/LCL并网滤波器。\n关键控制模式：(1)构网型控制（Grid-forming，GFM）——PCS模拟同步发电机的下垂特性和惯性响应，自建电压幅值和频率参考（电压源特性），主动支撑电网电压和频率。构网型PCS支持离网孤岛运行模式，在黑启动时作为电压源为所在微电网系统建立电压和频率，由零起建立微电网系统电压（类似大型发电机组自启动）。构网型有功/无功功率下垂系数模拟同步发电机外特性P-f/Q-V曲线，参与一次调频和一次调压响应。构网型并网尤其适合高比例可再生能源系统（系统短路容量和惯量均下降，需要构网变流器提供主动支撑、惯性模拟和长时过流能力）。(2)跟网型控制（Grid-following，GFL）——PCS采用锁相环PLL跟踪电网电压相位（电流源特性），快速响应调度AGC或EMS指令调节有功和无功功率（有功调节响应几毫秒~数十毫秒，无功调节响应容量由PCS额定容量和运行点决定）。跟网型PCS输出电流谐波和功率解耦控制性能较好，但弱电网场景下（短路容量比SCR<3），PLL同步性能劣化（容易失锁），在高比例新能源电网中支撑能力受限。\n关键参数：额定功率50~3500kW（模块化并联扩容，功率模块可并联至MW级），直流电压范围DC750~1500V（与电池簇电压匹配，1500Vdc为当前大储主流），响应时间<30ms（有功/无功指令响应，从接到指令到实际输出达到目标值90%的时间），充放电切换时间<100ms（两组不同工况切换，如从100%充电到100%放电的转换时间），效率>97%（含变压器），THDi<3%（高质量电流并网指标）。冷却方式：风冷（中小功率）或液冷（大功率模块/大容量MW级）。\n标准规范：GB/T 34120电化学储能系统储能变流器技术规范、NB/T 42014电化学储能变流器并网性能测试规范。", module:"m5", submodule:"5.3 储能技术", related:["→ 关联：产品知识库 §9.3 储能设备"] },
+  { id:"2406", title:"氢燃料电池", tags:["氢能","燃料电池","PEMFC"], content:"氢燃料电池是将氢气和氧气（空气中的氧气）通过电化学反应直接转化为电能的装置，产物为水，不产生CO₂等碳排放。PEMFC（Proton Exchange Membrane Fuel Cell，质子交换膜燃料电池）是目前技术最成熟、应用最广泛的氢燃料电池类型。\n工作原理：阳极（燃料极）通入氢气H₂，在催化剂（Pt铂/碳载体催化剂层）作用下分解为H⁺质子（通过质子交换膜PEM从阳极传递到阴极）和电子（通过外电路负载流向阴极，电子产生直流电）。阴极（空气极）通入空气，催化剂使氧气O₂与透过膜的H⁺质子以及外电路传递来的电子结合生成水。总反应：2H₂+O₂→2H₂O+电能+热能。燃料电池电堆开路电压约1V（单电池理论开路电压约1.23V），工作电压约0.6~0.8V（根据极化损失：活化极化+欧姆极化+浓差极化下燃料极与空气极之间的电动势偏移）。因此需要将多个单电池串联成电堆达到所需电压等级。\n系统组成：(1)电堆（燃料电池堆）=多个单电池串联（金属双极板/石墨双极板、膜电极组件CCM、气体扩散层GDL、密封件）；(2)空气供应系统（空气压缩机+膨胀器+空气过滤器/空滤+中冷器+加湿器）；(3)氢气供应系统（储氢瓶→减压阀→比例阀→喷射器/引射器→氢气循环泵/排氢阀）；(4)热管理系统（去离子水泵+散热器+节温器+去离子器，PEMFC效率40%~60%，约一半的能量转化为热能需排散）；(5)电力变换DC/DC（将燃料电池输出不稳定的直流电压升压/稳压至母线和逆变系统所需电压电流）+逆变器或其他。\n关键参数：电堆功率密度（kw/L，目前车用电堆约4.0~6.0kW/L），系统效率（40%~60%，LHV低热值效率），寿命（车用5000~30000h，固定式发电站可达60000~80000h），冷启动能力（-30℃低温启动），额定功率系统H₂消耗：1kg氢气可发约15~20kWh电。\n对比其他制氢-储氢-用氢方案：(1)碱性电解水制氢（成熟技术，能耗4.5~5.5kWh/Nm³H₂，设备成本最低——约3000元/kW，效率75%~85%，但碱性电解水不适合与可再生能源随机波动功率直接耦合）；(2)PEM电解水制氢（高电流密度，动态响应快，适应风电光伏的功率快速波动，系统效率70%~80%，设备成本较高约5000~8000元/kW）；(3)固态氧化物电解SOEC（高温电解，效率可达85%以上，仍处于示范和商业化早期）。\n储氢方式：高压气态储氢（35/70MPa IV型碳纤维全缠绕瓶，技术成熟，目前车用主流），低温液态储氢（-253℃液化，体积能量密度为气态高压氢的~2倍，适用于大规模储运和液氢重卡），固态储氢（金属氢化物如镁基/稀土系/钛系储氢材料，安全性好，重量能量密度低，适合固定式储氢和MW级储能调峰场合）。\n标准规范：GB/T 37244质子交换膜燃料电池汽车用氢气、GB/T 34593燃料电池发动机氢气排放测试方法、ISO 19880加氢站通用要求。", module:"m5", submodule:"5.4 氢能与燃料电池", related:[] },
+  { id:"2407", title:"微电网系统", tags:["微电网","EMS","孤岛"], content:"微电网（Microgrid）是由分布式电源（光伏/风电/燃气轮机/柴油发电等）、储能系统、负荷及监控保护装置组成的局域配电网系统，具有并网和离网两种运行模式，能实现自我控制、保护和管理。\n系统组成：(1)分布式电源（DG）——光伏组件阵列（通过逆变器接入交流微电网或通过DC/DC变换器接入直流微电网）+风力发电+柴油发电机（应急备用）+燃气轮机/燃气内燃机（CHP冷热电三联供，能量综合利用率可达70%~90%）。(2)储能系统（ESS）——磷酸铁锂电池PACK+PCS+EMU（储能单元）+超级电容（用于平抑快速功率波动，吸收微秒~秒级高频波动分量配以双向DC/DC变换储能接口）。(3)负荷——重要负荷（一级负荷，由微电网控制器确保供电可靠性）和可切除负荷（三级负荷，离网孤岛且电源出力不足时由微电网能量管理系统执行可控负荷切除）。(4)能量管理系统（MG-EMS，微网能量管理系统）——微电网最核心的决策和管理层。微电网能量管理系统实现发电预测（光伏/风电短期出力预测）、负荷预测、储能优化调度（充电/放电/待机状态及功率分配策略，分时电价套利和需量管理策略）、并/离网切换控制（无缝切换<20ms：并网转离网/离网转并网，要求并网断路器重合闸时刻确认同期条件，以防非同期合闸造成冲击）、功率平衡控制（实时动态平衡DG出力+储能出力+可调负荷与用能需求的平衡）。控制策略：主从控制（一台主力储能PCS做主控下垂控制R=V模式，其他DG和储能从功率指令P/Q指令，并离网状态下控制模式切换处理），对等控制（下垂控制，多台PCS自主协同，无需互联通信依赖本地信息的有功-频率/无功-电压下垂曲线分配功率）。\n运行模式：(1)并网运行——微电网与公共电网连接，从电网购电或余电上网。储能系统一般采用削峰填谷策略（充电：谷时段从电网充电（低谷电价），放电：高峰时段放电（峰时高电价），通过峰谷套利回收投资。需量管理也是微电网储能PCS的另一种收益模式：控制器监测变压器功率，投入储能系统放电削减用电需求的总峰值需量，节省基本电费）。(2)离网孤岛运行——当公共电网故障或因计划孤岛检修任务，微电网与公共电网断开连接，由微电网内部分布式电源和储能系统自给自足供电。无缝切换是关键技术要求（微电网从并网模式切换到离网模式的瞬间暂态双模式切换：并网模式下PCS一般是跟网型电流控制，离网模式下PCS需要切换为构网型电压控制转离网模式建立电压参考，切换时间<20ms保证了负荷不会因模式切换而短时断电）。(3)并离网切换——从并网（大电网支撑）变为离网（微电网自己构建）的无缝切换，要求快速且负载不中断供电。\n保护与控制：微电网需配置反孤岛保护（并网模式下，电网失电时自动或受控检测断开并网连接点，满足安全要求）、低频/低压减载、并网同期检测。通信协议：支持IEC 61850/IEC 104/Modbus等电力标准。\n标准规范：GB/T 38995微电网接入电力系统技术要求、GB/T 36270微电网监控系统技术规范、NB/T 10135微电网规划设计导则。国内微电网示范：珠海东澳岛兆瓦级智能微电网、新疆吐鲁番新能源微电网、西藏阿里地区微电网光储柴项目等。", module:"m5", submodule:"5.5 微电网", related:[] },
+  { id:"2408", title:"双碳目标与新型电力系统", tags:["双碳","新型电力系统"], content:"双碳目标是中国对全球气候治理作出的庄严承诺：2030年前实现碳达峰（二氧化碳排放量达到历史最高值后进入持续下降通道），2060年前实现碳中和（人为排放的二氧化碳与通过植树造林、碳捕集封存CCS/碳捕集利用与封存CCUS等技术吸收的二氧化碳相抵消）。\n新型电力系统是双碳目标的核心支撑，以新能源为主体，具有如下特征：\n(1)高比例新能源——风电、光伏装机将占总装机的80%以上（2030年风光总装机超12亿kW，新能源发电量占比将超过20%、2060年新能源电量渗透率超过60%以上甚至更高水平），新能源成为主力电源。电源结构从可控的化石能源（煤电、气电、核电、水电）转变为间歇性强的新能源（光伏和风电出力主要取决于天气——不同时间和季节的随机性、间歇性和波动性，日周期内光伏在无光照时段出力为零）。\n(2)高比例电力电子——传统电力系统中同步发电机（惯性大，固有旋转惯量为系统提供频率支撑，短路容量大，抗电网扰动强）与新电力系统中新能源通过变流器并网（电力电子接口，缺乏惯性支撑、短路容量小——SCR短路比下降、弱电网特性显著——由此带来频率稳定和宽频振荡等问题），电力电子设备占比从当前的约10%上升到未来可能的70%以上。带来的核心问题：系统惯量下降（频率调节能力变弱）；宽频振荡风险（次同步振荡/超同步振荡）；电压支撑能力不足（短路容量下降带来的暂态过电压风险）。构网型技术（Grid-forming Converter）是解决方向。\n(3)源网荷储互动——传统电力“源随荷动”（发电侧跟随用电负荷实时变化）模式转变为“源网荷储协同互动”模式：电源侧（各类电源协调互补）、电网侧（特高压骨干网架+智能配电网）、负荷侧（用户参与需求响应，电动车V2G反向送电，工商业用户响应实时电价）、储能侧（抽水蓄能+电化学储能多时间尺度协调，发挥削峰填谷/一次调频/二次调频/事故应急备用等功能）。\n(4)电力市场改革——中长期市场+现货市场+辅助服务市场（调频/调峰/备用/黑启动）。储能、需求响应、虚拟电厂参与市场交易。绿证和碳交易市场协同。\n关键路径：水电（西南水电基地开发，截至截至2023年约4.2亿kW，2035年有望达到4.7亿kW以上）、风电（三北风电基地+海上风电）、光伏（沙漠戈壁荒漠大基地+整县推进户用+工商业分布式）、储能（抽水蓄能14亿kW规划+新型储能各技术路线并重，新型储能指除抽水蓄能以外的新型电化学储能/压缩空气/飞轮等新型储能）；终端用能电气化（电动汽车（到2030年新能源汽车渗透率将超过60%以上）、电采暖、工业电窑炉）、氢能（绿氢替代灰氢，在工业脱碳和储运领域发挥重要作用）。\n标准参考：国务院《2030年前碳达峰行动方案》（国发〔2021〕23号）、国家发改委/国家能源局《关于加快建设全国统一电力市场体系的指导意见》（发改体改〔2022〕118号）、《新型电力系统发展蓝皮书》（国家能源局2023年6月发布）。", module:"m5", submodule:"5.6 双碳政策", related:[] },
+
+  // ===== m6: 电能质量治理 =====
+  { id:"2501", title:"电能质量指标", tags:["电能质量","THD","谐波"], content:"电能质量是电力系统的重要技术指标，直接关系到用电设备的正常工作和系统的安全经济运行。\n主要指标：(1)电压偏差——实际运行电压与额定电压的差值百分比。GB/T 12325规定：35kV及以上±5%，10kV及以下±7%，低压220V +7%/-10%。(2)频率偏差——GB/T 15945规定正常允许±0.2Hz（小容量系统±0.5Hz）。频率偏差反映了系统有功功率的总体平衡关系（有功不足→频率下降，有功过剩→频率上升）。(3)谐波/间谐波——电压/电流波形畸变的程度，用THD（Total Harmonic Distortion，总谐波畸变率）衡量。GB/T 14549规定：0.38kV电压THD≤5%，6~10kV≤4%，35~66kV≤3%，110kV及以上≤2%。奇次谐波3~19次按次数依次递减幅值限值，偶次谐波限值取相邻奇次谐波限值的50%。(4)三相不平衡——用负序/零序电压电流与正序分量的百分比衡量。GB/T 15543规定：电网负序电压不平衡度≤2%，短时≤4%。(5)电压波动与闪变——GB/T 12326规定：电压变动频度r≤1000次/h时，变动限值0.5~4.0%（按频度分挡递减）。闪变Pst（短时闪变严酷度）≤1.0，Plt（长时闪变严酷度）≤0.8。(6)暂态过电压及操作过电压、雷电过电压、暂时过电压谐振过电压等，与电力系统绝缘配合密切相关。\n监测手段：电能质量在线监测装置（固定安装在重要枢纽变电站、大容量非线性用户接入点PCC、新能源并网点等典型监测点），手持式分析仪（Fluke 435/437等，用于现场单点排查和故障录波分析）。\n标准体系：GB/T 14549公用电网谐波、GB/T 15543三相电压不平衡、GB/T 12326电压波动和闪变、GB/T 15945电力系统频率偏差、GB/T 18481暂时过电压和瞬态过电压。IEC 61000系列电磁兼容（EMC）标准，包含辐射/传导发射和抗扰度等级类别。", module:"m6", submodule:"6.1 问题分类", related:["→ 关联：规范与标准 — GB/T 14549"] },
+  { id:"2502", title:"无功补偿原理", tags:["无功补偿","功率因数","SVG"], content:"无功补偿是电能质量治理的基础手段，用于补偿电力系统中的感性无功功率（主要由变压器、异步电动机、电感器等感性负载消耗），提高功率因数、降低线路损耗、改善电压质量。\n补偿原理：(1)并联电容器——产生容性无功功率（Q_C=U²/XC=ωCU²正比于电压平方，当电压降低时无功输出以平方关系快速减小导致无功输出不足），补偿感性负载的滞后无功，提高cosφ。结构简单、投资低，但补偿容量随电压降低而平方降低（电压无功调节特性呈负调压效应）。(2)自动投切电容器组——接触器或晶闸管开关自动分组投切电容器，根据无功需求（功率因数/无功功率检测）自动投切不同容量组合的电容器组，解决固定电容器欠补偿或过补偿问题。响应时间秒级（接触器投切分组），可控硅晶闸管开关投切可实现20ms~40ms级快速过零投切无涌流。(3)SVG（静止无功发生器）——基于IGBT电压源型变流器VSC，通过PWM调制产生与系统同步的电压或电流，动态发出容性或感性无功电流，连续平滑调节。响应时间≤5ms。\n功率因数标准：电力用户功率因数≥0.9（根据《功率因数调整电费办法》，0.9为基准功率因数值，即一般工业用户。高压供电工业用户要求cosφ≥0.9，大用户（160kVA以上高压供电）功率因数标准执行0.9；100kVA及以上其他用户cosφ≥0.85；农业用户≥0.80）。当cosφ低于此标准时供电公司加收力率调整电费。\n补偿容量计算：Q_c=P×(tanφ₁−tanφ₂)，其中P为有功功率，φ₁为补偿前功率因数角，φ₂为补偿后目标功率因数角。实际工程设计时按变压器容量的20%~40%粗略估算配置电容器补偿容量。\n串联电抗器配置：为防止5次/7次及以上谐波谐振放大，电容器回路需串联一定电抗率（6%电抗器主要抑制5次7次及以上谐波谐振放大、7%及以上电抗器抑制3次谐波谐振放大，13%电抗率全滤除高次但整体造价高系统应用较少）。电容器支路与系统感抗形成的并联谐振频率需避开电网主要谐波次数。", module:"m6", submodule:"6.2 无功补偿", related:[] },
+  { id:"2503", title:"SVG静止无功发生器", tags:["SVG","VSC","动态补偿"], content:"SVG（Static Var Generator，静止无功发生器）是基于电压源型变流器（VSC，Voltage Source Converter）的先进动态无功补偿装置，可快速连续发出容性或感性无功功率。相比传统的SVC（晶闸管控制电抗器TCR+晶闸管投切电容器TSC组合型），SVG在响应速度、补偿范围、谐波特性等方面有显著优势。\n工作原理：SVG通过IGBT全控器件＋PWM调制，使VSC输出与系统电压同频的交流电压（或电流），通过改变输出电压的幅值和相位（相对系统电压），调节SVG与系统之间交换的无功功率。输出电压幅值<系统电压→吸收感性无功（相当于电感器）；输出电压幅值>系统电压→发出容性无功（相当于电容器）。SVG采用电流直接控制或电压间接控制策略，电流内环+电压外环双闭环控制。\n主要拓扑：(1)低压SVG——两电平VSC（380V/690V）或三电平NPC/飞跨电容VSC（690V），并联多重化提高容量，容量±50kVar~±2Mvar，台式或机架式安装。(2)高压SVG——链式H桥级联（Cascaded H-Bridge，CHB）多电平VSC：每相由N个H桥功率单元（IGBT模块+直流电容）串联形成6~10kV/10~35kV直连。MMC模块化多电平换流器也是中高压SVG采用拓扑，适用于±1~±300Mvar容量范围、6kV/10kV/35kV电压等级，适应大型轧钢电弧炉/新能源场站等快速大容量无功补偿需求。SVG同时具备有源滤波APF部分功能（可滤除一定比例的谐波电流），是综合电能质量治理设备。\n性能对比SVC：项目SVG（静止无功发生器）——SVC（静止无功补偿器TCR+FC/TSC）。响应时间：SVG ≤5ms（一个周波以内可完成调节），SVC 10~30ms（晶闸管触发延迟+半个周波过零闭锁自然换相）。谐波特性：SVG 自身产生的谐波很小（多电平PWM，输出谐波少，THD<3%），SVC TCR过程中产生大量3/5/7次谐波需配置相应次数滤波器组。调节范围：SVG 从容性额定到感性额定连续平滑补偿（正反双向额定无功均可稳定输出，无级差），SVC 感性补偿依赖TCR（需配合FC提供的固定容性容量使用），调节范围受晶闸管限制有一定盲区。占地面积：SVG 约为SVC的1/3~1/2。\n工程应用：新能源（风电/光伏）场站并网点AVC无功调节（电压-无功综合控制响应满足并网要求，快速跟踪AVC主站下发的电压或无功指令），大型工业（电弧炉/轧机/提升机等快速冲击性负荷的电压波动和闪变抑制），城市电网变电站（动态无功支撑，兼顾提高功率因数、降低线损和改善稳态电压质量）。", module:"m6", submodule:"6.2 无功补偿", related:["→ 关联：产品知识库 §9.5 电能质量设备"] },
+  { id:"2504", title:"谐波源识别", tags:["谐波源","6脉波","特征次谐波"], content:"谐波源是电力系统中产生非正弦电流/电压波形的设备或负载。识别各类谐波源的特征和谐波频次分布，是谐波治理方案设计（滤波器选型配置、有源补偿装置容量确定）的前提。\n主要谐波源类型和特征次谐波：(1)变频器VFD——6脉波变频器（通用低压变频器标准内置三相桥式不可控整流或PWM整流）产生特征次谐波6k±1（即5、7、11、13、17、19...次），5次谐波电流含量最大（约基波的33%理论值），7次次之（理论14%）。12脉波变频器（12脉波整流由两个6脉波整流桥串联或并联构成，整流变压器需有两组移相30°二次绕组），特征谐波为12k±1（即11、13、23、25...次），谐波含量显著降低（可降至6脉波的10%~15%）。变频器产生的谐波与负载率也有关系（轻载时谐波畸变往往恶化（相对基波占比）。变频器输入电流THD（总谐波失真）：不加电抗器→THDi约80%~120%（6脉波）；加3%交流电抗器→THDi降至30%~40%；加直流电抗器+交流电抗器→THDi可降至25%~30%；加有源前端AFE整流（IGBT PWM整流器）→THDi<5%。\n(2)整流器/直流电源——各工业直流电源（电镀电解、充电桩）、UPS不间断电源输入整流器。6脉波或12脉波三相桥式整流，特征谐波与变频器相同。单相整流器（电视机/办公设备、小功率开关电源）产生3次谐波为主，3次谐波在N线上叠加会显著增加N线电流（可能超过相线电流导致N线过热，GB 50054要求N线截面与相线相同或采取其他滤波措施）。(3)电弧炉EAF——电弧炉在熔化期（废钢熔化）会产生极不稳定的谐波（2~7次全范围均有较大的谐波电流，偶次谐波和间谐波丰富（与其他谐波源的不同）、伴随剧烈的电压波动和闪变（0.5~10Hz的电压调制变化）和三相不平衡（电极升降和电弧电阻不均匀、废钢塌料造成的电极短路）。电弧炉是电能质量污染最严重的工业负载之一，需配置SVC或SVG+FC固定滤波器综合治理。(4)UPS不间断电源——在线双变换UPS的输入整流器（6/12脉波晶闸管或IGBT整流），产生谐波同变频器/整流器。现代UPS采用IGBT PWM整流器（输入功率因数接近1，输入THDi<5%），几乎不产生谐波（高效率在线双变换UPS基本上都配备了IGBT整流方案谐波含量都很小)。(5)焊接机/中频炉/感应加热等——根据具体拓扑和工作频段产生不同频次的谐波和间谐波。中频炉（工作频率150~2500Hz不等）产生供电频率+工件中频频率的间谐波成分。(6)光伏逆变器并网——逆变器SPWM调制高频（3~20kHz）开关输出，大部分谐波被LCL滤波器滤除，对3~50次电网谐波影响很小；但逆变器输出直流分量需小于0.5%（注入电网的直流分量使配变半波饱和产生严重谐波），以及弱电网阻抗相互作用导致高频谐振可能恶化背景谐波。\n谐波影响：电流谐波在线路上产生谐波压降，导致电压波形畸变→电容器过载（谐波电流加速电容器过载发热，可能引起鼓包漏液着火爆炸，谐波谐振情况下放大更危险）；变压器谐波附加损耗、发热增加；电机谐波转矩降功发热；继电保护误动/拒动；通信干扰（电力线谐波对邻近通信线路的电磁感应干扰）；电能表计量误差。\n谐波源定位：采用电能质量分析仪（Fluke 435或类似高精度三相电能质量分析仪）在PCC点（公共连接点）测量电压/电流波形、谐波频谱、功率方向，参考GB/T 14549和IEC 61000-4-7谐波测量指导书。", module:"m6", submodule:"6.3 谐波治理", related:["→ 关联：电气自动化 §3.2 变频器"] },
+  { id:"2505", title:"有源电力滤波器APF", tags:["APF","有源滤波","谐波治理"], content:"APF（Active Power Filter，有源电力滤波器）实时检测电力系统中的谐波电流，产生与负载谐波电流大小相等、方向相反的补偿电流注入电网，实现谐波电流的动态实时抵消，达到滤波的目的。\n工作原理：APF通过电流互感器CT检测负载电流→DSP/FPGA实时计算谐波和无功分量（基于瞬时有功无功理论pq法、同步坐标系d-q法或FFT快速傅里叶变换提取谐波指令电流）→采用PWM调制控制IGBT逆变器输出与谐波指令电流极性相反的补偿电流注入电网→电网侧电流被补偿后恢复为标准正弦波。控制策略：开环（检测LOAD电流计算谐波指令）+闭环（同时检测补偿后的电网电流作为反馈校正，实现精确谐波补偿）。\n功率电路拓扑：三相四线制（三桥臂split电容+第四桥臂/△/Y形变压器或四桥臂四桥臂拓扑三种方案，三电平NPC优于两电平用于低压APF），电压等级380V/400V/480V，容量50~600A（单机），模块化可并联至3000A+。三电平NPC型APF比两电平输出波形谐波小（等效输出波形为多电平，谐波含量低、du/dt小、损耗小），效率更高。\n补偿能力：(1)谐波补偿——2~50次谐波（范围可设，特定次数或全频谱），单次谐波补偿率≥95%，电网THDi降至5%以下（根据补偿容量和背景谐波设定根据负载谐波电流大小匹配APF容量）。(2)无功补偿——APF在额定容量范围内可同时补偿谐波和无功（无功补偿量为有功以外的视在剩余容量），功率因数可调至0.99。(3)三相不平衡补偿——三相负载不平衡时通过控制APF输出对应不平衡电流，治理三相的不平衡度。APF补偿响应速度<10ms（瞬时值电流控制，一个工频周波内达到稳态补偿效果）。\n应用场景：(1)数据中心UPS输入谐波治理——UPS采用6/12脉冲整流器时输入谐波远大于THDi限值，APF治理UPS及IT设备谐波、消除N线三次谐波过流过热。(2)工业变频器集中治理——变频器集中使用场所（纺织/化纤/钢铁/制药/暖通空调）谐波集中，APF集中治理或就地补偿（变频器输入端注入），将THDi从30%~80%降至5%以下。(3)医疗设备谐波——CT机/MRI/加速器等大型医疗设备（因为设备内部有高频大功率开关电源/脉冲电源等）间歇冲击谐波（APF快速跟随补偿，避免谐波对其他精密医疗仪器（如心电仪、监护仪）的干扰。(4)商业建筑/大型商场——LED大屏、电梯、变频空调、UPS、调光设备的大量使用导致谐波叠加，建筑总进线处安装APF或分配电柜分散治理。\n标准规范：GB/T 14549公用电网谐波限值、GB/T 37408有源电力滤波器技术规范、IEC 61000-3-2/3-4谐波电流发射限值（低压供电系统）。", module:"m6", submodule:"6.3 谐波治理", related:["→ 关联：产品知识库 §9.5 电能质量设备"] },
+  { id:"2506", title:"低电压治理措施", tags:["低电压","调压","串补"], content:"低电压（末端电压偏低）是中低压配电网的常见电能质量问题，主要表现为用户端电压长期低于额定电压的-10%（GB/T 12325规定：220V用户电压允许偏差+7%/-10%）。农村电网、偏远山区、长距离供电线路末端的季节性负荷高峰电压问题尤其突出。\n治理措施：(1)加强无功补偿——在配变低压侧或线路中途安装并联电容器组（自动投切型），补偿无功电流减少线路无功传输产生的电压降ΔU≈(PR+QX)/U。根据线路参数和负荷情况确定无功补偿容量及安装位置。线路适当位置加装杆上无功补偿装置（电容器完全自动投切型）。\n(2)线路改造——增大导线截面（减小R和X）、缩短供电半径（优化配网网架结构，增设变电站布点或变压器布点）、加装线路调压器（自动感应调压器/有载调压器/串联补偿调压器）。(3)变压器调压——变电站主变有载调压分接头（通过OLTC自动或手动调节变压器高压侧抽头改变配网侧电压等级比例），配电变压器无载调压分接头（停电状态下调整变压器变比，每年在冬/夏最大负荷季之前根据电压监测数据季节性调整，调整量±2×2.5%或±4×2.5%）。\n(4)串联补偿装置（串补/线路补偿）——在线路上串入电容器（将线路中串联电容器以降低线路感抗，提高X/R比，利用线路感抗进行容性补偿抵消部分线路感抗），缩短线路等效电气距离，降低电压损耗。与并联补偿不同的是，串补无功补偿量与负荷电流平方成正比（即负荷电流升高→串补补偿量自动能力增高→自适应调压效果好），对末端电压提升作用明显，适合长距离配网线路。串补装置含电容器组+保护用氧化锌避雷器MOV+旁路开关+阻尼装置（限制故障下过电流冲击）。(5)分布式电源接入——光伏/储能接入配电网为用户提供自用电源，降低从电网吸收的有功功率和线路电流（不消耗线路有功传输容量），从而减少线路压降。\n低电压判别：按照GB/T 12325，低压用户电压低于198V（220V-10%），中压10kV用户低于9.3kV（10kV-7%）即判定为低电压。农村电网低电压台区（变压器低压侧出口母线/台区总表处电压低，反映来线电压偏低或多台区共用长距离母线供电等背景原因）按高损耗台区和单相供电等按类型评估改善。\n排查流程：电能质量在线监测系统或人工测量→确认用户端电压有效值低于限值→分析统计出现低电压的时长和频次→判断是系统/线路/变压器的原因还是用户内线的原因→制定改造方案。", module:"m6", submodule:"6.4 低电压治理", related:[] },
+  { id:"2507", title:"有载调压变压器", tags:["OLTC","有载调压"], content:"OLTC（On-Load Tap Changer，有载调压分接开关）是变电站和配电系统中重要的电压调整设备，可在变压器带负荷状态下（无需停电切换分接头）自动或手动切换变压器高压绕组的分接头位置，改变变比以调节低压侧输出电压。\n工作原理：变压器高压绕组设有若干个抽头（分接位（抽头位置）），每个抽头对应不同匝数的绕组段。有载调压开关在切换分头时采用过渡电路（电抗式或电阻式），通过主触头和辅助触投触头配合，在切换瞬间在两个相邻分接头之间接入过渡电阻或过渡电抗以限制环流、电弧和过渡过程，实现不断电平滑切换。电阻式OLTC使用最广泛，过渡电阻限制切换过程中的循环电流宽度。\n分接范围：标准分接范围±8×1.25%（共17档，对应调压范围±10%，第9档为额定档位，满档位可上升/下降各8级调整电压），每档调节电压约1.25%。也有±9×1.67%和±6×2.5%等非常用规格的调压变压器。\nOLTC类型：(1)真空管有载分接开关——切换开关和分接选择器浸泡在变压器油（绝缘和灭弧的油介质）中，真空灭弧室控制切换过程电弧电弧，无油中电弧产物，维护工作量低，是目前新装变压器的主流开关方案。(2)油中有载分接开关——传统油浸式OLTC（过渡电阻在切换过程中在在绝缘油中产生电弧并分解油质，需定期过滤或更换绝缘油），逐步被真空管型替代。\n控制方式：(1)自动电压调节AVR（Automatic Voltage Regulator）——控制器检测变压器低压侧母线电压的瞬时值/时间积分值与目标电压设定值比较判据，经延时（如20~60s防抖和机构动作时间）后向OLTC电动机机构（DCM电动机构）发出升/降指令。（2）并联运行控制——多台变压器并列运行时，OLTC调压需同步控制（主从控制模式或自动均衡控制器分配Q环流补偿或电压无功综合控制VQC根据9区图/17区图/动态分区图逻辑实现变电站电压无功自动控制：在电压和功率因数（或无功）二维坐标平面内分区域以延时投切电容器组分接头升降归入下限区域类逐项对应动作）。\n应用：变电站主变有载调压（所有110kV及以上变压器基本都配置有载调压装置，35kV变电站随升压增容逐步推广有载调压）；配电线路调压器（在10kV长线路中段安装线路调压器，含自耦变压器+OLTC自动调压，串联在线路中，自动感应调压可补偿线路末端电压，调压范围通常±10%）。\n标准：GB/T 1094变压器，GB/T 10230分接开关、DL/T 574有载分接开关运行维修导则。", module:"m6", submodule:"6.5 调压设备", related:["→ 关联：工业电气成套 §7.2 配电变压器"] },
+  { id:"2508", title:"柔性直流输电", tags:["柔直","VSC-HVDC","MMC"], content:"柔性直流输电（VSC-HVDC，Voltage Source Converter based High Voltage Direct Current，基于电压源型换流器的高压直流输电）是新一代直流输电技术，相比传统基于晶闸管的LCC-HVDC（电网换相换流器型直流输电，LCC电流源型逆变器+晶闸管换流阀，运行中依赖交流电网的短路容量换相），VSC-HVDC具有独立控制有功/无功、无需交流侧提供换相电压（可向无源网络供电）、谐波水平低等显著优势。\n核心换流器拓扑——MMC（Modular Multilevel Converter，模块化多电平换流器）：每相由上、下两个桥臂组成，每个桥臂由N个半桥或全桥子模块（SM，Submodule）串联而成。半桥子模块（HB，Half-Bridge Sub-module）：两个IGBT（V1/V2）+一个直流电容。通过V1和V2的开关配合，子模块可输出0（V2导通、V1关断）或U_c（电容电压，V1导通、V2关断）两种状态，损耗较小，但不能清除直流故障电流（直流侧短路时，避雷器灭弧或跳交流开关清除故障）。全桥子模块（FB，Full-Bridge Sub-module）：四个IGBT+一个直流电容，可输出−U_c / 0 / +U_c三种状态（利用逆电压输出能力清熄直流故障关断IGBT封锁直流故障电流），适用于直流电网和架空线场合（对直流故障清除能力有高要求）。每个桥臂子模块数N（几十一百级），可输出非常逼近正弦波的阶梯波，谐波含量极低，几乎无需滤波器。\nMMC-HVDC关键特性：(1)有功/无功独立解耦控制（d-q坐标系下电流内环+功率外环双闭环控制，P有功/无功/Q可四象限运行；(2)可为无源网络供电（PCC点电压由换流器独立建立，不依赖交流电网同步）；(3)换流站占地面积小（≈LCC-HVDC的一半）；(4)模块化设计（子模块为标准化功率单元，冗余设计寿命周期内不更换主回路功率模块损坏后可用现场备用模块替换，备用率为5%~10%）；(5)具备黑启动能力。\n工程应用：(1)海上风电柔性直流送出——远海风电场（离岸80km以上）采用柔直送出方案比交流海缆方案经济性更优。风场交流汇集→海上换流站（升压+整流至直流）→直流海缆（±200/±320/±525kV）→陆上换流站（逆变+降压并入主网）。国内工程：如东海上风电柔直工程、青洲海上风电柔直外送工程。\n(2)异步联网——LCC-HVDC传统直流已经用于长距离、大容量异步联网（背靠背、远距离）。VSC-HVDC的优势是互联两个不同步或不同频率的交流网络，潮流控制灵活，可快速双向功率调节，互不干扰。如南方电网鲁西背靠背柔性直流工程（云南主网与广西电网异步互联）。欧洲：INELFE（法国-西班牙间VSC-HVDC联络）。\n(3)城市配网柔性互联——柔直背靠背装置位于城市不同变电站、分区负荷之间的柔性互联，基于MMC，替代传统联络开关，实现多条馈线负荷的动态分配和N-1转供。正常工况下柔直互联装置可灵活调节两段母线间的交换功率，实现负载均衡；故障时互联侧快速支援备用变压器短时转供，实现备自投功能。\n标准：GB/T 30553高压直流输电系统用电压源型换流器、IEC 62747高压直流输电（HVDC）用电压源换流器（VSC）术语德。", module:"m6", submodule:"6.6 柔性直流", related:["→ 关联：新能源与储能 — 海上风电送出"] },
+  { id:"3007", title:"特高压工程案例", tags:["特高压直流","案例"], content:"昌吉-古泉±1100kV特高压直流工程——目前世界上电压等级最高、输送容量最大、输送距离最远的特高压直流输电工程。起于新疆昌吉换流站，止于安徽古泉换流站（±1100kV/10GW/3324km）。2020年建成投运，由中国国家电网公司建设运营。直流线路全长3324km，输送容量1200万kW（约相当于6个百万千瓦级核电基地）。接入±1100kV高端换流变压器+6英寸晶闸管/8000A/8500V的大功率晶闸管（电触发）换流阀。国内±1100kV特高压直流换流变压器和阀厅采用GIS套管+户外直流场户外场+滤波器组。\n酒泉-湖南±800kV特高压直流——输送容量800万kW，线路长度2383km，将西部绿电（酒泉风电+光伏+火电打捆外送）输送至湖南负荷中心。\n巴西美丽山±800kV特高压直流——国家电网公司海外投资和总承包的特高压输电项目。美丽山二期（2019年投入商业运行）将亚马逊河流域水电能源输送到里约热内卢负荷中心，输送容量400万千瓦（二期最终容量），线路长度2538km。\n白鹤滩-江苏±800kV特高压直流工程——世界首个混合级联特高压直流工程：送端白鹤滩换流站（LCC常规直流）—受端江苏换流站（VSC柔直）+分层接入（接入500kV/220kV交流电网），输送容量800万kW。这一LCC+MMC混合级联方案兼具常规直流大容量容量经济性（送端LCC换流站成本低）和受端柔直灵活控制（受端MMC换流器可实现黑启动/孤岛接入/动态无功支撑）两点优势，是特高压直流技术的重要创新。\n标准：GB/T 24841±800kV特高压直流换流站设计导则、DL/T 1786特高压直流工程系统设计内容深度规定。", module:"m6", submodule:"6.7 工程案例库", related:["→ 关联：产品知识库 §9.1 高压开关产品"] },
+  { id:"3008", title:"智能变电站工程案例", tags:["智能站","IEC61850"], content:"智能变电站是智能电网的重要节点，全站采用IEC 61850标准实现信息统一建模、网络化通信、智能化设备与高级应用。智能变电站典型三层两网架构：\n三层：(1)过程层——电子式互感器（ECT/EVT）、智能终端（合并单元+智能终端实现一次设备数字化采集、控制输出——传统互感器也可通过合并单元实现常规互感器+合并单元模式接入过程层）、智能开关设备（隔离/接地/断路器配置智能终端）。(2)间隔层——保护装置、测控装置、故障录波、电能表等二次设备。实现对应间隔的保护测控和对一次设备开关的发信跳合闸。(3)站控层——监控系统主机、远动通信装置、PMU同步相量测量装置、GPS对时、时间同步、五防工作站、保护信息子站网关、数据服务器、操作员工作站。\n两网：(1)GOOSE网络（Generic Object-Oriented Substation Event，通用面向对象变电站事件）——传输跳闸合闸信号、联闭锁信号、间隔联动、变压器挡位等一次设备状态量信号；采用多播发布/订阅通信机制（跳闸命令延时<3ms）；(2)SV网络（Sampled Value，采样值）——传输电子式互感器采集的电流电压数字采样值。采样率80点/周波（25Hz及工频50Hz四倍频谐波）用于保护控制，256点/周波用于电能质量分析。SMV9-2LE（标准采样值格式）的光纤以太网。\n工程示例：浙江金华500kV芝堰智能变电站（国家电网首批新一代智能变电站扩大示范工程），采用全站IEC 61850 Ed2.0，间隔层保护测控一体化装置，过程层合并单元+智能终端就地安装（下放到开关场智能汇控柜），全站光纤替代传统电缆（减少电缆90%）。重庆合川220kV智能变电站（国家电网新一代智能变电站试点），采用预制舱式二次组合设备，工厂化调试缩短现场施工周期。\n标准：GB/T 30155智能变电站技术导则、DL/T 860变电站通信网络和系统（IEC 61850 IDT）、Q/GDW 11156智能变电站继电保护技术规范（国网企标，含合并单元智能终端和继保接口规范）。", module:"m6", submodule:"6.7 工程案例库", related:["→ 关联：规范与标准 §8.4 — IEC 61850"] },
+  { id:"3009", title:"大型储能电站案例", tags:["储能电站","液冷"], content:"大型储能电站（电化学储能电站）是新型电力系统灵活调节能力的重要支撑，调峰填谷和一次调频是主要收益来源。\n典型案例一：某省网侧200MW/400MWh磷酸铁锂储能电站——容量200MW/400MWh（充放电2h，时长是当前配储标准主流时长），采用LFP电池+液冷温控技术，35kV并网接入110kV变电站。储能系统由电池预制舱（20尺或40尺。标准20尺预制舱约2.5~5MWh容量，本案例共约80~160台20尺标准预制舱+PCS升压一体化箱变（100kW~3.45MW功率等级）+35kV储能升压变压器系统组成。PCS采用1500Vdc方案（直流侧母线电压提升至1500V，电流在容量不变时降低为原来750Vdc方案的50%，线缆和开关电气损耗降低，功率密度提升30%以上）。液冷温控系统：电池簇液冷板与BTU（电池热管理机组）水泵循环接口连接，冷却液（乙二醇水溶液）流过液冷板将电芯热量带走，冷却液比热容高，散热效率高、电池间温差<3℃、功耗比风冷降低约30%~40%。\n运营模式：(1)调峰（两充两放：早晚高峰放电，午间和深夜充电，峰谷价差×充放电电量×系统效率≈收入）。(2)一次调频/二次调频（储能可响应AGC调度指令，储能电站以毫秒级~秒级响应参与调频市场，比火电机组响应速度快、调节精度高——调频补偿标准高的电力市场辅助服务收益可观)。（3）容量租赁（储能容量租赁给新能源场站完成强制配储要求，获得固定租赁收益）。(4)备用容量（有偿旋转备用市场）。\n当前全国各省均出台新能源配储（10~20%/2h）政策要求，各地储能电站建设进入快速扩张期，注意PCS变流器的构网型支撑功能、电池簇级管理BMS架构以及EMS系统统一监控。\n标准：GB/T 36276电力储能用锂离子电池、GB/T 36548电化学储能系统接入电网测试规范、GB/T 36558储能系统通用技术条件、GB 51048电化学储能电站设计规范。\n安全和消防：储能预制舱舱间防火间距/防火墙要求、电池模块OSB+灭弧探针+全氟己酮/水喷雾/气溶胶消防方案、消防主机与BMS联动监控热失控早期预警信号（温度/烟感/VOC/气溶胶复合探测）。", module:"m6", submodule:"6.7 工程案例库", related:["→ 关联：新能源与储能 §5.3 储能技术"] },
+  { id:"3010", title:"工业园区配网项目", tags:["配网自动化","FA"], content:"工业园区配网项目通常以提升供电可靠性和实现配电自动化（DA，Distribution Automation）为主要建设目标，特别关注配电自动化的馈线自动化FA（Feeder Automation）功能。\n典型配置：(1)配电室/开关站10kV一次网络环网化改造——采用环网柜（SF6绝缘/固体绝缘环网柜，负荷开关+熔断器组合柜，体积小/绝缘好/免维护/分断能力高）实现双电源供电或手拉手环网供电。每个配电室/开关站设置两路进线，正常情况下开环运行（联络开关断开，通过线路保护和备自投功能实现故障自愈切换）；当一路电源失电时，母联备自投自动闭合或由配网自动化系统自动转供操作。(2)配电自动化终端配置——在各配电室/环网柜/柱上开关安装DTU（开闭所终端单元，采集多个回路的模拟量和状态量，并可对一个开闭所的多个间隔进行就地/遥控操作）/FTU（馈线终端单元，安装于柱上开关/分段开关，采集本条线路的电压电流并就地遥控分合闸带重合功能，支持就地FA出口和通信主站遥控需求）/TTU（配变监测终端，配电台区变压器电气量采集和运行工况监测）。(3)配电自动化主站/子站——主站调度端（调配一体化主站系统，含SCADA/FA/GIS/PMS/DMS等高级应用功能，通常主站在地市供电局配调中心）；子站或终端利用光纤以太网（自愈环网）或5G无线专网等通信介质传输。\n馈线自动化FA功能——当配电网发生故障（瞬时性或永久性故障）时：(1)就地型FA：通过馈线终端FTU之间彼此配合（不依赖主站）实现故障检测和隔离（例如：电压时间型分段就地协同、集中式智能分布型FA）。柱上开关或环网柜配备FTU配合高精度零序CT识别单相接地故障选线选段、相间过流保护识别相间短路故障跳闸，利用智能分布式FA（相邻FTU之间GOOSE对等通信交换故障方向信息时间<100ms）实现故障隔离+负荷转供，恢复非故障区域供电，全流程时间<300ms（速动型）或3s~1min（缓动型）。(2)主站型FA：配电自动化主站接收各FTU/DTU上传的故障信号和遥测量，进行故障定位、隔离和非故障区域恢复供电方案辅助决策，供调度员判断发令遥控操作；功能部署由主站系统软件完成，对通信覆盖率的依赖度高。\n其他建设内容：配电室环境监控（温湿度/水浸/烟感/视频门禁及联动）、电能质量监测（从10kV进线及重要出线回路安装电能质量在线监测装置，及时发现谐波污染源）、智能巡检（室内挂轨机器人/轮式机器人、红外测温+局放TEV超声波在线捕捉局部放电信号+可见光+AI设备状态识别）。\n标准：GB 50052供配电系统设计规范、DL/T 5729配电网规划设计技术导则、DL/T 721配电网自动化技术导则。", module:"m6", submodule:"6.7 工程案例库", related:["→ 关联：电力系统 §2.4 配电系统"] },
+  { id:"3011", title:"海上风电送出工程", tags:["海上风电","海缆"], content:"海上风电送出工程将海上风电场发出的电能输送到陆上电网，是海上风电建设的核心环节。送出方案可根据风电场离岸距离及输送容量分为高压交流（HVAC）和柔性直流（VSC-HVDC）两种主流方案。\n交流送出方案（适用于离岸距离<80km）：(1)海上风电机组→机端升压变（0.69kV/35kV或66kV，66kV集电系统比35kV系统可减少海缆数量降低损耗+节省用海面积，是新一代海上风电集电系统的趋势）→中压集电海缆（阵列海缆回路，各风机之间通过35kV或66kV交流XLPE绝缘海底电缆连接，接线方式为放射形/环形/组合形）→海上升压站（220kV/330kV/500kV后现在也有配置350kV一步升压的成熟方案）→高压交流海缆送出（220kV或500kV三芯交联聚乙烯XLPE绝缘交流海底电缆，采用光纤复合海缆光电合一）→陆上集控中心（升压或降压，接入电网）。(2)海上升压站包含主变压器（容量根据风场总装机容量设计，如350MW~1000MW，典型220kV级升压变容量×1~3台）、GIS（220kV/66kV全封闭组合电器，SF6气体绝缘，紧凑防腐蚀）、接地变兼站用变、柴油发电机应急电源、航标灯直升飞机平台航标警示等辅助设施。\n柔性直流送出方案（离岸距离>80km，交流XLPE海缆的充电无功电流不能忽略限制有功输送距离或者交流输送不能满足送电需求）：(1)海上换流平台（直流平台的重量和尺寸巨大—如±320kV/1000MW海上换流平台，重约25000吨+上部组块30000吨，整个平台由导管架固定于海底。配置换流变+MMC换流器（IGBT功率模块堆叠+液冷系统+直流电抗器+直流GIS）+控保系统（换流阀阀基控制器VBE）+交/直流场设备+辅助系统（海水冷却系统、消防系统、直升机甲板等）。(2)直流海缆（±200kV/±320kV/±525kV直流XLPE绝缘海底电缆，输送容量达1~2GW，直流耐受电压+极性反转试验和长期工作电压累积电荷空间电荷效应）。(3)陆上换流站（逆变将直流转回交流并网）及陆上集控中心。柔直送出优势：传输距离不受电缆容性电流限制（无交流型式的的充电无功损耗问题）、可向无源电网受端孤岛供电（可做黑启动电源）、提供动态无功补偿电压支撑（无需再在并网点额外配置动态无功补偿SVG和滤波器）。\n关键工程：(1)英国Hornsea Project海上风电（~1.2GW，交流送出+陆上并网）。(2)德国北海海上风电集群柔直送出（多个海上风场和海上直流汇集环网+陆上换流站的MMC-HVDC方案）。(3)中国广东青洲三/青洲五六七海上风电（500MW/1000MW级，±500kV~±800kV级LCC/MMC混合级联直流送出或纯柔直方案）。(4)三峡阳江沙扒海上风电（1700MW，220kV交流海缆送出+陆上集控中心方案）。\n标准：GB/T 32348海底电力电缆输电工程施工及验收规范、DL/T 2368海上风电场工程海底电缆设计规范、GB/T 37559海上风电场接入电力系统技术规定。", module:"m6", submodule:"6.7 工程案例库", related:["→ 关联：新能源与储能 §5.2 风力发电、§6.6 柔性直流"] },
+
+  // ===== m7: 工业电气成套 =====
+  { id:"2601", title:"高压开关柜", tags:["开关柜","KYN28","五防"], content:"高压开关柜用于3.6kV~40.5kV电力系统的接受和分配电能，对电路进行控制、保护和监测。KYN28-12中置柜是应用最广泛的12kV户内金属铠装中置移开式开关柜（型号含义：K—金属铠装、Y—移开式、N—户内、28—设计序号、12—额定电压12kV）。柜体由固定的柜架（2mm覆铝锌板/冷轧钢板折弯拼装，完全金属封闭）和可移动的手车（断路器手车+PT手车+隔离手车+熔断器+接地手车手车）组成，断路器手车在工作/试验/检修位置之间可移动并且不同位置之间有机械闭锁防误操作。\n主要一次方案：进线（架空进线/电缆进线）、出线（馈线回路）、母联（母线分段，两台柜横向并列实现双电源切换或母线联络）、PT（电压互感器+熔断器手车柜）、避雷器柜。\n额定参数：额定电压12kV/24kV/40.5kV；额定电流630/1250/2000/3150/4000A；额定短路开断电流25/31.5/40kA（有效值）；额定短路耐受电流4s。\n配用的真空断路器主流型号：VS1（12kV固封极柱真空断路器，操动机构弹簧储能式/永磁操动式，采用APG自动凝胶工艺将真空灭弧室+上下出线完全固封在环氧树脂内，绝缘水平高）+底盘车（丝杆推进机构）。\n五防联锁（GB 3906和DL/T 404对高压开关柜的强制性安全设计要求）：(1)防止误分误合断路器——断路器只有通过操作手柄或电动分合闸机构才能操作。(2)防止带负荷分合隔离开关（或隔离插头）——断路器处于合闸位置时断路器手车不能从试验位置摇进到工作位置也不能从工作位置摇出（机械闭锁功能）。(3)防止带电挂地线（含接地开关）——断路器手车在工作位置时，接地开关不能操作合闸（机械闭锁，合上接地开关后才能打开柜后封板维护电缆室）。(4)防止带地线合断路器（或隔离开关）——接地开关在合闸位置时断路器手车不能从试验位置摇入工作位置。(5)防止误入带电间隔——手车在工作位置时电缆室柜门由机械闭锁锁住不能打开。\n标准：GB 3906 3.6~40.5kV交流金属封闭开关设备和控制设备、DL/T 404户内交流高压开关柜订货技术条件。", module:"m7", submodule:"7.1 高低压开关柜", related:["→ 关联：产品知识库 §9.1 高压开关产品"] },
+  { id:"2602", title:"低压配电柜", tags:["低压柜","MNS","GCS"], content:"低压配电柜适用于额定电压交流380V/400V/690V、频率50Hz的三相配电系统，作为电力系统的终端配电设备，负责电能的分配、控制、保护和监测。\n主流型号：(1)MNS（ABB引进技术）——模数化结构（抽屉单元+垂直母线+水平主母线），每个抽屉单元单元间隔独立（功能单元均在抽屉内），抽出式柜型，主母线水平安装于柜顶部且采用钢制隔离措施最高可达每个抽屉和功能室的完全分隔，改进的MNS2.0/MNS3.0为现在ABB新一代平台。额定电流水平母线至4000A（个别到6300A），短路耐受强度高。抽屉推进机构具有连接/试验/分离三位置定位并有机械联锁防止误抽出或误插入。(2)GCS（国产自主型，国家联合设计）——抽出式柜型，主母线额定电流至4000A，垂直母线额定电流1000A抽屉尺寸统一模数为160mm（1/2单元、1单元、2单元、3单元抽屉尺寸）。抽屉单元具有可靠的机械联锁（主开关合闸状态下抽屉不能抽出/插入—GV2/GV3型行程开关联锁）。(3)GCK（国产经济型抽屉柜）——抽屉高度250mm/400mm（1E/2E抽屉高度），固定分隔式（抽屉结构）+简单节能，适用于中小型配电。(4)GGD（固定式开关柜，非抽屉式，老式固定安装方案结构，GCK/GCS/MNS之前设计的主流国产柜型）——固定式结构：断路器固定安装在柜内安装板上，结构简单、成本低（便宜）、维护检修需要停电（主开关进线母排接地前安全步骤繁琐）。目前新的低压配电室主流都选用抽出式MNS或GCS柜，固定式GGD在改造维修和低成本小工程仍有少量使用。\n主要功能单元：进线柜（框架断路器ACB，如DW45智能型万能式断路器，电子脱扣器LSIG可选，框架壳架电流2000A/3200A/6300A，3极/4极）、馈线柜（塑壳断路器MCCB，如CM1/TM30/NSX系列，配电保护型或电动机保护型脱扣器）、电容补偿柜（自动功率因数补偿，智能电容器组/传统CJ19投切接触器+热继电器+电容器+串联电抗器+熔断器）、母联柜（双电源切换时连接两段低压母线）、有源滤波柜（APF/SVG柜，集中补偿柜谐波和无功。谐波治理和无功补偿常见的低压配电柜辅助功能回路）和马达控制柜（MCC，详见7.3节）。\n标准：GB/T 7251.1低压成套开关设备和控制设备第1部分总则、GB/T 7251.12低压成套开关设备和控制设备第12部分：成套电力开关和控制设备（PSC，即低压开关柜全套产品型式试验要求——柜体内部温升+介电性能+短路耐受强度+防护等级验证满足），JB/T 9661低压抽出式成套开关设备。", module:"m7", submodule:"7.1 高低压开关柜", related:[] },
+  { id:"2603", title:"干式变压器", tags:["干式变","SCB","环氧浇注"], content:"干式变压器（干式变）铁心和绕组不浸在绝缘油中，依靠空气对流冷却，具有无油、难燃、防火性能好、环保等突出优点，广泛应用于高层建筑、商业中心、地铁、数据中心和医院等对防火有严格要求的场所。\n结构类型：(1)环氧树脂浇注型（SCB系列为主流）——高压绕组在真空状态下用环氧树脂加石英粉混合料浇注/APG自动凝胶成型工艺固化（低压绕组一般采用铜箔绕制+端封树脂形成铜箔层式结构），形成坚固的绝缘筒体。环氧浇注绕组机械强度高、抗短路能力强、防潮性能好，可自然冷却后直接投入运行。主流SCB系列容量50~10000kVA，电压6/10/35kV。(2)敞开式（浸渍型，NOMEX绝缘纸+真空压力浸渍VPI绝缘漆工艺）——绕组采用NOMEX纸包绝缘导线，再整体真空浸渍绝缘漆后烘干成型。绝缘等级H级（180℃）允许短期220℃上限。过载能力强，适合高温环境，但防潮和防尘能力弱于环氧浇注型。\n冷却方式：AN（自然空气冷却，容量较小功率密度低时选用）或AF（强制风冷，加装轴流冷却风机在变压器底部向上吹风，开启强制风冷后容量可提高40%~50%）。温控系统：干变预埋Pt100铂热电阻在低压绕组线饼间或铁心中，由温控器多路巡检实时显示三相绕组温度，并发出超温报警跳闸信号，同时根据预设温度点自动启停冷却风机。干式变压器过负荷能力比油浸变弱（过载15%不超过30min需密切关注绕组温度不超过报警阈值）。\n绝缘等级：F级（155℃）为标准绝缘耐温水平，H级（180℃）为更高耐温等级（可用于高温环境或更高过负荷安全裕量场景）。\n标准：GB/T 10228干式电力变压器技术参数和要求、GB 20052电力变压器能效限定值及能效等级（1级2级3级对应不同时空载与负载损耗限值，新建项目需满足2级能效要求）、JB/T 501干式变压器计算负荷导则。干式变压器外壳防护等级IP20/IP23（IP20防直径12.5mm异物，IP23防淋水）。", module:"m7", submodule:"7.2 配电变压器", related:["→ 关联：电气基础理论 §1.3 变压器工作原理"] },
+  { id:"2604", title:"油浸式变压器", tags:["油浸变","非晶合金","瓦斯"], content:"油浸式变压器绕组和铁心浸在绝缘油（矿物变压器油/天然酯植物油/合成酯油）中以实现绝缘和散热冷却功能，具有成本低、过载能力强、散热好、寿命长等优势，广泛应用于户外变电站和配电系统中。\n能效系列：S9（已淘汰）→S11→S13→S15（SCBH15非晶合金，空载损耗最低），在变压器型号代号S后附加数字代表空载/负载损耗后续变化。S13型相对S11空载损耗降低约20%，负载损耗相当。非晶合金变压器（型号含SCBH15/非晶/非晶合金带材铁心）的铁心由超薄非晶合金带材（Fe基/Co基非晶态合金薄带20~30μm厚度）卷绕制成，空载损耗比S9降低约70%，比S13降低约30%，特别适合负载率低的配电台区和农网/光伏场景。\n冷却方式（依据变压器总体功率）：(1)ONAN（油浸自冷，依靠油自然对流循环+散热器/片式散热器自然冷却。中低压配变常用，容量≤10MVA）。(2)ONAF（油浸风冷，在散热器/片冷装置上加装轴流风机强制吹风加强散热，可提高容量30%以上）。(3)OFAF（强迫油循环风冷，油泵强迫油在变压器和散热器之间循环流动+风机对散热器吹风，用于大容量变压器OFWF(强迫油循环水冷)+大变压器配置）。(4)ODAF（强迫导向油循环风冷，多重导向油路直接引导油流过绕组内部热点，强油循环提高散热能力，大型变压器主力方式）。\n保护与监测：(1)瓦斯保护（气体继电器，即安装在变压器油箱与油枕之间连接管上的浮子式或挡板式流速继电器瓦斯继电器）——轻瓦斯：变压器内部故障产生少量气体聚积→气体继电器浮子下降接通轻瓦斯报警信号；重瓦斯：内部严重故障产生大量气体+油流高速冲击→挡板动作→重瓦斯瞬时跳闸切除变压器（油速整定值0.6~1.5m/s）。(2)温度保护——油面温度计+绕组热点温度间接计算（光纤测温直接监测绕组热点温度是新一代趋势）运行中的负荷电流可折算绕组热点温度限制于绝缘耐热等级（油浸A级105℃）温控上限。(3)油保护——储油柜（油枕）+呼吸器（硅胶吸潮干燥）+压力释放阀（油箱内部压力异常升高时迅速打开排油泄压）。\n标准：GB/T 1094电力变压器（第1~5部分：总则/温升/绝缘/分接/承受短路能力）、GB 20052电力变压器能效限定值及能效等级、GB/T 6451油浸式电力变压器技术参数和要求。", module:"m7", submodule:"7.2 配电变压器", related:[] },
+  { id:"2605", title:"MCC马达控制中心", tags:["MCC","马达控制"], content:"MCC（Motor Control Center，马达控制中心）是集中安装和配电电动机回路的成套控制设备，也可称为马达控制柜。MCC按回路组合配电柜架布置多回路集成设计，在单个机柜内集成多路马达的供电、保护、控制和监测功能，广泛用于需要集中控制多台电动机的工业场合（泵站、风机、压缩机、传送带、水处理、化工/石化/钢厂等）。\n柜型：GCK/GCS/MNS低压抽出式配电柜马达控制单元，按功能单元间隔抽屉化（各回路采用抽屉式单元，检修更换不影响其他回路）。MCC回路以抽屉单元为最小分隔，按电流大小选择不同模数的抽屉（1/2单元<32A、1单元63A、2单元125A、3单元250A）。每个MCC抽屉内配置：塑壳断路器或微型断路器（短路和过载保护，整定电流由马达额定电流×1.0~1.05）+交流接触器（电动机频繁启停控制和分合闸）+热继电器（过负荷保护，曲线与电动机热特性匹配）或电动机保护器（智能电动机保护控制器替代热继，提供更精确的过载保护、三相不平衡、堵转、缺相、漏电等多种保护功能，兼有电流测量、RS485通信/Modbus等接口）+变频器或软启动器（按需要选配，大功率电机要求大降压启动或变频调速的工况在MCC之外按配电柜设计）。\n控制方式（二次回路）包括：(1)就地控制——MCC柜门上安装就地的按钮/转换开关/指示灯（启动/停止按钮、故障复位、运行指示、综合故障指示），岗位操作人员在MCC室启停电机。(2)远程自动控制——由DCS/PLC/上位机通过硬线（DI/DO控制电缆接MCC柜内中间继电器线圈）或通信（Profibus DP/Profinet输出接触器分合闸命令输入反馈运行状态）实现远程启停。就地/远程切换通过控制柜门上SA转换开关实现。\n典型回路配置：电机功率5.5~200kW常用回路类别举例。MCC回路还支持现场总线通信（Modbus/Profibus）远程故障诊断和实时电气参数参数和参数设定+电流消耗监测+远程状态诊断，以及马达保护器+RS485接入DCS实现电机的能效管理。\n标准：GB/T 7251.8低压成套开关设备和控制设备第8部分：智能型成套设备通用技术要求、GB/T 14048.4低压开关设备和控制设备第4部分：接触器和电动机起动器。", module:"m7", submodule:"7.3 MCC", related:["→ 关联：电气自动化 §3.2 变频器、§3.3 伺服系统"] },
+  { id:"2606", title:"UPS不间断电源", tags:["UPS","蓄电池"], content:"UPS（Uninterruptible Power Supply，不间断电源）在电网电力中断或电压跌落在容许范围外时，通过蓄电池储能+逆变器切换输出持续稳定高质量交流电，保证关键设备（IT设备、弱电系统、工业过程控制系统、医疗设备、应急照明等）的连续正常运行。\n工作模式分类：(1)双变换在线式（Online Double Conversion，主流推荐方案，99%的关键负载应采用此架构）——整流器AC/DC将交流转为直流给蓄电池充电并同时提供直流母线给逆变器、逆变器DC/AC将直流转变为纯净稳定交流供给负载，始终在线双变换输出无中断，实现对电网电压波动、谐波、干扰的完全隔离和稳压稳频输出。效率96%~97%（效率取决于负载率，经济负载率为50%~75%时效率最高，可升级紧凑型UPS支持高达97%以上效率）。旁路模式：逆变器故障/过载/检修时静态开关自动切换至工频旁路（市电直通，无净化，切换时间<1ms可满足负载短暂不间断供电要求）。\n(2)后备式（Standby/Offline）——市电正常时直接旁路输出蓄电池充电不逆变工作、市电中断后约4~10ms切换继电器+逆变器投入。结构简单价低（用于个人电脑/家用路由器等非关键设备），有切换中断时间不适用于服务器、精密设备等高要求负载。\n蓄电池组：(1)铅酸蓄电池——阀控式密封铅酸蓄电池VRLA (AGM/GEL), 12V/9~250Ah单体。后备时间15min~8h（根据蓄电池容量配置计算，电池组容量(Ah)=UPS额定功率(W)×后备时间(h)÷(电池组电压(V)×放电效率(0.9)×利用率0.6~0.8受电池放电倍率限制）。浮充电压2.23V/节（25℃），寿命3~6年（受环境温度和充放电机制管理影响，环境温度每升高10℃，寿命减少50%）。(2)锂电池（Li-ion，特别是磷酸铁锂LFP）——体积小重量轻，循环寿命长，BMS全方位（过充保护/过放保护/高温保护/低温保护+均衡管理），能量密度是铅酸的3~5倍，寿命8~15年。虽初始投资成本高于铅酸蓄电池，但全生命周期成本性价比已有竞争力，在数据中心UPS领域新建项目过半均采用锂电方案。\n旁路切换：在线式UPS当逆变器故障/过载自动切换至旁路回路，切换时间<1ms（静态开关STSW静态转换开关，以晶闸管对实现负载从逆变器到旁路的转移，切换过程无中断但精细可靠）。\n标准：GB/T 7260不间断电源设备（系列标准，含UPS性能标准允许参数、电磁兼容性EMC限值、安全标准及环境要求等）、YD/T 1095通信用不间断电源（UPS）标准（电信行业对输入谐波电流/旁路要求/智能监控要求等）。", module:"m7", submodule:"7.4 UPS/EPS", related:["→ 关联：弱电与智能化 — UPS为弱电系统供电"] },
+  { id:"2607", title:"EPS应急电源", tags:["EPS","应急电源"], content:"EPS（Emergency Power Supply，应急电源）专门为消防应急负荷（消防水泵/喷淋泵/防排烟风机/应急照明/疏散指示/防火卷帘/消防电梯等）供电，确保火灾等紧急情况下消防救援设备能持续可靠运行。\nEPS与UPS的核心区别：\n- 负载特性：EPS专供消防负载（电动机类感性负载+照明类负载混合），对输出波形和电压暂态精度要求略低于UPS但对冲击性负载（电机起动）短时过载能力强（可承受120%额定容量持续60s，150%额定容量持续10s）。但消防泵不是变频启动，EPS至电机的线路较长且电机启动电流可达7Ie，EPS需要容量考虑启动倍数（配置容量需考虑电机启动倍数的叠加）。\n- 切换时间：EPS切换时间标准要求≤0.25s（EPS由市电旁路供电+充电器浮充电池，当检测到市电失电时，逆变器立即启动并切换继电器至应急供电模式）。0.25s保证了消防应急照明（GB 17945要求应急照明灯具转换时间≤0.25s）和消防控制室设备不因消失时间过长丢失数据或误动作（但EPS切换时间在设计上小于0.25s（最快<0.1s））。\n- 运行模式：EPS日常处于市电旁路直通方式+充电器给蓄电池组浮充，EPS始终处于热待机状态（逆变器不工作处于停机状态但控制系统准备就绪，相比UPS双变换在线工作）。在市电正常时，EPS的逆变器不工作（不常开），而UPS双变换在线式逆变器始终工作逆变供电（常态节能EPS优于UPS）。当市电中断，EPS控制板快速启动逆变器（DC/AC转换+电池组输出400/230V）并通过切换继电器（EPS的切换电器为接触器/继电器，其切换时间≤0.25s可满足消防标准）。\n- 负载维持时间：消防规范要求EPS应急供电持续≥90min（一类高层建筑根据项目类型不同要求90分钟~180分钟）。电池配置：铅酸蓄电池为主，近年来部分EPS厂家开始采用磷酸铁锂电池，但消防认证仍以铅酸为主。\n主要参数：容量2.2~500kW（按消防负荷计算，持续30~180min），电压等级AC380V三相/AC220V单相，充电时间<24h充满，逆变切换时间≤0.25s（满足GB 17945消防应急照明和疏散指示系统标准），逆变器输出波形失真≤5%，动态电压瞬变±10%（1个周波恢复）。\n标准：GB 17945消防应急照明和疏散指示系统、GB 51309消防应急照明和疏散指示系统技术标准、GB/T 16806消防联动控制系统（含消防应急电源性能要求）。", module:"m7", submodule:"7.4 UPS/EPS", related:["→ 关联：规范与标准 §8.5 — GB 50303施工验收规范"] },
+  { id:"2608", title:"GB 50054低压配电设计规范", tags:["GB50054","低压配电"], content:"GB 50054《低压配电设计规范》是低压配电工程设计的最基本国家标准，规定了低压配电系统的设计原则、设备选择、导体选择、配电装置布置、保护配合等方面的技术要求。本规范适用于新建、改建和扩建工程中交流1000V及以下、直流1500V及以下的低压配电设计。\n核心要求：(1)配电装置布置——配电柜前方操作通道（双面布置柜体面对面//单列布置柜体固定面墙面）：固定式柜前操作通道≥1500mm（柜体单列柜前1500mm+固定面墙），抽出式柜前操作通道双列面对面≥2000mm、单列靠墙≥1500mm。后方维修通道（柜后维修/墙间距）：柜后壁与墙之间净距≥1000mm，控制设备背后≥800mm。这些净距保障了操作人员安全操作维护间距避免触电。（2)导体选择：按载流量（IEC 60364电缆载流量表）选择导体截面，同时需校验电压降（≤5%，即低压配电线路末端电压损失不超过额定电压的5%）和短路热稳定（最小截面S≥I_k×√t/K，热稳定系数与导体材质和绝缘相关）。中性导体N截面与相线相同（当相线截面≤16mm²铜或25mm²铝时），当相线截面大于16mm²铜/25mm²铝倍时N线截面可适当减小但不得小于相线的50%。保护接地导体（PE）和PEN线截面也有相应规定。\n(3)保护配合——过负荷保护：配电线路的过负荷电流-时间特性必须满足反时限特性（I²t曲线），保证负载电流超过导体载流量的一定倍数时保护电器在规定时间内切断电路。短路保护：预期短路电流下开关设备的分断能力≥安装处预期短路电流，并在规定时间内切断。保护配合的核心准则：上下级保护电器的动作选择性（级联/选择性保护）——上级保护电器在故障时不应在下一级保护范围（负荷侧）故障时越级跳闸优先选择性跳闸。末端回路采用微断MCB，分支回路采用MCCB塑壳断路器（带电子脱扣器带LSIG保护曲线设定）或熔断器组，进线采用ACB框架断路器带保护单元。\n(4)配电柜的防护——配电柜防护等级≥IP2X（手指防触电），户外≥IP54（防尘+防溅水）。配电柜内部金属带电部分绝缘处理、安全净距尺寸、绝缘支撑件爬电距离均需满足。\n标准版本：GB 50054-2011（现行版，2011年发布，2012年6月实施），替代旧版GB 50054-95。配套的工程建设国家标准电气图集参见国家建筑标准设计图集《常用低压配电设备安装》和系列图集。与GB 50052（供配电系统设计规范）、GB 50055（通用用电设备配电设计规范）、GB 50058（爆炸危险环境电力装置设计规范）等设计规范配合使用，构成完整的低压配电设计标准体系。", module:"m7", submodule:"7.5 设计规范", related:["→ 关联：规范与标准 — 完整的标准体系"] },
+
+  // ===== m8: 规范与标准 =====
+  { id:"2701", title:"GB 50052供配电系统设计规范", tags:["GB50052","负荷分级"], content:"GB 50052《供配电系统设计规范》是电力工程设计的基本国家标准，规定了供配电系统设计的基本原则、负荷分级及供电要求、电源系统、电压等级选择、电能质量要求等。是GB系列标准中供配电设计的基础性技术法规。\n负荷分级（按对供电可靠性的要求和中断供电在经济/政治/公共安全上造成的损失程度分类）：(1)一级负荷——中断供电将造成人身伤亡、重大设备损坏、重大经济损失、重大政治影响（如大型医院手术室、大型金融数据中心、机场指挥塔、大型体育场馆比赛厅等）。供电要求：两个独立电源供电（来自两个独立的变电站或同一变电站的不同母线（进线分段））、必须配置应急电源（UPS/EPS/发电机）。特级重要电力用户（一级负荷中特别重要的负荷）：在上述双重电源供电基础上，还必须增加独立于正常电源的应急电源（柴油发电机或蓄电池EPS/UPS），且应急电源的负荷切换时间需满足设备允许中断供电时间的要求。(2)二级负荷——中断供电将产生较大经济损失、造成公共场所秩序混乱（如大中型商场、高层住宅、普通医院、重要实验室等）。供电要求：两回路线路供电（双回路供电，可由同一变电站的不同母线或同一母线分段供电），条件受限时可专线架空电缆供电。(3)三级负荷——不属于一级和二级的一般电力负荷，无特殊供电要求（普通居民、一般办公、车间辅助电气及不属于一二级的各类普通电气设备），允许单回路供电。\n电压等级选择：配电电压优选10kV（北方有些地区特别是矿业保留6kV电压——6kV系统）、20kV（上海等大城市推广）、35kV及110kV（根据区域供电网络统一规划）。(1)同一地区及同一规划区内电压等级应统一；(2)高压伸入负荷中心，减少配电级数降低线损（低压配电半径一般不宜超过250m）。接地系统形式：TN（TN-C/TN-S/TN-C-S，电源端中性点直接接地+设备外壳接PE/PEN）、TT（设备独立接地）、IT（中性点不接地或经阻抗接地，用于对供电连续性要求特别高的场所（如矿山/医院手术室/重要试验室）)。\n电能质量：要求供配电系统设计满足各种电能质量指标（频率偏差、电压偏差/波动/闪变/谐波/三相不平衡）在GB/T相关标准范围内。如有大容量谐波源应配置谐波治理或隔离措施。\n配套规范体系：GB 50052-2009（现行版本，2009年发布，替代95版）。涉及设计文件中引用该规范中的负荷等级划分、供电方式选择、电能质量标准适用时，需结合GB 50054/GB 50016/GB 51348等完成全套的设计逻辑。", module:"m8", submodule:"8.1 国家标准", related:["→ 关联：电力系统 §2.4 配电系统、项目与方案 §10.1 设计方案"] },
+  { id:"2702", title:"GB 50060高压配电设计规范", tags:["GB50060","高压配电"], content:"GB 50060《3~110kV高压配电装置设计规范》规定了3~110kV交流高压配电装置设计的基本要求，包括配电装置的型式选择、安全净距、导体和设备选择、配电装置布置、对建/构筑物的要求等。适用于发电厂和变电站工程中3~110kV高压配电装置的设计。室外配电装置的安全净距（A1值，相-地/相-相最小空气间隙）：3~10kV→200mm，35kV→400mm，66kV→650mm，110kV→1000mm（中性点直接接地系统）/900mm（中性点不接地系统）。不同相导体间（A2值）在上述数值基础上再加裕度。\n配电装置型式：根据环境条件和占地面积需求选择，包括户内配电装置（开关柜/手车柜/固定柜，柜体柜深根据断路器形式/电缆进出线方式确定），户外AIS（空气绝缘敞开式，用支持绝缘子+软导线/管母线）+断路器+隔离开关支柱绝缘子上方钢芯铝绞线构架布置，GIS（SF6全封闭气体绝缘组合电器户外安装）。在土地资源紧张的城区、变电站对电磁辐射敏感区、强污染、高海拔、重污秽地区，宜优先选用GIS或户内布置方案。\n导体选择：载流量按最高允许工作温度+综合校正（环境温度/日照/风速/多回路并列/敷设条件综合校正系数，绝缘导线及封闭母线还需考虑散热）。短路热稳定校验（短路电流热脉冲I²t小于导体及连接件允许承受的耐受电流值）。\n配电装置的布置间距必须满足有序停电检修（设备搬运通道，断路器等设备抽出搬运空间及起吊要求）、操作巡视维护的最小间距和通道宽度。GB 50060-2008与相关行业规程（如DL/T 5352高压配电装置设计规程、DL/T 5218-2009220kV~750kV变电站设计技术规程对应更高电压等级的设计要求。", module:"m8", submodule:"8.1 国家标准", related:[] },
+  { id:"2703", title:"DL/T 5153火力发电厂设计规范", tags:["DL/T5153","火力发电"], content:"DL/T 5153《火力发电厂厂用电设计技术规定》是关于火电厂厂用电系统设计的行业标准。适用于汽轮发电机组容量12MW及以上的火力发电厂厂用电系统设计。\n厂用电接线：(1)高厂变供电——发电机出口通过高厂变（高压厂用变压器）从发电机-变压器组之间分支引接，为厂用6kV/10kV母线供电；当发电机停机时，通过启动/备用变（起备变）从电网反送电作为厂用替代电源。厂用电母线按锅炉/汽机/公用系统/输煤/除灰等机组分段，每台机组设两段厂用母线（互为备用或手动切换）。(2)低压厂用电——从6kV/10kV母线经低压厂用变压器至400V/380V低压母线。低压厂用PC（动力中心）母线采用单母线分段，MCC（马达控制中心）从PC供电。重要负荷（如汽轮机润滑油泵、给水泵润滑油泵、EH油泵、DCS电源、事故保安电源）应双电源供电（自动切换）。(3)事故保安电源——快速启动柴油发电机组（15s内自动启动并加载到额定电压）作为全厂停电时交流保安负荷（汽轮机和给水泵等的盘车电机、旋转油泵、UPS、DCS控制和仪表电源、消防应急负荷等）的应急供电电源。蓄电池组直流系统（110V/220V DC）为开关分合闸、保护、控制系统、事故照明提供电力（充满电的蓄电池可在全厂失电情况下维持控制保护系统供电1~2h）。\n变压器选择：高厂变/起备变容量＝厂用负荷同时率系数×总负荷。典型选择原则：高厂变容量按厂用电负荷计算成果的10%裕量再叠加余量。低压厂用变压器优先采用干式变SCB系列。(2)厂用电压：高压厂用电电压等级定为6kV（200MW以下机组）或10kV（300MW及以上机组），低压厂用电采用380/220V三相四线制。\n电缆选型：动力电缆采用阻燃型交联聚乙烯XLPE绝缘电力电缆（ZR-YJV系列），重要回路（消防/保安/控制保护等）采用矿物绝缘防火电缆（BTTZ/RTTZ）或低烟无卤阻燃耐火电缆（低烟无卤WDZB/ZA系列）。\n标准：DL/T 5153-2014（现行版本）。与DL/T 5218、GB 50660大中型火力发电厂设计规范、DL/T 5041火力发电厂厂内通信设计技术规定配套使用。", module:"m8", submodule:"8.2 行业标准", related:[] },
+  { id:"2708", title:"DL/T 5202电能量计量系统设计规范", tags:["TMR","关口计量"], content:"DL/T 5202《电能量计量系统设计技术规程》是关于电厂和变电站电能量计量系统（也称TMR，Tele Meter Reading System）设计的行业标准。TMR系统由电量采集终端（ERTU电能采集终端/多功能关口电能表）、通信网络和主站系统组成，实现对电厂上网电量、网间交换电量、下网电量等关口计量点的电能数据的自动采集、处理和统计分析。\n关口计量点(出线或主变高压侧用于计量贸易结算的发/用电量。关口计量表计精度通常要求0.2S级或0.5S级（有功电能表精度，0.2S优于0.5S。S表示特殊用途电能表，需满足宽量程(1%In~Imax)低负载下仍保持高精度要求)。关口电能表如兰吉尔ZMG405/Red JL931、威胜、科陆电子等，目前逐步为数字化电能表+合并单元的数字式计量方式（IEC 61850数字采样）。PT/CT精度：计量用电压互感器PT准确度0.2级/0.5级，计量用电流互感器CT准确度0.2S/0.5S级，并满足二次压降限值（计量PT二次回路压降不超过额定二次电压的0.25%）。\n系统架构：各关口计量点电能表（RS485/DL/T 645规约输出电度量）→ERTU（电量采集终端，采集多块电能表每15分钟冻结的电能量数据，集中打包）→调度数据网（专用网络或拨号/4G背靠背通信）→调度端主站系统（完成归集/存储/处理，并传输至交易中心和结算系统）。(2)数据周期：电量数据采集周期15min（满足电力市场结算要求），电量数据保存≥1年，主站可完成统计分析、线损统计、母线平衡分析、网损计算。\n标准：DL/T 5202-2016（现行版，替代旧版2004）、DL/T 645多功能电能表通信规约（目前广泛应用的为DL/T 645-2007，是TMR系统数据通信帧格式和数据结构基本规范），以及GB/T 17215.321交流电测量设备特殊要求第321部分：静止式有功电能表（0.2S级/0.5S级）精度等级考核标准。", module:"m8", submodule:"8.2 行业标准", related:[] },
+  { id:"2704", title:"国家电网企标Q/GDW", tags:["Q/GDW","国网企标"], content:"Q/GDW系列是国家电网公司企业标准，对电气设备技术条件、配电网设计、变电站建设、智能电网技术、继电保护及安全自动装置等领域的技术指标和功能要求进行了细化规定，是国家电网公司系统内设备招标和工程设计的技术依据（在国网项目中具有强制效力）。\n主要标准分类：(1)设备类——Q/GDW 11220智能变电站继电保护技术规范（规范了智能变电站保护装置与合并单元/智能终端之间的接口及GOOSE/SV配置要求）、Q/GDW 11005柱上开关技术规范（适用于配网10kV柱上SF6和真空断路器、负荷开关）、Q/GDW 11612配电自动化终端/子站标准化设计技术规范（统一规范DTU/FTU/TTU硬件接口尺寸/通信协议/数据模型及SCADA相关性能指标）。(2)设计类——Q/GDW 11260配电网规划设计技术导则（指导地市/县级配电网网架规划和供电安全准则）、Q/GDW 156高标准农田配套电网建设技术导则（适用于电力接入和农田水利配套）、Q/GDW 121国家电网公司配电网工程典型设计（包括10kV架空线路/电缆线路/配电站房/箱式变电站典型设计图集和应用方案）。(3)技术规范通则——Q/GDW 10001智能变电站技术规范（整体站技术原则含三层两网等）。(4)网络安全与信息——Q/GDW 11224电力监控系统网络安全防护要求。\n新能源并网要求：Q/GDW 12197光伏电站接入电网技术规定、Q/GDW 1392风电并网调度运行管理规定。\n特高压：Q/GDW 144特高压交流输电技术标准体系、Q/GDW 145±800kV特高压直流输电工程系统研究内容深度。\nQ/GDW标准体系与国家/行业标准的关系：在国家/行业标准（GB/DL/T）基础之上，结合国网公司实际运行经验和设备运行可靠性管理更高要求，提出更严格的技术参数和设备质量保障（出厂试验例行、选型、型式试验、监造以及抽检等相关细则），Q/GDW通常是国网电气设备招标技术规范的依据（需纳入技术规范书）。", module:"m8", submodule:"8.3 国网企标", related:["→ 关联：项目与方案 §10.3 国网项目流程"] },
+  { id:"2705", title:"IEC 61850变电站通信标准", tags:["IEC61850","GOOSE","智能站"], content:"IEC 61850《变电站通信网络和系统》是国际电工委员会发布的变电站自动化系统通信标准，也是智能变电站通信体系的核心技术基础。IEC 61850实现了不同厂家二次设备（保护/测控/录波/计量/PMU/合并单元/智能终端等）之间的互操作性和即插即用。\n三个核心通信服务：(1)GOOSE（Generic Object-Oriented Substation Event，通用面向对象变电站事件）——用于高速传输跳闸合闸/联闭锁/状态开入开出等间隔层设备间的状态信息和跳闸指令。通信采用多播发布/订阅模式+重发机制（T0瞬发+快速重发T1（2ms）+ T2（4ms）+ T3（8ms）+ T4逐渐减慢至稳态心跳T0（1000ms））。跳闸信号传输延时<3ms（满足继电保护速动性要求——从发送到接收的端到端时间不超过3ms）。(2)SV（Sampled Value，采样值）——过程层合并单元将ECT/EVT（电子式互感器）或常规互感器经采集器采集的电压电流瞬时值利用IEC 61850-9-2的采样值映射到以太网帧，发送至间隔层的保护/测控/录波/计量等装置（数据帧的采样计数器以及数据的有效品质标示用于接收端判断数据的同步性及数据有效性）。采样频率：保护用80点/周波（4000Hz，用于工频电流的稳态和暂态保护如距离差动保护等算法；IEC 61850-9-2LE定义80点/周波为保护应用推荐格式），电能质量/计量用256点/周波（12800Hz，用于谐波分析和计量精度）。通信采用发布/订阅模式，通过IEEE 1588精确时间协议（PTP，Precision Time Protocol，网络对时精度可达1μs以下）实现全站采样同步，替代传统CT/PT模拟电缆和同步对时硬接线。(3)MMS（Manufacturing Message Specification，制造报文规范）——基于TCP/IP的客户端/服务器模式，用于站控层与间隔层之间的通信（监控后台上送全站实时遥测遥信、下发遥控指令、定值下装、录波数据读取、装置参数配置等）。MMS在TCP/IP以太网上映射到OSI应用层。\nSCD配置描述：IEC 61850-6定义了SCL（Substation Configuration Language，变电站配置描述语言），基于XML的变电站系统配置文件。全站配置流程：智能变电站系统配置器将全站ICD（IED能力描述文件 IED各厂家提供）→SSD（变电站一次系统一次接线拓扑）+ CID（设备）→SCD全站系统配置文件(含全站GOOSE和SV发布/订阅信息、通信网络参数和装置实例信息)。\n标准版次：IEC 61850 Ed1.0（2003年发布，奠定智能变电站通信基础和三层两网体系）、Ed2.0（2010年修订，新增强健的GOOSE重传机制、采样值冗余链路恢复、电站自动化安全扩展要求等内容）、Ed3.0（面向未来泛在电力物联网/能源互联网方向的扩展，增加分布式能源DER、储能、电动汽车充电站、STATCOM等电力电子设备对象建模）。国内对应标准：DL/T 860（IDT IEC 61850）系列标准。", module:"m8", submodule:"8.4 国际标准", related:["→ 关联：电气自动化 §3.5 工业通信、电力系统 §2.6 继电保护"] },
+  { id:"2706", title:"GB 50303建筑电气施工验收规范", tags:["GB50303","施工验收"], content:"GB 50303《建筑电气工程施工质量验收规范》规定了建筑电气工程（含变配电室、供电干线、电气动力、电气照明、备用不间断电源、防雷接地、弱电智能化系统等的电气安装部分）的施工质量要求和验收标准。适用于工业与民用建筑工程中电气分部工程的施工质量验收，是建筑工程整体质量验收（GB 50300系列标准）的重要组成部分，是电气工程竣工验收的强制性技术文件依据。\n主要验收内容：(1)变配电室——变压器、高低压柜、母线槽安装。验收要点：设备基础型钢接地（扁钢截面≥100mm²）、柜体垂直度（每米偏差≤1.5mm）、绝缘测试（低压≥0.5MΩ，高压按DL/T 596标准执行）。变压器安装后，需完成冲击合闸试验（新装变压器应进行5次冲击合闸，且第一次受电后持续运行时间不应少于10min，检查励磁涌流值衰减及保护装置动作情况）。(2)电气动力——电机试运转（空载/负载）、电缆敷设、桥架安装。电机试运转前检查绝缘电阻（≥1MΩ/1kV，最低≥0.5MΩ）、转向、空载电流平衡。电缆沟/桥架安装验收包括金属桥架可靠跨接接地、防腐层完好。(3)照明——灯具、开关、插座安装相序及绝缘测试、接地可靠性。并核对每回路绝缘（导线间/导线对地绝缘≥0.5MΩ）、漏电保护RCD动作特性（额定剩余动作电流30mA/100mA/300mA 脱扣时间<0.1s）、灯具固定（吊灯灯具质量≥3kg时，应预埋吊钩或螺栓）。(4)防雷接地——避雷带引下线截面积（圆钢≥φ8mm明敷或φ10mm？实际为热镀锌圆钢φ12mm直埋、-25mm×4mm镀锌扁钢）、接地电阻值≤设计值（综合接地体满足接地电阻≤1Ω）。(5)智能化布线——弱电线缆与强电线缆平行间距和交叉间距（电源线与信号线最小平行净距/穿管屏蔽要求受具体工程条件约束）、智能化设备接地及等电位连接、屏蔽接地等。\n隐蔽工程验收（电气工程关键质量控制节点，必须在掩埋/封闭前完成验收并签单）：防雷接地引下线焊接/接闪器/等电位连接排→接地电阻测试（满足≤设计值）。\n标准：GB 50303-2015（现行版本，适用建筑电气装置分部工程的检验批/分项/分部工程验收），配合GB 50300建筑工程施工质量验收统一标准的验收流程规定。", module:"m8", submodule:"8.5 施工验收", related:["→ 关联：工业电气成套 §7.5 设计规范、弱电与智能化"] },
+  { id:"2707", title:"GB/T 4728电气简图用图形符号", tags:["GB/T4728","电气制图"], content:"GB/T 4728《电气简图用图形符号》标准（IDT/等同采用IEC 60617标准）规定了绘制电气系统图、电路图、接线图和功能图等简图时所使用的统一图形符号。对于电气工程设计、绘图、技术交流、文档编制和设备标识的标准化具有重要意义，同一个符号在不同国家可能有不同变形，但在采用IEC标准的中国电气图纸中已高度统一。\n符号分类（GB/T 4728共13个部分，其最常用的分类符号类别大致如下——\n(1)限定符号和常用符号要素——基本线型、端子极性（+/-）、接地符号、屏蔽。\n(2)导线、连接件和电路——导线、端子和线路分支接点、连接件（插头/座/端子排/电缆连接盒）。\n(3)开关、控制和保护器件——断路器符号（一般符号、带自动脱扣、具有过流/过压/分励脱扣标注的断路器）、隔离开关（开启式/单断——隔离器、隔离开关）、接触器（主触头/辅助常开常闭触头）、继电器（线圈/触点）、熔断器、各个类别保护装置符号（热继/过流/过压/欠压/差动等）。\n(4)电阻器、电容器、电感器和变压器——电阻器（固定、可调、滑线变阻、热敏电阻）、电容器（普通/极性/可调/微调/穿心/温度补偿电容器）、电感器、变压器符号（双绕组/三绕组/自耦/互感器/星三角连接标注）。\n(5)半导体器件和电子管——二极管（普通/稳压/隧道/肖特基/发光/LED/光电）、晶体管（NPN/PNP 双极型，N沟/P沟 JFET/MOSFET）、晶闸管（单向/双向/可关断/光控可控硅）、运算放大器、门电路符号（AND/OR/NAND/NOT/异或门及功能复杂组合逻辑器件功能框符号，依据IEC 60617-12和第13部分二元逻辑/模拟器件的图形符号规则进行功能描述）。\n(6)电能的发生和转换——发电机/电动机符号（三相/单相、交流/直流、绕线/鼠笼、同步/异步、发电机/M/G和旋转电机功能框GB/T 4728.6变压器和电抗器的补充符号均可适用）、变流器、蓄电池。(7)电信及其他领域专用符号（如天线/放大器/滤波器/传输路径/交换系统/传感器触发电极/功能框等）。\n制图原则：电气图应层次清晰（系统图/布置图/原理图/接线图/电缆清册/端子排图按层级展开）。CAD绘图软件（EPLAN/AutoCAD Electrical/天正电气/中望电气）均配备国标图库，按GB/T 4728的符号字体标准化绘图。\n标准版本：GB/T 4728.1~13,IDT IEC 60617（系列标准，包含GB/T 4728所有13个技术部分的标准号），最新修订版保持与IEC 60617新版同步。电气制图工程师应掌握其中的主要常用符号并持续对照新版本（EPLAN/ AutoCAD Electrical内置的GB符号库更新需要跟进最新IEC 60617标准更新的符号修改。", module:"m8", submodule:"8.6 制图标准", related:["→ 关联：项目与方案 §10.1 设计方案图纸绘制"] },
+
+  // ===== m9: 产品知识库 =====
+  { id:"2801", title:"特高压GIS", tags:["特高压","GIS","1100kV"], content:"1100kV GIS（Gas Insulated Switchgear，气体绝缘全封闭组合电器）是目前世界上电压等级最高的GIS产品，核心用于特高压交流输电工程（如1000kV特高压交流试验示范工程——晋东南-南阳-荆门、淮南-南京-上海1000kV特高压交流工程等特高压骨干网架）。\n核心参数：额定电压1100kV，额定电流6300A，额定短路开断电流63kA，SF6气体额定压力0.6~0.7MPa，绝缘水平（雷电冲击耐压2250kV/工频耐压960kV，操作冲击耐压1800kV）。\n技术特点：超长断口的断路器（双断口/四断口串联）灭弧室结构+大功率液压弹簧操动机构，双断口或四断口结构开断SF6灭弧，大型绝缘件（环氧浇注盆式绝缘子/支撑绝缘子）和长行程绝缘拉杆设计和制造要求极高。GIS全封闭SF6绝缘，不受大气环境（污秽、结冰覆冰、高海拔、强风沙）影响，直接接至主变压器/高压电抗器/架空出线套管。\n目前国内具备1100kV GIS供货能力的企业：中国西电、平高电气（已掌握双断口/四断口）和新东北电气（与ABB技术合作）。国网特高压GIS招标格局基本稳定，中标方按批次约为中国西电、平高电气和新东北电气及山东电工电气等，国电南瑞（南瑞继保）在特高压二次设备和断路器保护控制方面有较大份额。\n标准：GB/Z 24843特高压设备标准系列、IEC 62271-203高压开关设备和控制设备第203部分：额定电压52kV及以上气体绝缘金属封闭开关设备。", module:"m9", submodule:"9.1 高压开关产品", related:["→ 关联：电力系统 §2.2 输电系统"] },
+  { id:"2802", title:"252kV高压开关", tags:["SF6","断路器","252kV"], content:"252kV高压开关（含SF6罐式断路器和GIS）广泛应用于220kV变电站，作为进出线/母联/分段/主变进线等回路的控制和保护设备。\n252kV罐式SF6断路器——瓷套管/复合套管出线（罐式断路器将灭弧室和电流互感器封装在接地的钢罐壳体内，是耐地震能力强、适合高寒/高海拔/重污秽地区的防震型断路器）。配用弹簧/液压弹簧操动机构（弹簧操动机构结构简单可靠性高，操作功耗小。液压弹簧操动机构出力大、机械特性稳定，适合252kV开关的高操作功要求）。额定电流3150/4000A，额定短路开断电流50kA，额定短路耐受电流3s。SF6气体额定压力0.6MPa（20℃表压）。\n252kV GIS——额定电流4000A/6300A，开断电流50kA/63kA。间隔回路包括断路器+隔离开关/接地开关+电流互感器+电压互感器+快速接地开关+SF6/空气套管。国内主要生产商：中国西电(XD)、平高电气（PG）、新东北电气（NHVS）、泰开高压（TK）、河南平芝（PZY，平高与东芝合资）等。\n新发展趋势：252kV真空断路器正在研发和逐步试点——真空开断可完全避免SF6温室气体的使用（SF6的GWP（全球变暖潜值）是CO₂的25200倍，SF6气体在电力开关设备中的排放问题是行业关注的环保议题，工信部正在逐步推动中高压环保开关设备——真空开断+固体绝缘/干燥空气绝缘方案）。", module:"m9", submodule:"9.1 高压开关产品", related:[] },
+  { id:"2803", title:"126kV高压开关", tags:["126kV","GIS"], content:"126kV GIS/罐式断路器是中国110kV电压等级变电站最主流的开关设备（110kV是我国区域配电网和大型用户变电站的常用电压等级）。产品设计已高度系列化、标准模块化，不同厂家126kV GIS间隔宽度尺寸约0.8~1m，额定电流2000/3150A，开断电流40kA。\n126kV GIS一个间隔典型配置：进线间隔（断路器/隔离开关/CT/VT/接地开关/快速接地开关/出线套管）；主变进线间隔（断路器/隔离开关/CT/接地开关/连接变压器）；母设间隔（隔离开关/快速接地开关/接地开关/电压互感器）；母联/分段间隔（断路器+隔离开关+接地开关）；出线间隔（断路器/隔离开关/CT/快速接地开关/出线套管）；备用间隔和过渡母线/分段扩展接口。\n126kV罐式SF6断路器：额定电流3150A，开断40kA。126kV三极机械联动操作，配弹簧操动机构。\n可靠性：GIS的绝缘和灭弧核心部件全密封在0.45~0.6MPa SF6气体中，不受外界环境影响。GIS间隔的漏气率≤0.5%/年，机械寿命≥10000次操作（断路器主回路）或≥3000/5000次额定短路电流开断（电寿命）。\n126kV环保型GIS（洁净空气绝缘+真空开关）已有多家厂家推出（平高电气、正泰电气、山东电工电气、上海西门子开关等逐步试点应用，以响应绿色电网建设号召，温室气体SF6替代逐步推进）。\n标准：GB 1984高压交流断路器、GB 7674六氟化硫封闭式组合电器、IEC 62271-100高压交流断路器。", module:"m9", submodule:"9.1 高压开关产品", related:[] },
+  { id:"2809", title:"真空断路器VS1", tags:["真空断路器","VS1"], content:"VS1型真空断路器是12kV户内开关柜（KYN28中置柜）最广泛使用的真空断路器。VS1将真空灭弧室+绝缘拉杆+上下出线导电回路通过APG自动凝胶工艺（环氧树脂+固化剂+填料混合浇注/凝胶）固封在环氧树脂中，形成极柱结构(固封极柱，Solid Insulated Pole)。绝缘水平高、抗凝露、抗污秽、零件数量少可靠性高。\n操动机构：(1)弹簧操动机构（VS1断路器标准配置）——储能电机给合闸弹簧储能，合闸时弹簧能量驱动凸轮机构带动真空灭弧室动导电杆合闸（合闸弹簧释放能量，同时带动分闸弹簧储能），合闸同时分闸弹簧储能使断路器处于准备分闸随时可能状态。失电情况下手动储能手柄储能+手动合分闸操作，可作用于紧急操作。弹簧操动成本适中、操作功耗低、寿命可靠。(2)永磁操动机构——利用永磁体保持在合闸/分闸位置（不需要保持机械脱扣和锁扣装置），通过分合闸线圈改变磁场方向实现操动。主要特点：零件数少（仅20多个运动件相比弹簧机构的200多个零件）、寿命长（可达10万次以上机械寿命）、可靠性高，但价格较高需配置充电控制器+超级电容/蓄电池。目前逐步推广但尚未完全替代弹簧操动。\n关键参数：额定电压12kV，额定电流630/1250/2000/3150A（至3150A / 4000A（VS1-12/6300-63大容量断路器）），额定短路开断电流25kA/31.5kA/40kA（标准型），机械寿命弹簧机构30000次（永磁机构≥100000次），电寿命（开断额定短路电流能力30~50次）。\n生产厂家：国产因VS1为全国联合设计产品，主流厂家有正泰电器、浙江紫光电器、库柏(宁波)和众多成套厂自主装配的VS1极柱搭配各品牌弹簧操动机构的方案，国内真空灭弧室知名品牌有宝光股份、旭光电子、华光等。ABB推出的VD4（真空断路器，配用ABB原装弹簧操动机构）在国内高端12kV开关柜（如UniGear ZS1）中是主要代表型号（VD4作为高端市场标杆产品，价格高于VS1）。", module:"m9", submodule:"9.1 高压开关产品", related:["→ 关联：工业电气成套 §7.1 — KYN28配VS1"] },
+  { id:"2901", title:"特高压GIS市场竞争格局", tags:["特高压","市场格局"], content:"特高压GIS是电力设备技术难度最高、市场和政策壁垒最强的输变电主设备之一。国内具有1100kV GIS供货业绩的企业集中度高。\n主要参与企业：(1)中国西电（XD）——特高压GIS和变压器市场份额居于行业前列。西电西开电气设计制造特高压GIS设备，对特高压产品有较全面的试验运行业绩覆盖。隶属于中国电气装备集团。(2)平高电气（PG）——1100kV GIS、断路器、隔离开关等特高压开关类产品标准制造商，隶属于中国电气装备集团。(3)新东北电气（NHVS）——从ABB引入特高压GIS技术，是国内首个获得1100kV GIS型式试验制造厂，在国网特高压集中招标批次中有较多中标业绩。(4)山东电工电气（隶属于国家电网产业板块）——在特高压变压器铁心及开关部分产品具有竞争力，子公司山东日立等。\n合资/外资品牌：(1)ABB（HITACHI Energy/日立能源）——特高压GIS技术和产品处于全球领先地位，但有较高的本地化制造要求（在中国有合资公司如厦门ABB高压/重庆ABB等间接供货）。(2)西门子能源——高压开关设备（如SIEMENS Energy 3AE系列断路器/高压GIS）和中国西门子变压器，近年来在特高压领域和国网直接中标较少，主要以设备供应和技术合作为主。(3)三菱电机/东芝/日立——在跨国公司中均与国内开关设备企业有不同程度的合作或合资。\n竞争特点：(1)特高压GIS的投标高度依赖运行业绩——国网招标时要求投标方有已运行业绩+同容量型式试验报告，新入局者业绩门槛极高。(2)国网对GIS设备采用集中招标模式（年度批次+集中规模招标，按最高限价和商务技术评分决定中标候选排名）。(3)单间隔1100kV GIS价格数千万人民币，特高压GIS单间隔报价较高（百万至千万级按配置复杂程度有巨大差异）。(4)中国电气装备集团（由中国西电集团、平高集团、山东电工电气集团、许继集团、南瑞集团等重组整合而成）对GIS开关产业资源整合带来市场格局变化。", module:"m9", submodule:"9.2 高压开关市场", related:[] },
+  { id:"2804", title:"储能PCS变流器", tags:["PCS","储能"], content:"储能PCS（储能变流器，Power Conversion System）是电化学储能系统的关键设备。我司（按行业一般产品）规划/自有品牌PCS产品序列通常覆盖50~3500kW功率范围，采用模块化设计（常见规格可选50kW/100kW/200kW/250kW/3450kW功率模块），通过模块化并联组成标准容量储能单元（如每台PCS由一个或多个功率单元+控制柜+交流滤波+开关柜组成）。\n直流电压范围：DC750~1500V（与磷酸铁锂电池簇电压匹配，1500Vdc体系是当前大储系统主流标准电压平台。直流电压范围宽有利于接更多电芯串联数量，降低电池簇并联电流及汇流复杂度，降低直流侧电缆损耗、提高储能系统效率。\n构网型控制（Grid-forming）：先进的储能PCS控制器实现构网型控制策略（P-f/Q-U下垂特性模拟同步发电机外特性，建立电压源特性。在弱电网或者离网场合下独立建立交流母线电压和频率。支持VSG（虚拟同步发电机）控制算法，参与电网一次调频和惯量响应（有功响应<30ms，无功响应<5ms）。具备黑启动能力（从电池储能系统零起建立微网电压及频率，分级恢复启动柴油发电机/风机/光伏微网等）。构网型储能PCS是新型电力系统储能的主要技术方向。\n通信与调度：PCS通过RS485/CAN/以太网与BMS和EMS/上位机通信，接收AGC或/和EMS功率调度指令（有功/无功参考值），上传运行状态信息与告警。电池侧绝缘监测（实时监测电池簇正/负极对地绝缘电阻，低于整定值时告警停机保护），并具备交流侧/直流侧过欠压保护、过频/欠频保护、过温保护、防孤岛保护等完备的安全保护功能。\n对比储能PCS与光伏逆变器：两者AC/DC拓扑均为VSC双向变流器，但储能PCS需支持电池充放电的频繁双向切换和并/离网模式切换（充/放电电压范围更能和电池电压匹配），光伏逆变器以MPPT控制组件输出和并网发电为主要功能（单向功率流）。\n标准：GB/T 34120电化学储能系统储能变流器技术规范、NB/T 42014电化学储能变流器并网性能测试规范。", module:"m9", submodule:"9.3 储能设备", related:["→ 关联：新能源与储能 §5.3 — PCS原理"] },
+  { id:"2805", title:"预制舱式储能系统", tags:["预制舱","储能系统"], content:"预制舱式储能系统（Battery Energy Storage Container System，集成式储能集装箱）将电池模组、BMS、温控系统、消防系统、配电系统、辅助系统（照明/门禁/传感器/视频）等集成在标准尺寸的预制舱（20尺或40尺集装箱）内，在工厂内完成组装和全部系统联调试，运输到现场后仅需完成舱体就位+外部电缆连接+PCS汇流柜连接+EMS通信系统组网即可投运，极大减少现场施工量并缩短并网周期。\n典型配置：\n- 20尺标准集装箱储能系统：额定容量约2.5~5MWh（因所选电池pack串并联形式，根据电芯能量密度和系统机架排布方案决定），可容纳约8~12个电池簇（每个簇约200~400kWh，由几十节电芯串联，簇与簇之间隔离熔断器/直流断路器）。适用中小规模或分布式储能。\n- 40尺标准集装箱储能系统（适用于大中型新能源配储/独立共享储能/电网侧储能电站）：额定容量约5~10MWh。配套设备包含汇流柜、BMS主控（汇集各簇从控BMU的电压/电流/温度/SOC/SOH等数据，与PCS和EMS/站控系统通信）、温控系统和消防系统、辅助用电照明/排污等辅助系统。\n子系统：(1)电池模组系统——电池pack（电芯间>2mm间隙预留热膨胀+汇流排焊接+LFP电芯+阻燃绝缘片）通过汇流排（叠片铜排/铝排，表面绝缘包覆）串联/并联构成电池簇。每个模组带独立的从控BMU（采集电芯单体/并联单元的温度电压，具备通道式单体电池均衡功能和温度数据异常上送）。\n(2)温控系统——液冷：液冷机组（BTU）+液冷板（水冷板贴附在电池PACK底部或之间），冷却液（乙二醇水溶液25%~50%）通过液冷板与电芯热交换带走热量（液冷温差<3℃）。送风和回风风道引导冷却/加热气流经过电池模组进行热管理（电池电芯最佳工作温度范围15~35℃）。\n(3)消防系统——复合探测器（感烟感温+CO+H₂+VOC气体传感器/电解液泄漏探测，多级预警）+全氟己酮/七氟丙烷/气溶胶消防。消防分区：电池包内/电池柜/舱体内部管道。灭火后消防复燃预警及强制排风。\n标准与认证：UN 38.3（锂电池运输安全要求满足联合国危险品运输测试准则）、GB/T 36276（电力储能用锂离子电池）、GB/T 36548（电化学储能系统接入电网测试规范）、GB 51048（电化学储能电站设计规范）。美国/国际标准：UL 1973（储能电池安全标准），UL 9540（储能系统安全），NFPA 855（储能系统安装消防标准）。国内储能电站消防设计要求按GB 51048及国家能源局相关消防技术规范。", module:"m9", submodule:"9.3 储能设备", related:["→ 关联：新能源与储能 §5.3、电能质量治理 §6.7"] },
+  { id:"2808", title:"开关柜智能操控装置", tags:["操控装置","开关柜"], content:"开关柜智能操控装置（Intelligent Switchgear Controller/Switchgear Intelligent Monitoring Device）是安装在高中压开关柜面板上的多功能控制监测模块，替代传统的单一功能元器件（如带电指示器、温湿度控制器、转换开关等），一体化集成了开关柜本地操作控制、一次模拟图动态显示、带电指示及闭锁、温湿度控制、人体感应智能照明、语音防误提示、RS485通信等多种功能。\n主要功能：(1)一次模拟图显示——开关柜一次接线图（主母线+断路器+隔离开关+接地开关+CT/VT+出线电缆等完整回路）面板上以LED或LCD动态模拟显示断路器和隔离开关的分/合闸状态（根据断路器手车位置（工作/试验/分闸/合闸）和接地开关的分合状态，通过采集辅助开关位置接点信号以LED或LCD图形断面变化和符号颜色变化实时呈现）。(2)带电指示——感应式高压带电传感器（与高压带电显示传感器配套（电容式分压传感器安装于母线侧/出线侧，检测线路带电状态），正常时各相LED指示灯亮表示对应相线带电（当三相或某一相未带电时对应相LED灭）。当线路带电时输出强制闭锁接点（闭锁电磁锁，防止带电合接地开关）。(3)温湿度控制——内置温湿度传感器（或外置线式温湿度探头置于开关柜电缆室/断路器室/母线室内），根据预设限值逻辑自动启停加热器（用于驱除凝露/防污秽/加热排湿）或排风扇降温。数据具备RS485 Modbus上传和后台分析。(4)人体感应——通过红外传感器检测柜前是否有人体接近，当有人靠近时自动开启柜内照明（LED灯板），人离开后延时熄灭，节能并与开关柜照明回路配合。(5)语音提示——当检测到操作（如接地开关合闸、手车位置变化）或误操作时，装置内置语音芯片播放提示（\"本回路已带电\"、\"请分接地开关\"等），辅助五防联动。\n通信：RS485接口+Modbus RTU规约接入后台监控系统，上传装置实时测量数据（温度/湿度/带电状态）和报警信息。\n智能操控装置已成为开关柜的标准配置（各类10~35kV户内开关柜），功能集成度高、节省柜面空间、简化接线。代表厂家和型号：珠海优特（UT系列）、深圳中电电力、石家庄科林、河南英特电气等。", module:"m9", submodule:"9.4 自动化设备", related:["→ 关联：工业电气成套 §7.1 开关柜"] },
+  { id:"2806", title:"SVG静止无功发生器", tags:["SVG","无功补偿"], content:"SVG（Static Var Generator，静止无功发生器）是新一代动态无功补偿装置，采用MMC级联H桥或两电平/三电平VSC拓扑，无级连续可调发出容性或感性无功功率，产品系列容量覆盖±50kVar~±300Mvar。\n低压SVG（380V/480V/690V，单机±50kVar~±2Mvar）：采用模块化设计（如50~200kVar功率模块），三相三线/三相四线可选（用于三相四线制电能质量综合治理的SVG配备分裂电容或△型变压器使运行灵活），高速DSP+FPGA控制器，兼具谐波补偿（2~25次）、三相不平衡补偿和快速无功补偿（响应<5ms）。适用于工商业/商业楼宇/医疗/数据中心低压配电系统。\n高压SVG（6/10/35kV直挂，±1~±300Mvar）：采用链式H桥级联CHB拓扑，每相由N个H桥功率单元串联实现高压直接并网（无需升压变压器级联，单元数取决于并网电压等级）。35kV SVG每相约30~40个H桥单元+控制柜。阀组布置中每级的IGBT模块+直流电容器+控制板+取能电源在一个功率单元盒内。控制系统：主控柜+光纤分配柜（主控柜通过光纤与每个H桥单元通信——PWM占空比指令下发+单元状态/电压/故障信息回复）。(1)响应速度<5ms（从检测到无功变化到SVG完全补偿）。(2)无功从-100%~+100%连续无级可调（满足风电场/光伏电站快速AVC无功电压控制对SVG大步进连续调整能力的要求(3)具备有功谐波补偿和三相不平衡补偿的附加能力（部分容量用于滤波和平衡补偿）。链式SVG也常被称为STATCOM（Static Synchronous Compensator）或SVG+APF混合型。\n冷却方式：风冷（紧凑型，中小容量模块SVG常见，风机+散热器+IGBT单元热管散热）或水冷（大容量SVG（±50Mvar以上）内循环纯水+外循环水冷却塔/风冷散热器，IGBT通过水冷板+纯水冷却循环带走热量，散热效率高适合大功率）。\n标准：GB/T 20297静止无功发生器（SVG）功能和性能要求、GB/T 32823电网电能质量治理设备技术规范。代表制造企业：四方股份、特变电工新能源、许继电气、思源电气、盛弘电气、新风光电子、国电南瑞等。", module:"m9", submodule:"9.5 电能质量设备", related:["→ 关联：电能质量治理 §6.2 SVG原理、§6.6 MMC拓扑"] },
+  { id:"2807", title:"有源电力滤波器APF", tags:["APF","有源滤波"], content:"APF（Active Power Filter，有源电力滤波器）产品系列覆盖三相三线/三相四线制低压配电系统（380V/400V/480V/690V），标准模块容量50~600A。通过多台APF模块并联可扩展补偿容量至3000A以上（适用于大容量谐波补偿要求的集中补偿方案）。\n核心拓扑：(1)两电平VSC（成熟拓扑，成本低适用于200A以下模块，输出谐波含量直接与载波频率和LCL滤波器有关）。(2)三电平NPC（Neutral Point Clamped，中点钳位型VSC拓扑）——较两电平拓扑输出谐波含量低（等效电平数3电平）、输出电压du/dt小（电机/变压器绝缘友好）、单管耐压要求减半、滤波电感减小。是目前50A~600A工业型APF模块主流拓扑方案。(3)SiC器件APF（碳化硅MOSFET替代Si IGBT）——开关频率可大幅提升至50~100kHz，无源滤波器尺寸减小70%以上、损耗降低、效率提升1%~2%。已进入商业化初期、成本高。\n补偿范围：(1)谐波补偿：2~50次（可设定补偿特定次，也可全补偿），谐波补偿效率>97%。(2)无功补偿：额定容量剩余部分可补偿无功功率。(3)三相不平衡补偿。补偿响应时间<10ms（全响应至额定补偿电流均值5%误差以内），谐波电流滤除率>95%（THDi降至<5%或更低，取决于APF容量与负载谐波电流的比值）。\n控制算法：(1)谐波检测：瞬时无功功率理论（p-q法、i_d-i_q法）→经同步参考坐标锁相环鉴相，分离零序/基波正序/负序电流分量→FFT提取基波及谐波分量。(2)电流控制：滞环PWM跟踪控制（响应快无延时不依赖负载参数但开关频率不固定对单管开关管通断寿命有影响）或三角载波线性控制（开关频率固定开关管频率恒定)。\n安装方式：APF并接在负载侧（PCC点，CT安装于负载电源进线回路、APF输出侧/负载侧的相应位置正确捕捉负载谐波电流分量，向系统与负载之间就地注入补偿电流）或安装在总进线柜集中补偿、分配电柜局部补偿。安装CT必须采用高精度电流互感器（精度0.5级以上）且次级不能开路。\n主要国产品牌：盛弘电气Sinexcel（专业电能质量厂商）、英博电气/英博新能源（中博电气）、深圳盛弘（行业份额领先）、苏州工业园区苏容/英威腾、诺企电气（上海诺企NQ APF）、国电南自/四方股份（各有APF产品线）。各大低压配电成套厂会配置竞争品牌的APF模块／整柜。\n标准：GB/T 37408有源电力滤波器技术规范、NB/T 10286有源电力滤波器性能测试规程。", module:"m9", submodule:"9.5 电能质量设备", related:["→ 关联：电能质量治理 §6.3 APF原理"] },
+  { id:"2902", title:"阳光电源", tags:["阳光电源","逆变器","储能"], content:"阳光电源股份有限公司（实际控制人曹仁贤，总部安徽合肥）是全球光伏逆变器和储能系统龙头，2024年逆变器全球出货量超130GW（累计，含风能变流器、制氢电源、电化学储能PCS及集成系统、电站EPC等综合板块），储能系统出货量国内稳居前三。新能源电源变换和储能系统集成完整产品线。\n核心产品：(1)光伏逆变器——SG系列组串式（8~350kW全功率覆盖）、SG系列集中式（500kW~3.15MW功率覆盖）。最大效率≥99%（SiC器件）。广泛应用的地面电站组串式逆变器包含SG320HX（320kW，1500Vdc，最大效率99.05%，12路MPPT/每路2串）等高端大功率型号。(2)储能变流器PCS——SC系列模块化PCS（50~3450kW），支持构网型控制（Grid-forming）。直流电压范围DC750~1500V，模块效率≥99%。广泛应用于表前和表后储能系统。阳光电源储能集成系统（PowerTitan系列液冷储能系统/ST3435CP-3450储能逆变升压一体机/PowerStack工商业储能系统）在国内及海外市场有大量项目。(3)新能源电站系统集成——风电变流器、氢能（制氢电源、电解槽）、电站EPC、储能电站系统集成。\n全球布局：中国合肥总部+研发中心，海外在印度、泰国、巴西、欧洲、美国等设有生产工厂和销售服务中心。在光伏逆变器领域全球份额领先（连续多年全球逆变器出货量前二，与华为FusionSolar交替第一），储能PCS国内市场持续排名第一。\n核心竞争力：早期技术积累+持续大额研发投入、1500Vdc系统全产品线覆盖、集中式储能系统集成技术/项目交付经验、完善的全球售后服务网络和本地化制造。\n对标竞品分析：阳光电源组串式逆变器和储能PCS是公司主要竞品——技术路线领先、成本与服务、产品可靠性与智能化（PID修复+I-V曲线扫描+智能组串诊断等）方面需重点跟进。", module:"m9", submodule:"9.6 竞品对比", related:["→ 关联：新能源与储能 §5.1 光伏逆变器"] },
+  { id:"2903", title:"宁德时代", tags:["宁德时代","LFP","储能电池"], content:"宁德时代（CATL，Contemporary Amperex Technology Co.， Limited，总部福建宁德）是全球动力电池和储能电池领域市场份额最高的公司。在动力电池领域（全球份额30%+），在储能电池领域（2024年储能电池出货量全球第一）。\n核心产品线：(1)储能电池——磷酸铁锂电芯（LFP）EnerOne/EnerC/EnerD系列（280Ah/306Ah/314Ah/560Ah+超大容量电芯逐步量产。最新技术的超大容量电芯已在宁德时代的工厂实现量产并可大批量循环寿命超过10000次@70%SOH EOL的储能工况）。(2)钠离子电池/凝聚态电池——宁德时代已推出第一代钠离子电池（160Wh/kg能量密度）和凝聚态电池（500Wh/kg航空级）用于多元储能应用场景。\n核心技术：(1)CTP（Cell to Pack，无模组电池包）技术——取消电池模组级结构，直接将电芯集成到箱体（成组效率提升15~20%，系统能量密度>180Wh/kg），已发展到CTP 3.0（麒麟电池，第三代CTP，全球首创电芯大面冷却技术，体积利用率最高达72%，三元电池系统能量密度255Wh/kg）。(2)长寿命电芯——储能专用电芯循环寿命达15000次（@70%SOH寿命终止条件）或20年日历寿命（7000次循环以上的电池保证在良好维护管理使用条件下能够维持储能电站设计寿命的电箱性能）。(3)BMS主动安全——基于AI的电芯热失控模型（依据异常特征（电压下降斜率/温度快速上升/内阻变化等）提前数分钟预警热失控可能）。\n全球布局：中国溧阳/宁德/青海/宜宾等生产基地+德国图林根工厂/匈牙利工厂（欧洲电池生产基地）。宁德时代（全球龙头）是各储能系统集成商和主要整车企业的核心电池供应商。\n竞争格局：与比亚迪（刀片电池/储能魔方Cube系列）、亿纬锂能、国轩高科、瑞浦兰钧（在储能电芯的技术和价格竞争加剧）等国内头部储能电池厂商存在激烈竞争。在储能电芯应用领域我司（作为系统集成商/设备制造商）重点关注宁德时代的电芯性能和供应链保障，同时关注第二梯队供应商（如鹏辉能源、海辰储能、楚能新能源等）的性价比较方案。", module:"m9", submodule:"9.6 竞品对比", related:["→ 关联：新能源与储能 §5.3 LFP电池"] },
+  { id:"2904", title:"华为数字能源", tags:["华为","数字能源","FusionSolar"], content:"华为数字能源（华为技术有限公司旗下数字能源业务板块）是全球组串式光伏逆变器龙头企业（与阳光电源交替居全球逆变器出货量前二），并在数据中心能源、站点能源、车载动力、储能及综合智慧能源领域全面布局。\n核心产品和方案：(1)智能光伏FusionSolar——组串式光伏逆变器系列（SUN2000系列：户用（3~30kW、多路MPPT及优化器（优化器选配））+工商业（50~100kW）+大型地面电站（175~300kW+，支持大功率组件和双面组件+智能组串分断+MPPT精度业界领先）。最大效率99%以上，1500Vdc系统全线覆盖。逆变器带PID修复、智能I-V曲线诊断、拉弧检测（AFCI功能保证屋顶直流线缆安全）和组串级监控。通信方案支持4G/WiFi/MBTC（华为PLC电力线载波通信或RS485方案）。(2)数字能源管理平台FusionSolar——云平台（实时监控、智能诊断、远程运维、故障告警、统计报表。支持移动APP。发电量评估和自动告警分析以AI技术提效）。智能光伏优化器（组件级优化器支持组件级MPPT和快速关断，满足美国NEC 2017/2020快速关断要求）。\n(3)储能系统——LUNA2000智能储能系统（户用（5~15kWh）+工商业）+大型储能系统和PCS技术与华为数字能源的紧密合作但不如逆变器那样全面自研（数字能源自研储能BMS和系统控制，电池外采集成PACK，大型储能系统集成起步晚于阳光电源但近年集中式/大储领域取得较快出货）。(4)智能充电网络和电动交通动力总成——直流快充/超充模块、充电桩及充电站解决方案。(5)数据中心能源——UPS（不间断电源，模块化UPS），iCooling（数据中心智能温控系统，基于AI优化）、模块化数据中心。\n方案特点与竞争力：华为数字能源依托华为在通信信息领域、芯片/功率半导体（SiC器件研发/数字电源控制芯片）和AI（智能IV曲线、智能电网预测、AI热管理模型）上的深厚布局，在数字技术融合能源电力方面有领先能力，逆变器数字化、智能运维和安全管理方面具有较强优势。\n对标：在光伏逆变器领域组串式方案要密切关注华为的技术迭代和产品组合。华为在光伏逆变器领域的品牌效应、服务体系和智能云平台生态（FusionSolar）给客户提供了很高黏性。", module:"m9", submodule:"9.6 竞品对比", related:["→ 关联：新能源与储能 §5.1 光伏逆变器"] },
+  { id:"2905", title:"ABB高压开关", tags:["ABB","高压开关","VD4"], content:"ABB（现电网业务已整合至日立能源Hitachi Energy，但ABB仍是自动化与电力设备的世界500强品牌）是全球电气设备高端品牌代表之一。在高压开关设备和配用电领域，ABB产品线以高品质、高可靠性在中高端市场具有很强品牌效应。\n核心电气产品：(1)真空断路器VD4——12kV户内固封极柱真空断路器（与国产VS1对标但质量定位和材料工艺要求更高）。配用ABB原装弹簧操动机构（可靠性高、机械寿命≥30000次），固封极柱为APG工艺（材料配方独特）。Emax系列框架断路器（E2N/E2S/E3/E4/E6系列等，1600A~6300A）、Tmax系列塑壳断路器（XT1~XT5/XT7，热磁/电子脱扣器可选）。\n(2)ETC系列开关柜（UniGear ZS1——12kV金属铠装中置开关柜，ABB中压开关柜中国销售主力）+iVD4中压智能化断路器（支持数据互联+温度在线监测）+ZX系列GIS（ZX2/ZX10（12~40.5kV）气体绝缘中压开关柜/充气柜）。UniGear ZS1在我国外资/合资高端中压配电项目中市占率高（许多大型数据中心/半导体厂房/商业综合体/地标建筑的开关柜都指定使用ZS1）。\n(3)中压气体绝缘开关柜（ZX2/ZX10 12~40.5kV）——SF6或干燥空气绝缘，免维护，抗恶劣环境（高海拔/凝露/污秽/低温）。体积小适合空间受限场景。\n市场定位：ABB高压开关和配电产品在高端市场以性能稳定、操作机构寿命长、零件装配精密和全寿命周期运维成本低受到用户青睐（价格偏高）。对标分析：我司可对标ABB的开关柜/断路器在以下几个差异化定位：(1)适度的价格性能平衡；(2)国产化配套产业链优势（供货周期短/本地化响应快）；(3)关键技术对标VD4的弹簧操动可靠性和固封极柱工艺配方、绝缘性能、机械寿命；VS1对标VD4逐步提升可靠性，缩小差距。", module:"m9", submodule:"9.6 竞品对比", related:["→ 关联：产品知识库 §9.1 我司高压开关对标"] },
+  { id:"2906", title:"台达电子", tags:["台达","UPS","PLC"], content:"台达电子（Delta Electronics，总部台湾台北）是全球电源管理与工业自动化领导厂商，在工业电源、UPS、PLC、变频器、伺服驱动、工业通信、视觉检测、工业机器人等自动化领域提供完整的产品线。在全球开关电源市场占有最大份额。\n核心产品和优势：(1)UPS不间断电源——台达UPS产品线从Ultron HPH/HP系列（20~300kVA三相高频在线式UPS）到DPH（模块化UPS，每个模块50~150kW，支持N+X冗余并联，热插拔模式，扩容和维护方便）覆盖从后备式到在线双变换大功率UPS全线。在工业、数据中心、通信电力等市场有较大份额。与APC（施耐德）、华为、科华数据、科士达、伊顿等竞争。(2)PLC——DVP系列（小型PLC，既有台达DVP全系列有ES/SS/EH/SV型号的可编程控制器，与三菱FX系列兼容性好）、AS系列（中型PLC，EtherCAT总线型，适合自动化产线控制与机器自动化）、NC系列（专用运动控制PLC）。(3)变频器——C2000系列（高功能/高精度矢量控制、电流矢量控制与V/F控制双模+内置DB及PG卡）、MS300系列（紧凑型变频器，面向轻工机械/纺织/包装机械小型单体设备）。(4)伺服驱动——ASDA-A3（中高阶，EtherCAT总线通讯，最小循环周期125μs，24bit单圈绝对值编码器，响应频率3kHz+）、ASDA-B3（经济型高速脉冲/位置定位应用）、ASDA-M系列（三合一驱动器(含PLC功能+I/O)，EtherCAT总线型，适合运动控制一轴一控方案）。\n台达的竞争优势：深度垂直整合——电源、电力电子、自动化和散热技术的系统性整合。对成本把控和制造规模有利，产品性价比较高。我司与台达有若干重叠领域（PLC/变频器/伺服/USP等），我司产品应找到差异化竞争（本地化服务/行业解决方案深度定制/渠道价格体系）。\n对标关注：台达的UPS和变频器产品在通用工业市场与我司产品线重合。台达的全球行销网络和电子制造规模效应是其成本优势。", module:"m9", submodule:"9.6 竞品对比", related:["→ 关联：工业电气成套 §7.4 UPS/EPS"] },
+  { id:"2907", title:"汇川技术", tags:["汇川","变频器","伺服"], content:"汇川技术股份有限公司（深圳市汇川技术股份有限公司，总部深圳）是国产工业自动化产品的龙头，在变频器（市占率多年第一）、伺服系统、PLC、SCADA、高性能运动控制、新能源电驱、工业机器人与精密机械等领域全面布局。在国内自动化市场整体排名前列（2024年中国工业自动化市场国产品牌排名第一，国产替代的典型企业代表）\n核心产品和市场地位：(1)变频器——MD500系列（通用矢量变频器/开环矢量闭环矢量/VF模式+支持多种编码器/和PG卡，应用广泛，是汇川的长期畅销主力机型）、MD800系列（多机传动+共直流母线高性能变频器+可插拔式驱动卡+同步定位）、MD880系列（工程型高性能变频器，可完全替代西门子S120，多轴传动/共直流母线/可编程）、HD9X系列（高压变频器，功率单元级联型，6/10kV电压等级，适配风机水泵提升机等高压应用）。市场份额国内第一。(2)伺服系统——SV660系列（高性能EtherCAT总线伺服驱动器，最小循环周期125μs对EtherCAT驱动伺服性能对标松下MINAS A6和安川Σ-7）+SV680系列（新一代高性能伺服驱动器、3.5kHz响应频率、24bit多圈绝对值编码器、更先进抖动抑制算法等定位精度提升）。伺服电机（MS1系列电机配合SV660/SV680驱动器的整体解决方案，与台达ASDA-A3/安川Σ-7同档次性能比，在“EC电机+主轴直驱”等电主轴方案有和机床及机械行业的较高占有率）。(3)PLC（可编程控制器）——AM系列（中型PLC，基于Codesys平台，支持EtherCAT运动控制，面向中高端自动化应用和机器控制领域）、AC系列（小型PLC，对标三菱FX3U，满足一般逻辑控制和简单定位控制需求）。\n(4)新能源（新能源汽车电驱系统&充电桩）——电驱系统和电源系统（乘用车/商用车纯电/混动驱动）。新能源是汇川近年来的快速增长引擎。(5)工业机器人——SCARA机器人（四轴平面关节型，汇川的SCARA在市场以高速度/高性价比在一些3C装配线取放工序替代国际品牌）+六轴工业机器人（逐步推广）。\n竞争定位：汇川是国产替代策略的典型代表企业——在变频器和伺服各细分市场全面与国际品牌（西门子/ABB/安川/三菱等）对标。我司在PLC/变频/伺服领域与汇川存在直接竞争关系。汇川凭借全产品线体系构建（PLC+HMI+伺服+变频+视觉+机器人设备层面到SCADA/MES/MotionController控制层解决方案的平台化）、性价比优势和强大的销售渠道网络在国产品牌中有强劲竞争力。", module:"m9", submodule:"9.6 竞品对比", related:["→ 关联：电气自动化 — PLC、变频器、伺服系统"] },
+
+  // ===== m10: 项目与方案 =====
+  { id:"3002", title:"技术方案编制要点", tags:["技术方案","设计"], content:"技术方案（Technical Proposal）是电气工程投标和项目执行的核心文件，直接决定了项目技术路线、设备选型、系统配置和工程造价。一份高质量的技术方案应包含以下核心章节：\n(1)项目概况——简要描述项目名称、建设地点、建设规模、电气主接线方案（变配电所/升压站/开关站/配电室的规模数量布局等）、主要技术指标（总装机容量/变压器容量/负荷等级/供电电压等）。(2)设计依据——项目设计任务书和合同、国家/行业现行标准规范清单（GB/DL/IEC等标准代号及名称）、现场踏勘资料（场地/气象/地质/水文数据）。(3)技术路线——主接线方案选择（单母线/双母线/桥形接线/3/2接线等，附图说明其拓扑结构及特点分析），负荷等级论证（按GB 50052负荷分级原则分类一二三级负荷），系统运行方式（正常运行/检修/故障情况下主接线运行方式切换的可行性、次序说明）。短路电流及抗灾能力校验方案（母线短路电流耐受强度和断路器等主设备开断能力的选择）。(4)设备选型——主要电气设备（变压器/高压开关柜/GIS/低压配电柜/变频器/UPS/PCS等）的型号规格/技术参数/数量列表，设备选型的技术经济和对比分析要点（满足标准性能和项目特殊要求的响应以满足设计技术规格书为准、可自选方案的最优化推荐）。(5)系统图——电气主接线图、电气总平面图、配电系统图、照明系统图、电缆走向图（平面图/干线图等）、防雷接地平面图、消防电气图等。图纸目录与图号编码统一。(6)工程量清单——设备材料表（名称/型号/规格/数量/单位/备注），施工安装工程量（线缆长度/设备台数/支架数量/土方量/桥架米数等）。(7)技术经济指标——总投资额、单位造价（元/kVA）、年运行费用、节能测算（有功/无功损耗估算）、投资回收期（节能改造类项目需要）。\n技术方案常见格式：封面+目录+正文+附件（图纸/计算书/设备技术资料/产品认证报告/业绩证明材料）。方案编制应完全响应招标技术规范书（逐条对标梳理），并列出技术偏离表（正偏离和负偏离均需明确标注并说明优化或补偿理由）。", module:"m10", submodule:"10.1 设计方案模板", related:["→ 关联：规范与标准 — 引用GB/DL标准"] },
+  { id:"3004", title:"电气施工图设计流程", tags:["施工图","设计流程"], content:"电气施工图设计是电气工程设计的最下游环节，将初步设计或方案设计转化为可指导现场施工安装的技术图纸文件。电气施工图设计的管理流程和技术流程如下：\n设计流程（分阶段）：(1)初步设计——根据设计任务书和方案设计确定主要电气技术原则：变配电所及发电机房的位置、负荷计算和变压器容量台数选择、高低压主接线型式、主要设备选型（开关柜/变压器/发电机/UPS/EPS/配电箱等）、干线走向等。初步设计阶段产出电气初步设计说明+电气系统图（主接线图、低压配电干线图、防雷类别及措施概要、照明标准及主要灯具选型、弱电各子系统方案）+初步设计概算。(2)施工图设计——在初步设计批复和深化设计基础上，细化到每一台设备/每一个回路的安装、接线和控制。施工图设计阶段按专业细化分册。典型电气施工图图纸目录（主要包括以下图纸种类和顺序）:电气设计总说明和图例（位于各专业施工图册首页，包含工程概况、设计依据、系统指标、设备安装要求和图例符号表）、高低压配电系统图（变配电系统单线图/主接线图，注明设备型号参数、保护配置、开关整定值、CT变比等）、电气照明平面图（各楼层照明/插座布置、灯具型号功率、回路编号、管线标注、地面/墙面插座出线口等）、电力平面图（设备配电箱/动力配电箱/控制箱的电源引接、线缆走向标注敷设方式/管径/电缆编号及规格尺寸等）、防雷接地平面图（避雷带/避雷网/接闪器布置、引下线位置、断接卡、接地极及接地干线布置、等电位联接做法/等电位箱位置等）、消防电气平面图（消防报警设备点位/手动报警按钮/警铃/声光报警器/消防广播/消防电话回路及布线、消火栓按钮启泵线/应急照明平面等）、弱电智能化系统图及平面图（综合布线/安防/楼控/能耗监测等）。\n(3)图纸会审——设计单位向施工和监理单位进行技术交底，各方会审提出问题（设计说明不清楚、系统图与平面图不一致、安装空间冲突、与土建装修条件或水暖条件冲突等），设计单位形成会审纪要并修改图纸。会审是施工前的关键质量控制节点。\n(4)设计交底——施工前由设计负责人对项目部/施工方进行设计意图、施工技术要求、关键部位工艺做法、安装注意事项的交底。\n制图标准：图纸幅面优先采用A0/A1/A2/A3，绘图图层/线型/文字字体/尺寸标注按照GB/T 50001《房屋建筑制图统一标准》和GB/T 18135《电气工程CAD制图规则》标准化。使用CAD电气专业软件（AutoCAD Electrical/天正电气/中望电气）出图。图纸目录（按系统图、平面图、大样图分区排列）和图纸编号（图号按设计院图号和专业-子项-图纸序列编码，例如D-01或E-001或电施-01/电施-02等区段）。\n图纸归档：每一阶段设计图纸须设计人/校对/审核/审定四级签字（四级校审制度），盖章后（设计出图专用章+注册电气工程师执业印章（强电及弱电由注册电气工程师签章盖章））方可交付施工。竣工图由施工单位在竣工后根据实际施工情况将变更部分标注或重新绘制归档。", module:"m10", submodule:"10.1 设计方案模板", related:["→ 关联：规范与标准 §8.6 GB/T 4728制图标准"] },
+  { id:"3003", title:"商务标书编制", tags:["投标","商务标"], content:"商务标书是投标文件的重要组成部分，与报价（经济标）和技术方案（技术标）一起构成完整的投标文件。商务标书包括投标人资质能力审查文件、业绩证明和商务条款响应表，是招标人/评标专家进行投标人资格评审和实力评价的主要依据。\n核心内容：(1)投标函及法定代表人授权书（法定代表人签字并盖公司公章），投标保证金（按招标文件要求提交保额和形式（电汇/保函等））。(2)资质文件——企业法人营业执照副本（三证合一）、投标人法定代表人身份证明、企业资质证书（电力工程施工/设计/承装/修/试许可证明，如电力工程施工总承包/送变电专业承包、安全生产许可证等，根据项目范围和等级要求提供相应等级资质）、产品型式试验报告（投标设备应符合国家认证）、ISO体系认证证书（质量/环境/职业健康安全）、CCC强制认证（产品如在强制性认证目录范围内则须提供CCC证书）。(3)业绩证明——近3~5年同类项目业绩（合同关键页+竣工验收证明+用户评价证明），业绩规模/数量与拟投标项目匹配（以证明投标人有足够经验和能力履行合同）。(4)财务状况——经审计的近三年财务报表（资产负债表+利润表+现金流量表）、银行资信证明、企业信用报告（无重大违约/失信记录）。(5)技术偏离表——对招标文件技术规格书中每一项技术条款的响应情况逐条进行响应（响应/正偏离/负偏离）并明确说明。正偏离指投标产品指标优于招标要求（可加分）、负偏离指低于招标要求（必须说明理由/替代方案/接受降级处理等，过多负偏离可能导致投标被判定为非实质性响应）。\n(6)报价表——分项报价（设备/材料/安装/调试/培训/技术服务/税金/运保费等）+总价大写小写。单价乘以数量等于合价，全部合价相加等于总价（一字不差）。报价依据需附设备材料品牌型号规格的参考价或报价依据来源。(7)商务条款响应——对付款方式、交货期、质保期、售后服务响应时间的响应或偏离说明，对合同主要商务条款的完全响应（如付款条件/履约保函/质保金/逾期违约金/仲裁等通用商务条件）。(8)其他——项目经理及关键人员简历资质、施工机械/试验设备清单、投标人企业简介等。\n投标文件编制要求：逐条响应招标文件中的所有资格条件和商务要求（不能漏项、漏响应、缺失）。签字盖章齐全（骑缝章+每一页由法定代表人或授权代理人签字/加盖公章）。电子标按招标文件格式要求上传平台加密（如国网ECP2.0平台、南方电网供应链统一服务平台、各地方公共资源交易中心交易平台）。纸质标按招标文件（正本1份+副本若干份）封装为内层+外层密封包封，严格密封并加盖密封章。\n注意事项：需严格检查响应格式要求（文件格式（PDF/Word/盖章扫描件）、装订要求、密封要求、电子文件载体和数量要求（U盘/光盘）），以及投标保证金电汇底单是否在截止时间前到账。", module:"m10", submodule:"10.2 投标文件", related:[] },
+  { id:"3001", title:"国网招投标流程", tags:["国网","招投标","ECP"], content:"国家电网公司（国网）的招投标流程是电力行业设备供应商最重要的商机获取渠道。国网的物资/服务采购主要集中招标平台为ECP2.0（国家电网新一代电子商务平台，https：//ecp.sgcc.com.cn），物资类招标按年度批次计划＋集中规模招标进行。国网招标/投标主要流程如下：\n(1)招标公告——国网在ECP2.0平台和中国招标投标公共服务平台发布招标公告（物资/服务批次名称、投标人资格要求、招标文件获取时间、投标截止时间、开标时间地点、投标保证金提交方式和联系人）。供应商需在ECP2.0平台完成注册审核（免费注册+企业资质提交审核）。\n(2)投标文件编制——购买招标文件（在ECP2.0线上操作）后按照规定格式要求编制投标文件。注意：国网对投标人的资质业绩要求严格（必须满足型式试验报告、CQC/PCCC产品认证、同类产品运行业绩等硬门槛），资格预审（国网对主要物资品类每年或每批次发布资格预审公告，潜在供应商需提前参加资格预审（同时在国网供应商资质能力核实系统提交资料、核实），未通过资格预审者无法参与相应投标）。投标文件须在截止时间前加密上传至ECP2.0（电子签章+网络加密投递开标前不可解密）。\n(3)开标——国网批次集中开标采用远程在线开标（视频直播开标过程），在ECP2.0平台上公布投标人名称和投标价格，各投标人远程解密。\n(4)评标——评标委员会由国网专家库抽取技术专家+商务专家+法律专家组成。评标原则：综合评估法（商务+技术+价格三部分加权打分，各部分权重按批次和产品略有差异，商务10%、技术40%~50%、价格40%~50%）。价格分评定通常采用平均价法（报价在基准价正负一定范围内平均价最好或区间内平均价法，一般扣除最高和最低后的平均价作为基准价为中间价或价格得分按照与基准价的偏差率计算低者为满分）或限价法——超过最高限价或明显低于成本价的投标报价无效。(5)中标公示和中标通知——评标结束后国网在ECP2.0平台公示中标候选人（不少于3日），公示结束后向中标人发中标通知书。\n(6)合同签订——在ECP2.0进行电子合同签署。履约保证金（一般为合同金额的10%，可以履约保函代替或银行转账）和质量保证金（5%左右质保期满后退还）按合同约定执行。(7)供货及验收——按中标交货期要求供货，国网各省公司物资部/项目单位组织物资到货验收，产品需符合招标技术规范和出厂资料要求。\n对其他电力行业项目同样适用本流程的中标逻辑（南方电网公司也有类似的供应链统一服务平台进行线上招投标，流程和国家电网基本一致，差别为具体平台界面和评标细则）。\n重点关注：国网供应商需留意国网供应商资质能力核实（供应商在国网供应商资质能力信息核实系统提交资质业绩材料，参与国网统一资质能力核实并提供支撑资料证明自己；需要具备履约能力核实和产品质量评估认定以获得国网供应商资质能力信息核实结果证明函件），该函件是供应商资质业绩的集中统一证明，是参与后续投标的重要支撑（并非每批次都需要重复提交，但产品质量及运行情况的定期核查将对中标产生影响）。", module:"m10", submodule:"10.3 国网项目流程", related:["→ 关联：规范与标准 §8.3 Q/GDW企标"] },
+  { id:"3005", title:"EPC总承包模式", tags:["EPC","总承包"], content:"EPC（Engineering Procurement Construction，设计-采购-施工总承包）模式是电力工程项目中最常用的工程总承包方式之一（另外常见的还有交钥匙Turnkey、DB设计建造、PMC项目管理承包等模式）。在EPC模式下，总承包商按固定总价/固定工期合同承担工程的设计（Engineering）、采购（Procurement）和施工建设（Construction）全过程，对工程的安全性、质量、进度、造价向业主承担全部责任。\n组织架构：业主（投资方/项目公司/招标方）→EPC总承包商（一家企业或联合体牵头方）→分包商（设计分包/土建分包/电气安装分包/调试分包等）。总包对业主负总责、各分包对总包负责，业主不直接管理分包。\nEPC模式的特点和优势：(1)单一责任制——业主只需与总承包商对接，减少合同界面和协调工作量。(2)有利于设计优化和投资节约——设计和采购施工一体化，总承包商可优化设计（在功能标准不变前提下的价值工程优化）降低造价，提升总包利润空间。(3)固定总价/固定工期——业主投资风险可控（省去分别招标和界面索赔的麻烦），但也意味着总包承担更多的风险（设计错误的变更/物价上涨/地质条件变化/不可抗力等——可能通过EPC合同中的索赔条款限制总包的索赔项）。\n合同类型：EPC合同一般为固定总价合同（Lump Sum Turn Key，LSTK），部分为可调总价（随大宗材料/人工价格的指数调整）。付款节点按里程碑设置（如设计完成10%+主要设备到货20%+土建完成20%+安装调试完成30%+竣工验收20%）。\n适用范围：大型电站（火力发电厂/燃气联合循环/垃圾焚烧发电/生物质发电/光伏/风电）/变电站/化工/冶金等大型工业工程。EPC总包方应具备设计能力（电力/化工设计资质）和施工能力或总包管理能力（施工资质+项目管理团队+采购资源整合能力）。\n注意事项：(1)投标前应充分进行现场踏勘和招标文件澄清深入研读，识别自然环境/土地/许可等风险；(2)投标报价的工程量清单中细化暂列金额和报价涨幅空间；(3)明确合同变更索赔条款（业主要求变更/新增工程范围导致费用或工期调整索赔）和不可抗力（自然灾害/极端天气/政策停工/流行病等不可归责于双方的外部事件影响处理方式）的定义和分配。(4)关注分包合同与EPC主合同的背对背条款（总包与分包之间关键权利义务条款与总包合同一致/对应）。", module:"m10", submodule:"10.4 项目归档", related:[] },
+  { id:"3006", title:"成本估算与报价", tags:["成本","报价","清单计价"], content:"电气工程项目成本估算是投标报价和项目经济管理的基础。准确的成本估算需基于设计图纸和工程量清单，结合设备材料市场价格、人工成本和施工经验进行详细核算。\n成本构成（典型电气项目）：\n(1)设备购置费——主要电气设备（变压器/高低压开关柜/GIS/UPS/变频器/配电箱/电缆/母线槽/桥架灯具/电线等）的出厂含税价+运输费+保险费+采保费（惯例取设备费1%~2%）。设备费通常占电气工程总造价的50%~65%。获取设备报价的方式：向生产厂家或代理商进行询价（不少于3家）、参考历史中标价/信息价/造价信息网发布的设备指导价。(2)安装工程费（包括人工费+施工机具费+辅材费+措施费）——包含设备安装（变压器/盘柜/配电箱/灯具/开关插座/电缆敷设/电缆头制安/桥架安装/防雷接地等所有电气施工内容的安装）、调试费（单体调试+系统调试/试验/送电调试等）、脚手架搭拆等措施费。\n(3)其他费用——管理费（企业管销费用，按直接费的比例取费，项目规模越大费率越低（定额计价管理费费率约25%~35%直接费成本））、设计费（EPC项目总包方自行承担设计或分包设计、深化设计等）、培训费、总承包服务费（EPC）、税金（增值税9%建筑业或13%设备采购，随一般纳税人和小规模纳税人差异有区别、城市建设维护税/教育附加/地方教育附加以增值税为基数乘以相应税率计算）。(4)利润——一般按直接费+间接费的5%~10%（竞争性报价一般取较低利润4%~8%或根据市场竞争的激烈程度调整）。\n计价方法：(1)定额计价——按项目所在省份建设行政主管部门发布的《建设工程计价定额》及同期造价信息进行算量套价（人工/材料/机械台班按定额消耗量标准计算）。适用于政府项目或预算控制项目。(2)工程量清单计价（GB 50500《建设工程工程量清单计价规范》）——招标控制价编制+投标报价分别按同一清单项目特征描述自主报价。投标报价采用综合单价（人工+材料+机械+管理费+利润+增值税等费用的全费用单价）。建设单位负责提供清单项目特征和工程量，风险由业主承担清单量算量不准调整风险，投标方承担组价风险（投标单价固定，按中标单价×实际完成工程量＝结算价）。\n投标报价策略：(1)对业主预算进行测算（围标控标风险）。(2)对技术要求高/我司有方案优势的报价适当提高利润（利用技术差异性优势取得高利润）。(3)低价竞标+变更索赔策略（低报固定总价，在实施中寻找变更机会合理索赔）。(4)注意不平衡报价法——总价不变但调整各单项报价：前期付款项目（如预付款、设备进场款）适当报高、后期项目（如质保期工作、调试收尾）适当报低，提前资金回流。注意招标文件禁止不平衡报价（或设置评分扣分等限制）。\n标准规范配套：GB 50500建设工程工程量清单计价规范、各省/行业定额（如电力工程定额和电网检修工程定额、建筑安装工程定额由各省/行业工程造价站发布）。", module:"m10", submodule:"10.5 技术报价", related:["→ 关联：产品知识库 — 设备选型价格"] }
+];
+
+// ===== App Logic =====
+let activeModule = null;
+let filteredEntries = [];
+
+function getModuleEntries(moduleId) {
+  return ENTRIES.filter(e => e.module === moduleId);
+}
+
+function escapeHtml(text) {
+  if (!text) return "";
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+function renderModuleSidebar() {
+  const list = document.getElementById('moduleList');
+  list.innerHTML = '';
+  const searchTerm = document.getElementById('moduleSearch').value.toLowerCase().trim();
+
+  MODULES.forEach(mod => {
+    if (searchTerm && !mod.name.toLowerCase().includes(searchTerm)) return;
+
+    const item = document.createElement('div');
+    item.className = 'module-item' + (activeModule === mod.id ? ' active' : '');
+    item.dataset.module = mod.id;
+
+    const icon = document.createElement('div');
+    icon.className = 'module-icon ' + mod.id;
+    icon.textContent = MODULE_ICONS[mod.id];
+
+    const info = document.createElement('div');
+    info.className = 'module-info';
+    info.innerHTML = '<div class="module-name">' + escapeHtml(mod.name) + '</div>';
+
+    const badge = document.createElement('span');
+    badge.className = 'entry-count-badge';
+    badge.textContent = mod.count;
+
+    item.appendChild(icon);
+    item.appendChild(info);
+    item.appendChild(badge);
+
+    item.addEventListener('click', function() {
+      activeModule = (activeModule === mod.id) ? null : mod.id;
+      renderModuleSidebar();
+      renderEntries();
+      document.getElementById('sidebar').classList.remove('open');
+      document.getElementById('sidebarOverlay').classList.remove('open');
+    });
+
+    list.appendChild(item);
+  });
+}
+
+function renderEntries() {
+  const container = document.getElementById('entriesContainer');
+  const searchTerm = document.getElementById('entrySearch').value.toLowerCase().trim();
+  const currentModuleEl = document.getElementById('currentModule');
+  const currentCountEl = document.getElementById('currentCount');
+  const searchStats = document.getElementById('searchStats');
+
+  let baseEntries = activeModule ? getModuleEntries(activeModule) : ENTRIES.slice();
+
+  if (searchTerm) {
+    baseEntries = baseEntries.filter(function(e) {
+      return e.title.toLowerCase().includes(searchTerm) ||
+             e.tags.some(function(t) { return t.toLowerCase().includes(searchTerm); }) ||
+             e.content.toLowerCase().includes(searchTerm) ||
+             e.id.includes(searchTerm);
+    });
+  }
+
+  var byModule = {};
+  baseEntries.forEach(function(e) {
+    if (!byModule[e.module]) byModule[e.module] = [];
+    byModule[e.module].push(e);
+  });
+
+  if (activeModule) {
+    var mod = null;
+    for (var i = 0; i < MODULES.length; i++) {
+      if (MODULES[i].id === activeModule) { mod = MODULES[i]; break; }
+    }
+    currentModuleEl.textContent = mod ? mod.name : '';
+    currentCountEl.textContent = '[ ' + baseEntries.length + ' / ' + (mod ? mod.count : 0) + ' entries ]';
+  } else {
+    var totalFiltered = searchTerm ? baseEntries.length : ENTRIES.length;
+    currentModuleEl.textContent = '# all modules';
+    currentCountEl.textContent = '[ ' + totalFiltered + ' / ' + ENTRIES.length + ' entries ]';
+  }
+
+  if (searchTerm) {
+    searchStats.textContent = '// search: found ' + baseEntries.length + ' match(es)';
+  } else {
+    searchStats.textContent = '';
+  }
+
+  if (baseEntries.length === 0) {
+    container.innerHTML = '<div class="empty-state"><div class="icon">* * *</div><p>no entries found<br>try a different search or clear the filter</p></div>';
+    return;
+  }
+
+  var html = '';
+  var moduleIds = Object.keys(byModule).sort();
+
+  for (var mi = 0; mi < moduleIds.length; mi++) {
+    var modId = moduleIds[mi];
+    var mod = null;
+    for (var i = 0; i < MODULES.length; i++) {
+      if (MODULES[i].id === modId) { mod = MODULES[i]; break; }
+    }
+    if (!mod) continue;
+    var entries = byModule[modId];
+
+    var bySub = {};
+    entries.forEach(function(e) {
+      if (!bySub[e.submodule]) bySub[e.submodule] = [];
+      bySub[e.submodule].push(e);
+    });
+
+    var subKeys = Object.keys(bySub).sort(function(a, b) {
+      var idxA = mod.submodules.indexOf(a);
+      var idxB = mod.submodules.indexOf(b);
+      return (idxA === -1 ? 999 : idxA) - (idxB === -1 ? 999 : idxB);
+    });
+
+    html += '<div class="module-section" data-module="' + modId + '">';
+    html += '<div class="module-section-title">';
+    html += '<span class="module-icon ' + modId + '" style="display:inline-flex;width:24px;height:24px;align-items:center;justify-content:center;border:1px solid;border-radius:3px;font-size:0.7rem;font-family:var(--font-mono);flex-shrink:0;">' + MODULE_ICONS[modId] + '</span>';
+    html += escapeHtml(mod.name);
+    html += ' <span class="badge">' + entries.length + '</span>';
+    html += '</div>';
+
+    for (var si = 0; si < subKeys.length; si++) {
+      var sub = subKeys[si];
+      var subEntries = bySub[sub];
+      html += '<div class="submodule-group">';
+      html += '<div class="submodule-title">' + escapeHtml(sub) + '</div>';
+      for (var ei = 0; ei < subEntries.length; ei++) {
+        var entry = subEntries[ei];
+        var globalIdx = baseEntries.indexOf(entry);
+        html += '<div class="entry-card" data-index="' + globalIdx + '">';
+        html += '<div class="entry-header">';
+        html += '<div class="entry-title">' + escapeHtml(entry.title) + '</div>';
+        html += '<div class="entry-id">' + escapeHtml(entry.id) + '</div>';
+        html += '</div>';
+        html += '<div class="entry-tags">';
+        for (var ti = 0; ti < entry.tags.length; ti++) {
+          html += '<span class="entry-tag">' + escapeHtml(entry.tags[ti]) + '</span>';
+        }
+        html += '</div>';
+        html += '<div class="entry-content">' + escapeHtml(entry.content) + '</div>';
+        if (entry.related && entry.related.length > 0) {
+          html += '<div class="entry-related">' + entry.related.join(' · ') + '</div>';
+        }
+        html += '</div>';
+      }
+      html += '</div>';
+    }
+
+    html += '</div>';
+  }
+
+  container.innerHTML = html;
+}
+
+// Sidebar toggle
+document.getElementById('sidebarToggle').addEventListener('click', function() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sidebarOverlay').classList.toggle('open');
+});
+document.getElementById('sidebarOverlay').addEventListener('click', function() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebarOverlay').classList.remove('open');
+});
+
+// Search with debounce
+var searchTimer = null;
+document.getElementById('entrySearch').addEventListener('input', function() {
+  clearTimeout(searchTimer);
+  searchTimer = setTimeout(renderEntries, 150);
+});
+
+document.getElementById('moduleSearch').addEventListener('input', function() {
+  renderModuleSidebar();
+});
+
+// Keyboard shortcut to clear
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    document.getElementById('entrySearch').value = '';
+    renderEntries();
+  }
+});
+
+// ===== Detail Modal =====
+let modalEntryList = [];
+let modalEntryIndex = -1;
+
+function openModal(entry, list, index) {
+  modalEntryList = list || [];
+  modalEntryIndex = index;
+
+  document.getElementById('modalModule').textContent = (function() {
+    for (var i = 0; i < MODULES.length; i++) {
+      if (MODULES[i].id === entry.module) return MODULES[i].name;
+    }
+    return '';
+  })() + ' / ' + entry.submodule;
+
+  document.getElementById('modalTitle').textContent = entry.title;
+  document.getElementById('modalId').textContent = entry.id;
+  document.getElementById('modalContent').textContent = entry.content;
+
+  var tagsHtml = '';
+  for (var i = 0; i < entry.tags.length; i++) {
+    tagsHtml += '<span class="modal-tag">' + escapeHtml(entry.tags[i]) + '</span>';
+  }
+  document.getElementById('modalTags').innerHTML = tagsHtml;
+
+  if (entry.related && entry.related.length > 0) {
+    document.getElementById('modalRelatedSection').style.display = 'block';
+    document.getElementById('modalRelated').innerHTML = entry.related.join('<br>');
+  } else {
+    document.getElementById('modalRelatedSection').style.display = 'none';
+  }
+
+  document.getElementById('modalSubmodule').textContent = entry.submodule;
+
+  document.getElementById('modalPrev').disabled = (index <= 0);
+  document.getElementById('modalNext').disabled = (index >= list.length - 1);
+
+  document.getElementById('modalOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+  document.getElementById('modalOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+document.getElementById('modalClose').addEventListener('click', closeModal);
+document.getElementById('modalOverlay').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeModal();
+  if (e.key === 'ArrowLeft') document.getElementById('modalPrev').click();
+  if (e.key === 'ArrowRight') document.getElementById('modalNext').click();
+});
+
+document.getElementById('modalPrev').addEventListener('click', function() {
+  if (modalEntryIndex > 0) {
+    var prev = modalEntryList[modalEntryIndex - 1];
+    openModal(prev, modalEntryList, modalEntryIndex - 1);
+  }
+});
+
+document.getElementById('modalNext').addEventListener('click', function() {
+  if (modalEntryIndex < modalEntryList.length - 1) {
+    var next = modalEntryList[modalEntryIndex + 1];
+    openModal(next, modalEntryList, modalEntryIndex + 1);
+  }
+});
+
+// Click entry card to open modal
+document.getElementById('entriesContainer').addEventListener('click', function(e) {
+  var card = e.target.closest('.entry-card');
+  if (!card) return;
+
+  var searchTerm = document.getElementById('entrySearch').value.toLowerCase().trim();
+  var baseEntries = activeModule ? getModuleEntries(activeModule) : ENTRIES.slice();
+
+  if (searchTerm) {
+    baseEntries = baseEntries.filter(function(entry) {
+      return entry.title.toLowerCase().includes(searchTerm) ||
+             entry.tags.some(function(t) { return t.toLowerCase().includes(searchTerm); }) ||
+             entry.content.toLowerCase().includes(searchTerm) ||
+             entry.id.includes(searchTerm);
+    });
+  }
+
+  var idx = parseInt(card.dataset.index, 10);
+  if (!isNaN(idx) && baseEntries[idx]) {
+    openModal(baseEntries[idx], baseEntries, idx);
+  }
+});
+
+// Init
+renderModuleSidebar();
+renderEntries();
+</script>
+</body>
+</html>
