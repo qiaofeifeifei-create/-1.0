@@ -5,3 +5,9 @@ node_modules/
 .env.local
 .claude/
 check_quotes.js
+knowledge/generate-html.js
+knowledge/package*.json
+knowledge/node_modules/
+knowledge/outputs/
+tools/paper-skills/paper_lib/
+tools/paper-skills/agent_papers_cli-0.2.1.dist-info/
