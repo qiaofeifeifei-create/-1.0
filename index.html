@@ -2522,7 +2522,7 @@ body{font-family:var(--font-sans);background:var(--bg-primary);color:var(--text-
 let totalEntries = 0;
 let sectionCounts = [];
 document.querySelectorAll('.content-section').forEach(s => {
-  const count = (s.innerHTML.match(/ID:\s*\d+/g) || []).length;
+  const count = (s.textContent.match(/ID:\s*\d+/g) || []).length;
   sectionCounts.push(count);
   totalEntries += count;
 });
