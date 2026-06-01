@@ -1,0 +1,2557 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>电气工程知识库</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg-primary:#0a0a12;--bg-secondary:#111122;--bg-card:#16162a;
+  --bg-hover:#1e1e3a;--border:#2a2a4a;--accent:#00f0ff;--accent-dim:#0088aa;
+  --accent-green:#00ff88;--text-primary:#e0e0f0;--text-secondary:#8888bb;
+  --text-dim:#555577;--sidebar-width:280px;
+  --font-mono:'Cascadia Code','JetBrains Mono','Fira Code','Consolas',monospace;
+  --font-sans:'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif;
+}
+html{font-size:15px}
+body{font-family:var(--font-sans);background:var(--bg-primary);color:var(--text-primary);display:flex;min-height:100vh;overflow-x:hidden}
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-track{background:var(--bg-primary)}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+
+/* Sidebar */
+.sidebar{position:fixed;top:0;left:0;width:var(--sidebar-width);height:100vh;background:var(--bg-secondary);border-right:1px solid var(--border);display:flex;flex-direction:column;z-index:100;overflow:hidden}
+.sidebar-header{padding:20px 16px 12px;border-bottom:1px solid var(--border);flex-shrink:0}
+.sidebar-header h1{font-family:var(--font-mono);font-size:1rem;color:var(--accent);letter-spacing:2px;margin-bottom:4px}
+.sidebar-header .subtitle{font-size:0.75rem;color:var(--text-dim);font-family:var(--font-mono)}
+.sidebar-header .total-info{margin-top:8px;font-size:0.75rem;color:var(--accent-green);font-family:var(--font-mono)}
+.nav-list{flex:1;overflow-y:auto;padding:8px 0}
+.nav-link{display:flex;align-items:center;gap:10px;padding:10px 16px;cursor:pointer;transition:all 0.15s;border-left:3px solid transparent;text-decoration:none;color:var(--text-primary)}
+.nav-link:hover{background:var(--bg-hover);border-left-color:var(--accent-dim)}
+.nav-link.active{background:rgba(0,240,255,0.08);border-left-color:var(--accent)}
+.nav-icon{width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:4px;font-size:0.75rem;font-family:var(--font-mono);flex-shrink:0;border:1px solid}
+.nav-text{font-size:0.82rem;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nav-count{font-size:0.7rem;color:var(--text-dim);font-family:var(--font-mono);background:var(--bg-primary);padding:1px 6px;border-radius:8px}
+
+/* Main */
+.main{margin-left:var(--sidebar-width);flex:1;padding:24px 32px 60px;max-width:calc(100% - var(--sidebar-width))}
+
+/* Sections */
+.content-section{display:none}
+.content-section.active{display:block;animation:fadeIn 0.3s ease-out}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.section-header{margin-bottom:24px;padding-bottom:16px;border-bottom:1px solid var(--border)}
+.section-title{font-family:var(--font-mono);font-size:1.4rem;color:var(--accent)}
+.section-body{font-size:0.9rem;line-height:1.7;color:var(--text-secondary)}
+
+/* Content styles */
+.section-body h2{font-size:1.15rem;margin:28px 0 10px;color:var(--text-primary);padding-bottom:6px;border-bottom:1px solid var(--border)}
+.section-body h3{font-size:1rem;margin:20px 0 8px;color:var(--accent)}
+.section-body h4{font-size:0.9rem;margin:14px 0 6px;color:var(--text-primary)}
+.section-body p{margin:8px 0}
+.section-body ul,.section-body ol{margin:8px 0;padding-left:24px}
+.section-body li{margin:3px 0}
+.section-body hr{margin:20px 0;border:none;border-top:1px solid var(--border)}
+.section-body blockquote{margin:10px 0;padding:8px 14px;background:var(--bg-card);border-left:3px solid var(--accent-dim);color:var(--text-dim);font-size:0.85rem}
+.section-body code{background:#1e1e3a;padding:1px 5px;border-radius:3px;font-family:var(--font-mono);font-size:0.85rem;color:var(--accent)}
+.section-body pre{background:#0d0d1a;padding:12px 16px;border-radius:6px;overflow-x:auto;margin:10px 0;border:1px solid var(--border)}
+.section-body pre code{background:none;padding:0;color:#e0e0f0;font-size:0.82rem;line-height:1.5}
+.section-body .table-wrap{overflow-x:auto;margin:10px 0;border:1px solid var(--border);border-radius:6px;background:var(--bg-card)}
+.section-body table{width:100%;border-collapse:collapse;font-size:0.82rem;min-width:400px}
+.section-body th{background:var(--bg-secondary);padding:6px 10px;text-align:left;font-weight:600;border:1px solid var(--border);color:var(--text-primary);white-space:nowrap}
+.section-body td{padding:5px 10px;border:1px solid var(--border)}
+.section-body tr:nth-child(even){background:rgba(255,255,255,0.02)}
+.section-body tr:hover{background:rgba(0,240,255,0.03)}
+.section-body strong{color:var(--text-primary)}
+
+/* Mobile */
+.sidebar-toggle{display:none;position:fixed;top:12px;left:12px;z-index:200;width:38px;height:38px;background:var(--bg-secondary);border:1px solid var(--border);border-radius:6px;color:var(--accent);font-size:1.1rem;cursor:pointer;align-items:center;justify-content:center}
+.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:99}
+
+@media(max-width:768px){
+  .sidebar{transform:translateX(-100%);transition:transform 0.3s}
+  .sidebar.open{transform:translateX(0)}
+  .sidebar-overlay.open{display:block}
+  .sidebar-toggle{display:flex}
+  .main{margin-left:0;padding:16px;max-width:100%;padding-top:60px}
+  .section-title{font-size:1.15rem}
+  .section-body{font-size:0.85rem}
+  .section-body table{font-size:0.75rem;min-width:300px}
+  .section-body th,.section-body td{padding:4px 6px}
+}
+</style>
+</head>
+<body>
+
+
+<button class="sidebar-toggle" onclick="toggleSidebar()" aria-label="Toggle sidebar">☰</button>
+<div class="sidebar-overlay" id="overlay" onclick="toggleSidebar()"></div>
+
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <h1>// 电气工程</h1>
+    <div class="subtitle">knowledge base</div>
+    <div class="total-info">[ <span id="totalCount">0</span> entries · 10 domains ]</div>
+  </div>
+  <div class="nav-list">
+    
+  <a href="#" class="nav-link" data-index="0" onclick="showSection(0);return false">
+    <span class="nav-icon" style="color:#00f0ff;border-color:#00f0ff">~</span>
+    <span class="nav-text">电气基础理论</span>
+    <span class="nav-count">0</span>
+  </a>
+
+  <a href="#" class="nav-link" data-index="1" onclick="showSection(1);return false">
+    <span class="nav-icon" style="color:#00ff88;border-color:#00ff88">=</span>
+    <span class="nav-text">电力系统</span>
+    <span class="nav-count">0</span>
+  </a>
+
+  <a href="#" class="nav-link" data-index="2" onclick="showSection(2);return false">
+    <span class="nav-icon" style="color:#ff0088;border-color:#ff0088">#</span>
+    <span class="nav-text">电气自动化</span>
+    <span class="nav-count">0</span>
+  </a>
+
+  <a href="#" class="nav-link" data-index="3" onclick="showSection(3);return false">
+    <span class="nav-icon" style="color:#aa66ff;border-color:#aa66ff">@</span>
+    <span class="nav-text">弱电 & 智能化</span>
+    <span class="nav-count">0</span>
+  </a>
+
+  <a href="#" class="nav-link" data-index="4" onclick="showSection(4);return false">
+    <span class="nav-icon" style="color:#ff8800;border-color:#ff8800">$</span>
+    <span class="nav-text">新能源 & 储能</span>
+    <span class="nav-count">0</span>
+  </a>
+
+  <a href="#" class="nav-link" data-index="5" onclick="showSection(5);return false">
+    <span class="nav-icon" style="color:#ff4488;border-color:#ff4488">%</span>
+    <span class="nav-text">电能质量治理</span>
+    <span class="nav-count">0</span>
+  </a>
+
+  <a href="#" class="nav-link" data-index="6" onclick="showSection(6);return false">
+    <span class="nav-icon" style="color:#44ffaa;border-color:#44ffaa">&</span>
+    <span class="nav-text">工业电气成套</span>
+    <span class="nav-count">0</span>
+  </a>
+
+  <a href="#" class="nav-link" data-index="7" onclick="showSection(7);return false">
+    <span class="nav-icon" style="color:#ffaa44;border-color:#ffaa44">*</span>
+    <span class="nav-text">规范 & 标准</span>
+    <span class="nav-count">0</span>
+  </a>
+
+  <a href="#" class="nav-link" data-index="8" onclick="showSection(8);return false">
+    <span class="nav-icon" style="color:#4488ff;border-color:#4488ff">+</span>
+    <span class="nav-text">产品知识库</span>
+    <span class="nav-count">0</span>
+  </a>
+
+  <a href="#" class="nav-link" data-index="9" onclick="showSection(9);return false">
+    <span class="nav-icon" style="color:#ff44aa;border-color:#ff44aa">!</span>
+    <span class="nav-text">项目 & 方案</span>
+    <span class="nav-count">0</span>
+  </a>
+  </div>
+</nav>
+
+<main class="main">
+  
+<section id="sec-0" class="content-section">
+  <div class="section-header">
+    <h2 class="section-title">电气基础理论</h2>
+    <div style="font-size:13px;color:var(--text-dim);font-family:var(--font-mono);margin-bottom:16px">原始模块：1 · 子模块：电路理论 · 电磁场理论 · 电机学 · 电力电子技术 · 信号与控制基础</div>
+  </div>
+  <div class="section-body">
+    <h1>电气基础理论</h1>
+<blockquote>
+<p>原始模块：1 · 子模块：电路理论 · 电磁场理论 · 电机学 · 电力电子技术 · 信号与控制基础</p>
+</blockquote>
+<h2>概述</h2>
+<p>本 Wiki 页面涵盖电气工程核心基础理论，共 <strong>15</strong> 个条目，包含电路基本定律、电磁场理论、电机工作原理、电力电子器件与控制、以及防雷接地等工程基础。每条知识均包含原理讲解、公式推导、工程应用与注意事项。</p>
+<p><strong>关联页面</strong>：<a href="%E7%94%B5%E5%8A%9B%E7%B3%BB%E7%BB%9F.md">电力系统</a> · <a href="%E7%94%B5%E8%83%BD%E8%B4%A8%E9%87%8F%E6%B2%BB%E7%90%86.md">电能质量治理</a> · <a href="%E5%B7%A5%E4%B8%9A%E7%94%B5%E6%B0%94%E6%88%90%E5%A5%97.md">工业电气成套</a> · <a href="%E8%A7%84%E8%8C%83%E4%B8%8E%E6%A0%87%E5%87%86.md">规范与标准</a></p>
+<hr>
+<h2>1.1 电路理论（7 条目）</h2>
+<h3>基尔霍夫定律</h3>
+<p><strong>ID</strong>: 2001 | <strong>标签</strong>: <code>KCL</code>, <code>KVL</code>, <code>电路定律</code></p>
+<h4>定义</h4>
+<p><strong>基尔霍夫电流定律（KCL）</strong>：在任一时刻，流入某一节点的电流之和恒等于从该节点流出的电流之和。数学表达式为 $\sum I_{\text{in}} = \sum I_{\text{out}}$ 或 $\boxed{\sum_{k=1}^{n} I_k = 0}$（流入为正，流出为负）。</p>
+<p><strong>基尔霍夫电压定律（KVL）</strong>：沿任一闭合回路绕行一周，各段电压的代数和恒等于零。数学表达式为 $\boxed{\sum_{k=1}^{m} U_k = 0}$。</p>
+<h4>物理本质</h4>
+<ul>
+<li><strong>KCL 的物理本质是电荷守恒</strong>：根据电流连续性方程 $\oint_S \vec{J} \cdot d\vec{S} = -dq/dt$，对于稳恒电流有 $\oint_S \vec{J} \cdot d\vec{S} = 0$，电荷不能在节点处堆积。</li>
+<li><strong>KVL 的物理本质是能量守恒</strong>：电场是保守场（位场），电位的单值性保证了沿闭合路径的电压代数和为零。</li>
+</ul>
+<h4>应用方法</h4>
+<p>标准解题步骤：</p>
+<ol>
+<li><strong>标定参考方向</strong>：假设各支路电流方向并标注</li>
+<li><strong>列KCL方程</strong>：对 $(n-1)$ 个独立节点应用KCL（$n$ 为节点总数）</li>
+<li><strong>选回路列KVL方程</strong>：选择 $m$ 个独立回路（通常为网孔），应用KVL</li>
+<li><strong>联立求解</strong>：求解方程组，负号表示实际方向与假设方向相反</li>
+</ol>
+<p><strong>独立方程数</strong>：KCL方程数 = 节点数 − 1；KVL方程数 = 网孔数；总方程数 = 支路数。</p>
+<h4>推广形式</h4>
+<ul>
+<li><strong>广义节点（超节点）</strong>：KCL可推广到电路中任一封闭面，通过封闭面的电流代数和为零</li>
+<li><strong>交流电路修正</strong>：含时变磁场时，KVL需修正为 $\sum v_k = \mathcal{E} = -d\Phi/dt$</li>
+</ul>
+<h4>注意事项</h4>
+<p>KCL和KVL仅提供<strong>拓扑约束</strong>，需结合<strong>欧姆定律</strong>（元件约束）才能完整求解电路。交流电路中相量形式的KCL/KVL仍然成立：$\sum \dot{I} = 0$，$\sum \dot{U} = 0$。</p>
+<hr>
+<h3>戴维南定理</h3>
+<p><strong>ID</strong>: 2002 | <strong>标签</strong>: <code>等效电路</code>, <code>戴维南</code></p>
+<h4>定义</h4>
+<p>任何线性有源二端网络，对外电路而言，总可以用一个理想电压源 $V_{Th}$ 与一个电阻 $R_{Th}$ 串联的电路来等效代替。$V_{Th}$ 等于该二端网络的开路电压 $U_{oc}$，$R_{Th}$ 等于网络内部所有独立电源置零后从端口看进去的等效电阻。</p>
+<h4>等效电阻的三种求法</h4>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><h4>应用四步法</h4>
+<ol>
+<li>断开待求支路</li>
+<li>求开路电压 $U_{oc}$</li>
+<li>求等效电阻 $R_{Th}$</li>
+<li>画出戴维南等效电路，接入待求支路，用欧姆定律求解</li>
+</ol>
+<h4>关联定理</h4>
+<ul>
+<li><strong>最大功率传输定理</strong>：当 $R_L = R_{Th}$ 时负载获得最大功率 $P_{max} = V_{Th}^2/(4R_{Th})$，此时效率50%</li>
+<li><strong>诺顿定理</strong>：戴维南定理的对偶形式（电流源+并联电阻），两者可通过电源等效互换相互转换</li>
+</ul>
+<hr>
+<h3>叠加定理</h3>
+<p><strong>ID</strong>: 2003 | <strong>标签</strong>: <code>叠加定理</code>, <code>线性电路</code></p>
+<h4>定义</h4>
+<p>在线性电路中，任一支路的响应（电压或电流）等于每个独立源单独作用时响应的代数和。<strong>核心思想</strong>：多电源共同作用 = 各电源单独作用效果的线性叠加。</p>
+<h4>数学表达</h4>
+<p>$U = \sum_{k=1}^{n} U_k$ 或 $I = \sum_{k=1}^{n} I_k$，其中 $U_k$、$I_k$ 是第 $k$ 个独立源单独作用时在该支路产生的响应。</p>
+<h4>使用步骤</h4>
+<ol>
+<li>确认电路为线性电路（仅含R、L、C等线性元件）</li>
+<li>选中一个独立源保留，<strong>电压源置零→短路</strong>，<strong>电流源置零→开路</strong>（<strong>受控源始终保留</strong>）</li>
+<li>计算当前电源单独作用下的响应</li>
+<li>对每个独立源重复步骤2~3</li>
+<li>代数叠加（注意参考方向）</li>
+</ol>
+<h4>注意事项</h4>
+<ul>
+<li><strong>不能用于功率计算</strong>：功率是电压/电流的二次函数，必须先用叠加算出U和I再算功率</li>
+<li>含线性受控源时，受控源<strong>不能置零</strong></li>
+<li>交流电路中需用<strong>相量（复数）</strong> 计算，不同频率的电源需分别用相量叠加后再合成时域响应</li>
+</ul>
+<hr>
+<h3>正弦交流电路</h3>
+<p><strong>ID</strong>: 2004 | <strong>标签</strong>: <code>交流</code>, <code>正弦</code>, <code>阻抗</code>, <code>相量</code></p>
+<h4>正弦量三要素</h4>
+<p>正弦电压和电流的瞬时值表达式：$u = U_m \sin(\omega t + \psi_u)$，$i = I_m \sin(\omega t + \psi_i)$。</p>
+<p>三要素：<strong>幅值</strong> $U_m$（最大值）、<strong>角频率</strong> $\omega = 2\pi f$、<strong>初相位</strong> $\psi$。</p>
+<h4>有效值</h4>
+<p>正弦交流电的有效值：$I = I_m/\sqrt{2} \approx 0.707I_m$，$U = U_m/\sqrt{2}$。日常所说的220V、380V、设备铭牌额定值、仪表显示值均指有效值。</p>
+<h4>相量法</h4>
+<p><strong>核心思想</strong>：将正弦稳态电路的分析转化为复数运算。相量定义为 $\dot{I} = I\angle \psi_i$，$\dot{U} = U\angle \psi_u$。</p>
+<p>相量形式的基尔霍夫定律：$\sum \dot{I} = 0$，$\sum \dot{U} = 0$。微分对应 $j\omega$，积分对应 $1/(j\omega)$。</p>
+<h4>三种基本元件对比</h4>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><h4>RLC串联电路</h4>
+<p>阻抗 $Z = R + j(X_L - X_C)$，模 $|Z| = \sqrt{R^2 + (X_L - X_C)^2}$，阻抗角 $\varphi = \arctan\frac{X_L - X_C}{R}$。</p>
+<p><strong>电路性质判断</strong>：$X_L &gt; X_C$ 感性（电压超前电流）；$X_L &lt; X_C$ 容性（电压滞后电流）；$X_L = X_C$ 阻性（谐振）。</p>
+<h4>三个三角形</h4>
+<p><strong>阻抗三角形</strong>（R、X、|Z|）、<strong>电压三角形</strong>（U_R、U_X、U）、<strong>功率三角形</strong>（P、Q、S）三者相似，功率因数角 $\varphi$ 相同。</p>
+<h4>功率与功率因数</h4>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>提高功率因数</strong>的方法：在感性负载两端<strong>并联电容</strong>。所需电容值 $C = \frac{P}{\omega U^2}(\tan\varphi_1 - \tan\varphi_2)$。</p>
+<p><strong>谐振</strong>：串联谐振时 $f_0 = 1/(2\pi\sqrt{LC})$，阻抗最小 $Z=R$，电流最大。品质因数 $Q = \omega_0 L/R$，Q值越大选频特性越好。</p>
+<hr>
+<h3>三相电路基本概念</h3>
+<p><strong>ID</strong>: 2005 | <strong>标签</strong>: <code>三相</code>, <code>对称分量</code>, <code>星三角</code></p>
+<h4>基本概念</h4>
+<p>三相电路由三个频率相同、振幅相同、相位互差120°的正弦电动势供电。优点：发电功率提高50%、输电节省钢材25%、变压器更经济。</p>
+<h4>星形（Y）与三角形（△）连接</h4>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><h4>对称三相电路计算</h4>
+<p><strong>简化为单相法</strong>（A相法）：对称三相电路可简化为单相电路计算，中点等电位，中线电流为零。</p>
+<p><strong>三相功率</strong>：$P = 3U_P I_P \cos\varphi = \sqrt{3}U_L I_L \cos\varphi$。</p>
+<h4>对称分量法</h4>
+<p>用于分析<strong>不对称三相电路</strong>（如故障分析）。将不对称三相系统分解为三组对称分量：</p>
+<ul>
+<li><strong>正序分量</strong>：$F_1 = \frac{1}{3}(F_a + \alpha F_b + \alpha^2 F_c)$</li>
+<li><strong>负序分量</strong>：$F_2 = \frac{1}{3}(F_a + \alpha^2 F_b + \alpha F_c)$</li>
+<li><strong>零序分量</strong>：$F_0 = \frac{1}{3}(F_a + F_b + F_c)$</li>
+</ul>
+<p>其中 $\alpha = e^{j120^\circ} = -1/2 + j\sqrt{3}/2$（旋转因子）。</p>
+<hr>
+<h3>拉普拉斯变换在电路分析中的应用</h3>
+<p><strong>ID</strong>: 2013 | <strong>标签</strong>: <code>拉普拉斯</code>, <code>复频域</code>, <code>运算阻抗</code></p>
+<h4>定义与意义</h4>
+<p>拉普拉斯变换将时域函数 $f(t)$ 变换为复频域函数 $F(s) = \int_{0^-}^{\infty} f(t) e^{-st} dt$，其中 $s = \sigma + j\omega$ 为<strong>复频率</strong>。</p>
+<p><strong>核心价值</strong>：将时域的微分积分运算转化为复频域的代数运算，统一处理瞬态和稳态响应，自动计入初始条件。</p>
+<h4>复频域中的电路元件</h4>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>关键洞察</strong>：将 $sL$ 和 $1/(sC)$ 看成&quot;广义电阻&quot;，串并联分压分流公式仍然适用。</p>
+<h4>传递函数</h4>
+<p>零初始条件下，输出与输入象函数的比值：$H(s) = Y(s)/X(s)$。传递函数是系统本身的固有属性，与输入量无关。<strong>极点位置决定系统稳定性</strong>：所有极点位于s平面左半平面 → 系统稳定。</p>
+<h4>运算法解题步骤</h4>
+<ol>
+<li>由换路前电路计算 $u_c(0^-)$ 和 $i_L(0^-)$</li>
+<li>画出运算电路模型（注意附加电源）</li>
+<li>用代数方法求解象函数</li>
+<li>部分分式展开，拉普拉斯反变换得时域解</li>
+</ol>
+<h4>常用变换对</h4>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><hr>
+<h3>中性点接地方式</h3>
+<p><strong>ID</strong>: 3101 | <strong>标签</strong>: <code>中性点</code>, <code>消弧线圈</code>, <code>接地方式</code></p>
+<h4>分类总览</h4>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><h4>选择原则（GB 50613）</h4>
+<ul>
+<li>电容电流&lt;10A：不接地</li>
+<li>电容电流10~150A：消弧线圈接地（谐振接地）</li>
+<li>电容电流&gt;150A（全电缆网络）：小电阻接地（但国内外趋势仍倾向谐振接地）</li>
+<li>≥110kV：直接接地</li>
+<li>220/380V低压配电：必须直接接地（安全考虑）</li>
+</ul>
+<hr>
+<h2>1.2 电磁场理论（2 条目）</h2>
+<h3>法拉第电磁感应定律</h3>
+<p><strong>ID</strong>: 2006 | <strong>标签</strong>: <code>电磁感应</code>, <code>法拉第</code>, <code>楞次定律</code></p>
+<h4>定律内容</h4>
+<p>法拉第电磁感应定律：<strong>任何封闭电路中感应电动势的大小等于穿过这一电路磁通量的变化率</strong>。公式为 $\mathcal{E} = -d\Phi_B/dt$。对于N匝线圈：$\mathcal{E} = -N d\Phi_B/dt$。</p>
+<p><strong>负号代表楞次定律</strong>：感应电流的方向总是使得它所激发的磁场来阻碍引起感应电流的磁通量的变化。本质上是<strong>能量守恒定律</strong>的体现。</p>
+<h4>磁通量的定义</h4>
+<p>$\Phi_B = BA\cos\theta$（匀强磁场、平面回路），其中 $\theta$ 为磁场方向与回路法线夹角。</p>
+<h4>两种电动势</h4>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><h4>工程应用</h4>
+<p><strong>变压器</strong>：初级通交变电流→铁心交变磁通→次级产生感应电动势。电压比 $U_1/U_2 = N_1/N_2$。</p>
+<p><strong>电机</strong>：发电机将机械能转化为电能（楞次定律：感应电流产生阻碍转动的力矩）；电动机旋转时产生<strong>反电动势</strong>，限制电流自动调节功率。</p>
+<p><strong>其他应用</strong>：电磁炉（涡流加热）、无线充电、涡流制动、电磁流量计。</p>
+<hr>
+<h3>麦克斯韦方程组</h3>
+<p><strong>ID</strong>: 2007 | <strong>标签</strong>: <code>麦克斯韦</code>, <code>电磁场</code>, <code>积分形式</code>, <code>微分形式</code></p>
+<h4>概述</h4>
+<p>麦克斯韦方程组由四个方程组成，统一了电学、磁学和光学，预言了电磁波的存在，被誉为&quot;世界上最美的物理公式&quot;。</p>
+<h4>积分形式</h4>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><h4>微分形式</h4>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>位移电流</strong> $\partial \mathbf{D}/\partial t$ 是麦克斯韦的伟大创新，使得变化的电场也能产生磁场，保证了电荷守恒，最终预言了电磁波的存在。</p>
+<h4>历史意义</h4>
+<p>从麦克斯韦方程组可推导出电磁波波动方程 $\nabla^2 \mathbf{E} - \mu_0\varepsilon_0 \partial^2\mathbf{E}/\partial t^2 = 0$，波速 $c = 1/\sqrt{\mu_0\varepsilon_0}$ 恰好等于光速，从而<strong>预言光就是电磁波</strong>。</p>
+<hr>
+<h2>1.3 电机学（3 条目）</h2>
+<h3>变压器工作原理</h3>
+<p><strong>ID</strong>: 2008 | <strong>标签</strong>: <code>变压器</code>, <code>变比</code>, <code>等效电路</code></p>
+<h4>基本结构与原理</h4>
+<p>变压器由闭合铁心（硅钢片叠成，减少涡流损耗）和两个线圈绕组组成。基于<strong>电磁感应定律</strong>工作：一次绕组接交流电源→交变电流→铁心中交变主磁通→二次绕组产生感应电动势。</p>
+<p><strong>变比</strong>：$k = N_1/N_2 = U_1/U_{20}$，$k&gt;1$ 降压，$k&lt;1$ 升压。</p>
+<h4>空载运行</h4>
+<p>空载电流 $i_0$ 包含磁化电流（无功，建立主磁通）和铁损电流（有功）。电力变压器空载电流仅为额定电流的0.5%~5%。空载损耗 $P_0 \approx$ 铁损。</p>
+<p><strong>主磁通公式</strong>：$U_1 \approx E_1 = 4.44fN_1\Phi_m$。关键结论：主磁通 $\Phi_m$ 由电源电压 $U_1$ 决定，与负载无关。</p>
+<h4>负载运行</h4>
+<p><strong>磁势平衡</strong>：$i_1N_1 + i_2N_2 = i_0N_1$。负载时二次侧磁势 $i_2N_2$ 产生去磁作用，一次侧增加电流补偿。</p>
+<h4>等效电路</h4>
+<p>T型等效电路包含原边漏阻抗 $Z_1$、副边折算漏阻抗 $Z_2&#39; = k^2Z_2$、励磁阻抗 $Z_m$。简化等效电路可忽略励磁支路。</p>
+<h4>性能参数</h4>
+<p><strong>电压调整率</strong>：$\Delta U% = \beta(r_k^<em>\cos\varphi_2 + x_k^</em>\sin\varphi_2) \times 100%$。电力变压器从空载到满载，电压变化率通常为3%~5%。</p>
+<p><strong>效率</strong>：$\eta = P_2/P_1 \times 100%$。变压器损耗包括铁损（与负载无关）和铜损（与电流平方成正比）。<strong>最大效率条件：铁损 = 铜损</strong>。大型变压器效率可达99%以上。</p>
+<p>→ 关联：<a href="%E5%B7%A5%E4%B8%9A%E7%94%B5%E6%B0%94%E6%88%90%E5%A5%97.md">工业电气成套</a> §7.2 配电变压器</p>
+<hr>
+<h3>异步电动机</h3>
+<p><strong>ID</strong>: 2009 | <strong>标签</strong>: <code>异步电机</code>, <code>转差率</code>, <code>感应电机</code></p>
+<h4>基本概念</h4>
+<p>三相异步电动机（感应电机）转子转速<strong>低于</strong>定子旋转磁场转速，存在转速差，故得名&quot;异步&quot;。按转子结构分为<strong>笼型</strong>（鼠笼式，结构简单、应用最广）和<strong>绕线式</strong>（转子带绕组通过滑环接外部电阻，可改善起动和调速性能）。</p>
+<h4>工作原理</h4>
+<ol>
+<li>三相定子绕组通入对称交流电 → 产生<strong>旋转磁场</strong></li>
+<li>同步转速 $n_1 = 60f/p$（工频下：3000/1500/1000/750 r/min对应1/2/3/4对极）</li>
+<li>转子导体切割磁力线 → 产生感应电动势和感应电流</li>
+<li>载流转子导体在磁场中受电磁力 → 形成<strong>电磁转矩</strong></li>
+<li>转子沿旋转磁场方向旋转，但 $n &lt; n_1$</li>
+</ol>
+<h4>转差率</h4>
+<p>$s = (n_1 - n)/n_1$ 是异步电机最核心的参数。启动瞬间 $s=1$，空载 $s\approx 0.004\sim0.007$，额定运行时 $s_N = 0.01\sim0.06$。</p>
+<h4>转矩特性</h4>
+<ul>
+<li><strong>额定转矩</strong>：$T_N = 9550 \cdot P_N/n_N$（$P_N$ 单位kW）</li>
+<li><strong>最大转矩</strong> $T_m \propto U_1^2$，与转子电阻无关</li>
+<li><strong>启动转矩</strong> $T_{st} \propto U_1^2$</li>
+<li>启动电流 $I_{st} = (5\sim7)I_N$，启动转矩 $T_{st} = (1.0\sim2.2)T_N$</li>
+</ul>
+<h4>调速方法</h4>
+<p>从 $n = 60f/p \cdot (1-s)$ 可知调速有三类途径：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>变频调速</strong>应用最广，基频向下恒转矩调速（$U_1/f_1$ 恒定），基频向上恒功率调速。控制方式：U/f控制、矢量控制（VC）、直接转矩控制（DTC）。</p>
+<hr>
+<h3>同步电动机</h3>
+<p><strong>ID</strong>: 2010 | <strong>标签</strong>: <code>同步电机</code>, <code>功率因数</code>, <code>永磁同步</code></p>
+<h4>工作原理</h4>
+<p>同步电动机转速<strong>严格等于同步转速</strong>（$n = 60f/p$），与负载大小无关，无转差率。定子旋转磁场与转子恒定磁场相互作用产生电磁转矩，拖动转子同步旋转。</p>
+<h4>转子结构</h4>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><h4>功率因数调节（突出优点）</h4>
+<p><strong>功率因数可调</strong>是同步电动机最突出的优点。通过调节励磁电流可实现：</p>
+<ul>
+<li><strong>正常励磁</strong>：$\cos\varphi = 1$，仅从电网吸收有功</li>
+<li><strong>过励</strong>：呈容性，向电网输出感性无功（可补偿电网中的感性负载）</li>
+<li><strong>欠励</strong>：呈感性，从电网吸收无功（一般不推荐长期运行）</li>
+</ul>
+<p><strong>同步调相机</strong>：专门不带机械负载的同步电动机，在过励状态下运行，专门用于无功补偿。</p>
+<h4>启动方法</h4>
+<p>同步电动机<strong>不能自启动</strong>，必须借助辅助方法：</p>
+<ol>
+<li><strong>异步启动法（最常用）</strong>：转子上装设阻尼绕组，异步启动至95%同步转速后加入励磁牵入同步</li>
+<li><strong>变频启动法</strong>：变频器从低频开始平滑启动，电流冲击小</li>
+<li><strong>辅助电动机启动法</strong>：用辅助电机拖至接近同步转速后并网</li>
+</ol>
+<hr>
+<h2>1.4 电力电子技术（2 条目）</h2>
+<h3>电力电子器件分类</h3>
+<p><strong>ID</strong>: 2011 | <strong>标签</strong>: <code>IGBT</code>, <code>晶闸管</code>, <code>MOSFET</code>, <code>电力电子</code></p>
+<h4>分类总览</h4>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><h4>三大核心器件对比</h4>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>IGBT</strong>（绝缘栅双极型晶体管）= MOSFET（高输入阻抗）+ BJT（低导通压降），是电力电子装置的&quot;CPU&quot;，目前在变频器、电动车、风电光伏逆变器中应用最广。</p>
+<p>→ 关联：<a href="%E7%94%B5%E8%83%BD%E8%B4%A8%E9%87%8F%E6%B2%BB%E7%90%86.md">电能质量治理</a> — SVG、APF 均基于全控器件</p>
+<hr>
+<h3>PWM整流器</h3>
+<p><strong>ID</strong>: 2012 | <strong>标签</strong>: <code>PWM</code>, <code>整流</code>, <code>谐波</code>, <code>能量回馈</code></p>
+<h4>概述</h4>
+<p>PWM整流器是&quot;绿色电能变换器&quot;，从根本上解决了传统整流器的谐波污染问题，可实现<strong>网侧电流正弦化、单位功率因数、能量双向流动</strong>。</p>
+<h4>分类</h4>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><h4>工作原理</h4>
+<p>通过PWM控制全控器件（IGBT）的通断，调节交流侧电压的幅值和相位，从而控制输入电流的波形和相位。</p>
+<p><strong>四象限运行</strong>：</p>
+<ul>
+<li><strong>整流</strong>（$I_s$ 与 $V_s$ 同相）：能量从电网流向直流侧</li>
+<li><strong>逆变</strong>（$I_s$ 与 $V_s$ 反相）：能量从直流侧回馈电网</li>
+<li>可实现功率因数从-1到+1连续可调</li>
+</ul>
+<h4>控制策略</h4>
+<p><strong>双闭环控制</strong>：电压外环（AVR）稳定直流母线电压；电流内环（ACR）控制输入电流跟踪指令。主流方法有空间电压矢量控制（SVPWM）、直接功率控制（DPC）。</p>
+<h4>谐波与功率因数</h4>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><h4>工程应用</h4>
+<p>变频调速系统中的<strong>能量回馈</strong>（电机制动）、蓄电池充放电、电梯/起重机节能、轨道交通制动能量回馈。</p>
+<hr>
+<h2>1.5 信号与控制基础（1 条目）</h2>
+<h3>防雷接地系统</h3>
+<p><strong>ID</strong>: 3103 | <strong>标签</strong>: <code>防雷</code>, <code>接地</code>, <code>SPD</code>, <code>浪涌保护</code></p>
+<h4>系统组成</h4>
+<p>防雷接地系统由三部分组成：<strong>外部防雷</strong>（接闪器+引下线+接地装置）+ <strong>内部防雷</strong>（SPD浪涌保护器+等电位连接）。</p>
+<h4>外部防雷</h4>
+<p><strong>接闪器</strong>：避雷针/接闪带/接闪网。采用滚球法确定保护范围。材料要求：热镀锌圆钢直径≥12mm或扁钢截面≥100mm²。</p>
+<p><strong>引下线</strong>：材料≥40×4mm热镀锌扁钢或Φ10mm圆钢，间距≤18m（二类防雷）。高层建筑30m以上每6m设置均压环。</p>
+<p><strong>接地装置</strong>：水平接地体（埋深≥0.7m，镀锌扁钢40×4mm）+ 垂直接地极（长度≥2.5m，间距≥5m）。</p>
+<h4>接地电阻要求</h4>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><h4>SPD浪涌保护器分级防护</h4>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><h4>等电位连接</h4>
+<p>防雷接地、交流工作接地、安全保护接地、屏蔽接地和防静电接地应<strong>统一接入同一接地装置</strong>（共用接地系统），避免电位差反击。</p>
+<h4>主要设计标准</h4>
+<p>GB 50057《建筑物防雷设计规范》、GB 50343《建筑物电子信息系统防雷技术规范》、IEC 62305 系列。</p>
+<p>→ 关联：<a href="%E8%A7%84%E8%8C%83%E4%B8%8E%E6%A0%87%E5%87%86.md">规范与标准</a> §8.5 施工验收</p>
+<hr>
+<h2>Capture Notes</h2>
+<ul>
+<li>综合自 WebSearch 获取的详细技术资料，每个条目从1~2句扩展为带公式、原理、数值参考和工程应用的完整讲解</li>
+<li>所有 15 条记录均扩展完成，保持原始ID和标签结构</li>
+<li>跨页面链接指向 wiki 中对应页面</li>
+</ul>
+
+  </div>
+</section>
+
+<section id="sec-1" class="content-section">
+  <div class="section-header">
+    <h2 class="section-title">电力系统</h2>
+    <div style="font-size:13px;color:var(--text-dim);font-family:var(--font-mono);margin-bottom:16px">原始模块：2 · 子模块：发电系统 · 输电系统 · 变电系统 · 配电系统 · 用电技术 · 电力系统分析 · 继电保护 · 调度自动化</div>
+  </div>
+  <div class="section-body">
+    <h1>电力系统</h1>
+<blockquote>
+<p>原始模块：2 · 子模块：发电系统 · 输电系统 · 变电系统 · 配电系统 · 用电技术 · 电力系统分析 · 继电保护 · 调度自动化</p>
+</blockquote>
+<h2>概述</h2>
+<p>电力系统从发电、输电、变电到配电的完整产业链知识，共 <strong>17</strong> 个条目。</p>
+<p><strong>关联页面</strong>：<a href="%E7%94%B5%E6%B0%94%E5%9F%BA%E7%A1%80%E7%90%86%E8%AE%BA.md">电气基础理论</a> · <a href="%E6%96%B0%E8%83%BD%E6%BA%90%E4%B8%8E%E5%82%A8%E8%83%BD.md">新能源与储能</a> · <a href="%E7%94%B5%E8%83%BD%E8%B4%A8%E9%87%8F%E6%B2%BB%E7%90%86.md">电能质量治理</a> · <a href="%E7%94%B5%E6%B0%94%E8%87%AA%E5%8A%A8%E5%8C%96.md">电气自动化</a> · <a href="%E8%A7%84%E8%8C%83%E4%B8%8E%E6%A0%87%E5%87%86.md">规范与标准</a></p>
+<hr>
+<h2>2.1 发电系统（2 条目）</h2>
+<h3>发电厂类型</h3>
+<p><strong>ID</strong>: 2101 | <strong>标签</strong>: <code>发电厂</code>, <code>火电</code>, <code>水电</code>, <code>核电</code></p>
+<p>按一次能源分类，各类电厂技术参数对比：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>关键技术参数</strong>：</p>
+<ul>
+<li><strong>火电热效率链</strong>：锅炉效率（92%~94%）× 汽轮机效率（43%~47%）× 发电机效率（98%~99%）= 全厂净效率</li>
+<li><strong>水电站水头分类</strong>：高水头 &gt;100m（冲击式水轮机），中水头 30~100m（混流式），低水头 &lt;30m（轴流式/贯流式）</li>
+<li><strong>核电站汽轮机特点</strong>：采用饱和蒸汽（压力约6~7MPa，温度约280℃），比火电过热蒸汽参数低，故同等功率体积更大</li>
+<li><strong>抽水蓄能电站综合效率</strong>：抽水→发电循环效率约70%~82%（抽水用电4kWh约可发电3.2kWh）</li>
+</ul>
+<p>→ 关联：<a href="%E6%96%B0%E8%83%BD%E6%BA%90%E4%B8%8E%E5%82%A8%E8%83%BD.md">新能源与储能</a> §5.2 风力发电、§5.3 光伏发电</p>
+<hr>
+<h3>火力发电原理</h3>
+<p><strong>ID</strong>: 2112 | <strong>标签</strong>: <code>火电</code>, <code>发电</code>, <code>锅炉</code></p>
+<p><strong>热力循环（Rankine循环）</strong>：工质（水/水蒸气）经历四个过程：</p>
+<ol>
+<li><strong>锅炉加热</strong>（定压吸热）：给水→饱和水→饱和蒸汽→过热蒸汽，压力随参数等级不同（亚临界16.7MPa/超临界24.2MPa/超超临界≥27MPa）</li>
+<li><strong>汽轮机膨胀</strong>（绝热做功）：蒸汽在各级叶片中膨胀，热能→动能→机械能，排汽压力约4~10kPa（高度真空）</li>
+<li><strong>凝汽器冷凝</strong>（定压放热）：排汽被循环冷却水冷凝为凝结水，放热量占总热量的50%~60%（冷源损失），这是Rankine循环热效率不高的根本原因</li>
+<li><strong>给水泵升压</strong>（绝热压缩）：凝结水经低压加热器→除氧器→给水泵→高压加热器→省煤器→锅炉，完成循环</li>
+</ol>
+<p><strong>四大主机设备</strong>：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>提高效率的主要途径</strong>：</p>
+<ul>
+<li><strong>提高初参数</strong>：主蒸汽温度每提高10℃，热效率约提升0.3%<del>0.5%。目前最先进的超超临界机组主蒸汽温度达600</del>620℃</li>
+<li><strong>再热循环</strong>：高压缸排汽回锅炉再热→中/低压缸，可提高效率约4%~5%</li>
+<li><strong>回热加热</strong>：从汽轮机各级抽汽加热给水（7~8级回热），可提高效率约8%~10%</li>
+<li><strong>热电联产</strong>：抽取部分蒸汽供热，综合热效率可达60%~80%</li>
+</ul>
+<p><strong>排放处理系统</strong>：脱硫（湿法石灰石石膏法，脱硫率≥95%）→ 脱硝（SCR选择性催化还原，脱硝率≥80%）→ 除尘（静电除尘器，除尘率≥99.9%）</p>
+<hr>
+<h2>2.2 输电系统（1 条目）</h2>
+<h3>输电电压等级</h3>
+<p><strong>ID</strong>: 2102 | <strong>标签</strong>: <code>电压等级</code>, <code>交流</code>, <code>直流</code></p>
+<p><strong>交流输电电压等级</strong>（中国标准GB/T 156-2017）：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>直流输电电压等级</strong>（中国标准）：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>交流 vs 直流输电技术对比</strong>：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>关键技术指标</strong>：</p>
+<ul>
+<li><strong>自然功率</strong>：输电线路在纯阻性负载下运行时的输送功率，500kV双分裂导线约1000MW</li>
+<li><strong>波阻抗</strong>：Zc = √(L/C)，500kV线路约280~320Ω</li>
+<li><strong>充电功率</strong>：空载时线路的电容效应，500kV线路约1.0~1.2Mvar/km，需配置并联电抗器补偿</li>
+</ul>
+<hr>
+<h2>2.3 变电系统（3 条目）</h2>
+<h3>变电站类型</h3>
+<p><strong>ID</strong>: 2103 | <strong>标签</strong>: <code>变电站</code>, <code>GIS</code>, <code>智能站</code></p>
+<p><strong>按功能分类</strong>：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>按安装方式分类</strong>：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>数字化/智能化变电站特点</strong>（IEC 61850标准体系）：</p>
+<ul>
+<li><strong>三层架构</strong>：站控层（监控主机/远动装置）→ 间隔层（保护/测控装置）→ 过程层（合并单元/智能终端）</li>
+<li><strong>网络结构</strong>：站控层MMS网 + 间隔层GOOSE网 + 过程层SV网（或三网合一）</li>
+<li><strong>关键设备</strong>：电子式互感器（ECT/EVT，无磁饱和）、合并单元（MU，同步采样）、智能终端（直跳/GOOSE）</li>
+</ul>
+<hr>
+<h3>变电站主接线形式</h3>
+<p><strong>ID</strong>: 2113 | <strong>标签</strong>: <code>主接线</code>, <code>双母线</code>, <code>桥形接线</code></p>
+<p><strong>常见接线形式对比</strong>：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>关键技术要点</strong>：</p>
+<ul>
+<li><strong>内桥接线</strong>（断路器在变压器侧）：线路投入/退出操作方便，变压器操作复杂。偏好：线路长、故障概率高时用内桥</li>
+<li><strong>外桥接线</strong>（断路器在线路侧）：变压器投入/退出操作方便，线路操作复杂。偏好：变压器切换频繁、线路短时用外桥</li>
+<li><strong>一个半断路器接线</strong>：两条母线之间串接3个断路器，接2回出线/主变。正常时两组母线均运行，任一母线故障或检修不影响任何出线</li>
+<li><strong>双母线倒母线操作</strong>：将一组母线负荷逐路切换至另一组母线，过程中瞬时两母线并列运行（需确认等电位）</li>
+</ul>
+<p><strong>选择依据层次</strong>（GB 50059-2011）：</p>
+<ol>
+<li><strong>供电可靠性</strong>：N-1原则，重要用户需双电源</li>
+<li><strong>运行灵活性</strong>：调峰/调频、检修方式转换</li>
+<li><strong>经济性</strong>：全寿命周期成本（初始投资+运维+停电损失）</li>
+<li><strong>扩建方便性</strong>：分期扩建的过渡方案</li>
+</ol>
+<hr>
+<h3>GIS气体绝缘组合电器</h3>
+<p><strong>ID</strong>: 2114 | <strong>标签</strong>: <code>GIS</code>, <code>SF6</code>, <code>组合电器</code></p>
+<p><strong>组成结构</strong>：GIS将以下元件封闭在充SF6气体的金属壳体内：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>SF6气体特性</strong>：</p>
+<ul>
+<li><strong>绝缘性能</strong>：约空气的2.5<del>3倍，0.3</del>0.4MPa（20℃）时绝缘水平等同空气1.0MPa</li>
+<li><strong>灭弧性能</strong>：电弧时间常数极短（μs级），自由电子吸附能力强</li>
+<li><strong>液化温度</strong>：-40℃（0.3MPa），-25℃（0.6MPa），高寒地区需配加热器或使用SF6/N2混合气体</li>
+<li><strong>温室效应</strong>：GWP=23900（CO₂的23900倍），泄漏率要求每年≤0.5%~1%</li>
+</ul>
+<p><strong>压力与绝缘关系</strong>：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>故障统计</strong>（CIGRE数据）：</p>
+<ul>
+<li>GIS事故率约0.01<del>0.05次/间隔·年，远低于AIS的0.1</del>0.5次</li>
+<li>主要故障原因：绝缘劣化（35%）、机构卡涩（25%）、SF6泄漏（20%）、密封老化（15%）</li>
+<li>局部放电检测：特高频法（UHF，300<del>3000MHz）灵敏度可达1</del>5pC</li>
+</ul>
+<p>→ 关联：<a href="%E4%BA%A7%E5%93%81%E7%9F%A5%E8%AF%86%E5%BA%93.md">产品知识库</a> §9.1 — 特高压GIS产品</p>
+<hr>
+<h2>2.4 配电系统（2 条目）</h2>
+<h3>配电网接线方式</h3>
+<p><strong>ID</strong>: 2104 | <strong>标签</strong>: <code>配网</code>, <code>环网</code>, <code>辐射</code></p>
+<p><strong>典型接线形式对比</strong>：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>开环运行原理</strong>：</p>
+<ul>
+<li>环网正常运行时在联络开关处断开（开环），两侧各带一半负荷</li>
+<li>任一侧电源故障 → 断开该侧主开关 → 闭合联络开关 → 非故障侧恢复供电</li>
+<li>操作时间：手动约1<del>2h，电动（自动化）约3</del>5min，自动（自愈）约50~200ms</li>
+</ul>
+<p><strong>供电区域划分</strong>（GB 50613-2010 / DL/T 5101-2017）：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>中压配网电压选择</strong>：</p>
+<ul>
+<li>10kV：传统主流，设备成熟，适用于负荷密度中等区域</li>
+<li>20kV：供电半径增大（约10kV的1.4倍）、线损降低约50%，适用于新区/工业园区</li>
+<li>35kV：介于高压配电和中压配电之间，用于大型用户或偏远地区</li>
+</ul>
+<p><strong>分布式电源接入影响</strong>（高渗透率场景）：</p>
+<ul>
+<li>电压越限：光伏大发时配电网电压升高（逆潮流），需逆变器无功调压</li>
+<li>保护误动/拒动：双向潮流使传统单端量保护失效，需方向保护或差动保护</li>
+<li>孤岛效应：非计划孤岛对人身和设备安全构成威胁，需防孤岛保护（主动+被动法）</li>
+</ul>
+<hr>
+<h3>电缆选型原则</h3>
+<p><strong>ID</strong>: 2115 | <strong>标签</strong>: <code>电缆选型</code>, <code>载流量</code>, <code>XLPE</code></p>
+<p><strong>四步选型法</strong>：</p>
+<p><strong>第1步：按载流量选择导体截面</strong></p>
+<ul>
+<li>计算电流 I_c = S / (√3 × U_n) （S为视在功率，U_n为额定线电压）</li>
+<li>校正系数乘积 K = K_θ × K_d × K_g × K_m<ul>
+<li>K_θ：温度校正（&gt;25℃时降低，&lt;25℃时升高）</li>
+<li>K_d：埋深校正（标准深度0.7~1.0m，更深则降低）</li>
+<li>K_g：多根并列校正（排管中每增加一根载流量减少约10%~25%）</li>
+<li>K_m：土壤热阻校正（干燥土壤系数0.75~0.85）</li>
+</ul>
+</li>
+<li>选截面要求：K × I_t ≥ I_c （I_t为基准载流量）</li>
+</ul>
+<p><strong>第2步：按电压降校核</strong></p>
+<ul>
+<li>ΔU = √3 × I × L × (Rcosφ + Xsinφ) （三相）</li>
+<li>要求：ΔU/U_n ≤ 5%（配电线路），≤ 3%（照明等敏感负载）</li>
+<li>常用口诀（粗略估算）：铝芯电缆每千米每安约0.4~0.5%压降（cosφ=0.8时）</li>
+</ul>
+<p><strong>第3步：按短路热稳定校核</strong></p>
+<ul>
+<li>S_min = I_k × √t / C<ul>
+<li>I_k：短路电流有效值（A）</li>
+<li>t：故障切除时间（s），一般0.1~0.5s</li>
+<li>C：热稳定系数（铜芯XLPE电缆C≈143，铜芯PVC电缆C≈115）</li>
+</ul>
+</li>
+<li>这是许多中高压电缆选择的决定性因素（特别是靠近电源的短电缆）</li>
+</ul>
+<p><strong>第4步：经济电流密度法</strong></p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><ul>
+<li>经济截面 S_e = I_c / J （J为经济电流密度）</li>
+<li>当经济截面较大时，取实际截面为经济截面（长远更划算）</li>
+</ul>
+<p><strong>绝缘类型选择</strong>：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>典型载流量参考</strong>（铜芯XLPE电缆，空气中敷设，环境温度40℃）：</p>
+<ul>
+<li>YJV-4×16：约80~90A</li>
+<li>YJV-4×95：约260~290A</li>
+<li>YJV-4×240：约430~480A</li>
+<li>YJV22-3×300（10kV）：约550~600A</li>
+</ul>
+<hr>
+<h2>2.5 用电技术（1 条目）</h2>
+<h3>电气安全防护</h3>
+<p><strong>ID</strong>: 2116 | <strong>标签</strong>: <code>安全防护</code>, <code>漏电保护</code>, <code>安全电压</code></p>
+<p><strong>接地系统类型</strong>（GB/T 16895.1 / IEC 60364）：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>直接接触防护</strong>（防止人体直接触碰带电体）：</p>
+<ul>
+<li><strong>绝缘</strong>：基本绝缘+附加绝缘（双重绝缘、加强绝缘）</li>
+<li><strong>遮栏/外壳</strong>：防护等级IPxx，带电体安装在封闭外壳内</li>
+<li><strong>安全距离</strong>：按GB 50054-2011，不同电压等级的最小电气间隙</li>
+<li><strong>安全特低电压（SELV）</strong>：≤50V AC（干燥环境），≤25V AC（潮湿环境）</li>
+<li><strong>限制能量</strong>：本质安全电路（火花能量不足以点燃爆炸性气体）</li>
+</ul>
+<p><strong>间接接触防护</strong>（防止设备故障时外壳带电致人电击）：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>各级RCD配置</strong>：</p>
+<ul>
+<li>总保护：300<del>500mA，延时0.3</del>0.5s（选择性）</li>
+<li>分配电：100<del>300mA，延时0.1</del>0.3s</li>
+<li>终端插座回路：30mA，瞬时≤0.1s（直接接触补充防护）</li>
+<li>特殊场所（潮湿环境）：10mA，瞬时≤0.1s</li>
+</ul>
+<p><strong>安全电压等级</strong>（GB/T 3805-2008）：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p>→ 关联：<a href="%E7%94%B5%E6%B0%94%E5%9F%BA%E7%A1%80%E7%90%86%E8%AE%BA.md">电气基础理论</a> §1.5 — 防雷接地系统</p>
+<hr>
+<h2>2.6 电力系统分析（3 条目）</h2>
+<h3>潮流计算</h3>
+<p><strong>ID</strong>: 2105 | <strong>标签</strong>: <code>潮流</code>, <code>牛顿-拉夫逊</code></p>
+<p><strong>基本方程</strong>（节点功率平衡）：</p>
+<ul>
+<li>节点i的功率方程：P_i + jQ_i = U_i∑(Y_{ij}U_j)^* （极坐标形式）</li>
+<li>有功方程：P_i = U_i∑U_j(G_{ij}cosθ_{ij} + B_{ij}sinθ_{ij})</li>
+<li>无功方程：Q_i = U_i∑U_j(G_{ij}sinθ_{ij} - B_{ij}cosθ_{ij})</li>
+</ul>
+<p><strong>节点类型</strong>：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>主流计算方法对比</strong>：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>NR法修正方程</strong>（极坐标形式）：</p>
+<pre><code>[object Object]</code></pre><p>其中 H ∈ R(n-1)×(n-1)，L ∈ R(m)×(m)（m为PQ节点数），N和M为耦合子阵</p>
+<p><strong>收敛判据</strong>：</p>
+<ul>
+<li>节点功率不平衡量 ΔP_i, ΔQ_i ≤ 0.001~0.01MW/Mvar（一次收敛标准）</li>
+<li>电压幅值修正量 ΔU_i ≤ 0.0001~0.001p.u.（二次收敛标准）</li>
+</ul>
+<p><strong>工程应用要点</strong>：</p>
+<ul>
+<li>N-1校核：每个元件（线路/主变/发电机）退出运行后校核潮流不越限</li>
+<li>静态安全分析：快速扫描法（补偿法）对所有N-1场景计算约5~30s</li>
+<li>灵敏度分析：发电机出力转移分布因子（GSDF）、线路开断分布因子（LODF）</li>
+</ul>
+<hr>
+<h3>短路电流计算</h3>
+<p><strong>ID</strong>: 2106 | <strong>标签</strong>: <code>短路</code>, <code>对称</code>, <code>不对称</code></p>
+<p><strong>短路类型及概率分布</strong>（统计数据）：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>短路电流组成</strong>：</p>
+<ul>
+<li><strong>周期分量（I_p）</strong>：幅值恒定（远端短路），由系统阻抗决定，是保护整定的主要依据</li>
+<li><strong>非周期分量（I_dc）</strong>：指数衰减，时间常数 T_a = L/R = X/(ωR)，典型值20~100ms<ul>
+<li>冲击电流 i_im = √2 × K_im × I_p&quot;，K_im = 1 + e^{-0.01/T_a}，典型取1.8</li>
+<li>冲击电流峰值一般出现在短路后约10ms（半个工频周波）</li>
+</ul>
+</li>
+<li><strong>全电流有效值I_k = √(I_p² + I_dc²)</strong>，是开关设备开断能力校核的依据</li>
+</ul>
+<p><strong>计算步骤（工程实用法）</strong>：</p>
+<ol>
+<li><strong>绘制等值电路</strong>：将系统各元件（发电机/变压器/线路/电抗器）用标幺值阻抗表示</li>
+<li><strong>选取基准值</strong>：S_B = 100MVA，U_B = 平均额定电压（如10.5kV/37kV/115kV/230kV/525kV）</li>
+<li><strong>计算各元件阻抗标幺值</strong>：<ul>
+<li>系统：X_s* = S_B / S_k&quot; （S_k&quot;为系统短路容量）</li>
+<li>变压器：X_T* = u_k% / 100 × S_B / S_T</li>
+<li>线路：X_L* = x_0 × L × S_B / U_B²</li>
+<li>电抗器：X_R* = x_R% / 100 × U_n / (√3 I_n) × S_B / U_B²</li>
+</ul>
+</li>
+<li><strong>网络简化</strong>：串并联合并 + Y-Δ变换</li>
+<li><strong>对称分量变换</strong>（不对称短路时）：<ul>
+<li>正序网络：发电机有电动势，对称元件正序阻抗 = 负序阻抗</li>
+<li>负序网络：发电机无电动势，X_2 ≈ 0.8~1.2X_1</li>
+<li>零序网络：取决于变压器接地方式和绕组连接方式</li>
+</ul>
+</li>
+<li><strong>故障点电流计算</strong>：<ul>
+<li>三相短路：I_k³ = E / X_1Σ （最简形式）</li>
+<li>单相接地：I_k¹ = 3E / (X_1Σ + X_2Σ + X_0Σ)</li>
+<li>两相短路：I_k² = √3E / (X_1Σ + X_2Σ)</li>
+<li>两相接地：I_k¹·¹ = 3E × √(X_2Σ² + X_2ΣX_0Σ + X_0Σ²) / (X_1ΣX_2Σ + X_1ΣX_0Σ + X_2ΣX_0Σ)</li>
+</ul>
+</li>
+</ol>
+<p><strong>短路容量与断路器选择</strong>：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>限制短路电流的措施</strong>：</p>
+<ul>
+<li>母线分段运行（减小短路阻抗的并联效应）</li>
+<li>高阻抗变压器（u_k%从10%~14%提至16%~20%）</li>
+<li>串联电抗器（通常接入母线分段或馈线）</li>
+<li>故障限流器（FCL：超导型或电力电子型，动态响应&lt;5ms）</li>
+</ul>
+<hr>
+<h3>电力系统稳定性</h3>
+<p><strong>ID</strong>: 2107 | <strong>标签</strong>: <code>暂态</code>, <code>功角</code>, <code>低频振荡</code></p>
+<p><strong>三类稳定定义</strong>（IEEE/CIGRE联合定义，结合GB/T 26399-2011）：</p>
+<p><strong>1. 功角稳定</strong>（转子角度同步能力）：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>功角特性方程</strong>（单机无穷大系统）：</p>
+<ul>
+<li>P_e = (EU_s/X_Σ) × sinδ</li>
+<li>δ为发电机q轴电动势与无穷大系统电压的夹角（功角）</li>
+<li>传输功率极限 P_max = EU_s/X_Σ（δ = 90°时）</li>
+<li>静态稳定储备系数：K_P = (P_max - P_0)/P_0 × 100%，要求 ≥ 15%~20%</li>
+</ul>
+<p><strong>等面积定则</strong>（暂态稳定判据）：</p>
+<ul>
+<li>故障期间转子加速 → 动能增加 → 功角增大</li>
+<li>故障清除后减速 → 若最大可能的减速面积 &lt; 加速面积 → 失步</li>
+<li>极限切除角 δ_cr = arccos[(P_acc_max(δ_m - δ_0) + P_de_max cosδ_m - P_ac_max cosδ_0)/(P_de_max - P_ac_max)]</li>
+<li>临界切除时间（CCT）：工程中通过时域仿真反复搜索得到</li>
+</ul>
+<p><strong>2. 频率稳定</strong>（有功功率平衡能力）：</p>
+<ul>
+<li>频率 = f_0 + Δf = f_0 + ΔP / K  （K为系统单位调节功率，约20~40MW/0.1Hz）</li>
+<li>一次调频（3~15s）：发电机调速器响应，有差调节（调差系数3%~5%）</li>
+<li>二次调频（30s~5min）：AGC自动发电控制，无差调节</li>
+<li>三次调频（5~30min）：经济调度EDC、机组启停</li>
+<li>低频减载（UFLS）：按频率分轮切除负荷，典型设置49.5Hz/49.0Hz/48.5Hz等3~6轮，每轮切除5%~10%负荷</li>
+</ul>
+<p><strong>3. 电压稳定</strong>（无功功率平衡能力）：</p>
+<ul>
+<li>PV曲线（鼻形曲线）：系统传输功率到极限点（鼻点）时电压崩溃</li>
+<li>静态电压稳定裕度：K_U = (P_max - P_0)/P_0 × 100%，要求 ≥ 8%~10%</li>
+<li>动态电压稳定：考虑OLTC调节、发电机过励限制、负荷动态特性等的电压崩溃过程</li>
+<li>典型电压崩溃时间：几秒到几十分钟（缓慢型电压崩溃）</li>
+</ul>
+<p><strong>低频振荡</strong>（0.1~2.5Hz）：</p>
+<ul>
+<li><strong>本地模式</strong>（0.8~2.5Hz）：单机对系统振荡，阻尼器（PSS）设定于此频段</li>
+<li><strong>区域间模式</strong>（0.1~0.8Hz）：一群发电机对另一群，阻尼弱，威胁大</li>
+<li><strong>抑制措施</strong>：电力系统稳定器（PSS，附加励磁控制）是最经济有效的手段，可将阻尼比从0%~1%提升至3%~10%</li>
+<li><strong>广域测量</strong>：WAMS/PMU（相量测量单元）以50~100帧/s采样，实现低频振荡实时监测</li>
+</ul>
+<p><strong>稳定三道防线</strong>（DL/T 755-2016）：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>新能源对稳定性的影响</strong>：</p>
+<ul>
+<li>低惯量：大量电力电子接口（逆变器）替代同步发电机，系统等效惯量降低，频率变化率（RoCoF）增大</li>
+<li>无功支撑能力弱：光伏/风电的逆变器过流能力通常仅1.1<del>1.2p.u.（同步机可达2</del>3p.u.），暂态电压支撑能力弱</li>
+<li>阻尼贡献有限：传统PSS基于同步机励磁系统设计，对逆变器接口电源的抑制效果降低</li>
+</ul>
+<p>→ 关联：<a href="%E6%96%B0%E8%83%BD%E6%BA%90%E4%B8%8E%E5%82%A8%E8%83%BD.md">新能源与储能</a> — 新能源并网影响系统稳定性</p>
+<hr>
+<h2>2.7 继电保护（3 条目）</h2>
+<h3>继电保护基本原理</h3>
+<p><strong>ID</strong>: 2108 | <strong>标签</strong>: <code>继保</code>, <code>四性</code>, <code>主保护</code></p>
+<p><strong>四性要求</strong>（GB/T 14285-2016）：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>三段式电流保护</strong>（6~35kV线路最常用）：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>距离保护</strong>（110~220kV线路主保护/后备）：</p>
+<ul>
+<li><strong>测量阻抗</strong> Z_m = U_m / I_m，反映故障点到保护安装处的距离</li>
+<li>三段式圆特性或四边形特性，Z_Ⅰ保护范围约80%~85%本线路，Z_Ⅱ约120%~150%（延伸至下级），Z_Ⅲ作为后备</li>
+<li><strong>方向性</strong>：只测量正向故障，反向故障通过方向元件闭锁</li>
+<li><strong>振荡闭锁</strong>：系统振荡时电压电流周期性变化→测量阻抗进入圆内→闭锁保护，振荡平息后自动恢复</li>
+</ul>
+<p><strong>差动保护</strong>（变压器/母线/发电机/短线路）：</p>
+<ul>
+<li><strong>基本原理</strong>：比较被保护元件两端（或多端）电流的相量和</li>
+<li><strong>动作条件</strong>：|I_1 + I_2 + ... + I_n| &gt; I_set（和电流&gt;门槛）</li>
+<li><strong>理想情况</strong>：内部故障时和电流大（各端均流入故障点）；外部故障/正常时和电流≈0（仅不平衡电流）</li>
+<li>不受振荡影响（差动保护在振荡时仍然正确），不需与上下级配合（绝对选择性）</li>
+</ul>
+<p><strong>线路纵联保护</strong>（220kV及以上线路）：</p>
+<ul>
+<li><strong>高频相差保护</strong>：比较两端电流的相位，高频信号沿输电线路载波通道传输</li>
+<li><strong>方向比较保护</strong>：每端判断故障方向后通过通道向对端发闭锁/允许信号</li>
+<li><strong>分相电流差动</strong>：利用光纤通道传输两端电流采样值进行比较，精度最高</li>
+</ul>
+<hr>
+<h3>微机型继电保护装置</h3>
+<p><strong>ID</strong>: 2109 | <strong>标签</strong>: <code>微机保护</code>, <code>算法</code></p>
+<p><strong>硬件架构</strong>（三层模块化）：</p>
+<pre><code>[object Object]</code></pre><p><strong>采样与滤波</strong>：</p>
+<ul>
+<li><strong>采样频率</strong>：额定频率f_0 = 50Hz，大多采用f_s = 600<del>2400Hz（12</del>48点/周波）<ul>
+<li>12点/周波（600Hz）：故障测距精度有限，但计算量小</li>
+<li>24点/周波（1200Hz）：精度与速度的较好折中</li>
+<li>48点/周波（2400Hz）：高精度测距，计算量大</li>
+</ul>
+</li>
+<li><strong>采样方式</strong>：<ul>
+<li>等间隔采样（固定频率）→ 同步误差影响精度</li>
+<li>锁相环同步采样（PLL跟踪系统频率）→ 避免非整周期采样误差</li>
+</ul>
+</li>
+<li><strong>数字滤波</strong>：差分滤波（去除直流分量）、余弦滤波（提取基波）、小波滤波（暂态分析）</li>
+</ul>
+<p><strong>常用保护算法</strong>：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>主要计算算法（傅氏算法）</strong>：</p>
+<ul>
+<li>基波实部：X_R = (2/N)∑x_k·cos(2πk/N)</li>
+<li>基波虚部：X_I = (2/N)∑x_k·sin(2πk/N)</li>
+<li>基波幅值：X_1 = √(X_R² + X_I²)</li>
+<li>基波相位：φ_1 = arctan(X_I / X_R)</li>
+</ul>
+<p><strong>提高可靠性的措施</strong>：</p>
+<ul>
+<li><strong>双重化配置</strong>：两套独立的保护装置互为备用，直流电源、CT、PT、出口均独立</li>
+<li><strong>装置自检</strong>：上电自检（ROM/RAM/AD/出口回路）+运行中周期性自检</li>
+<li><strong>硬件容错</strong>：看门狗（Watchdog）、电源监视、三取二出口逻辑</li>
+<li><strong>软件容错</strong>：互锁逻辑、有效数据检验、多重判据</li>
+</ul>
+<p><strong>通信功能</strong>：</p>
+<ul>
+<li><strong>站控层通信</strong>：IEC 61850（MMS协议）、IEC 103（传统规约）</li>
+<li><strong>过程层通信</strong>：GOOSE（跳闸/合闸/联锁信号）、SV（采样值传输）</li>
+<li><strong>GPS对时</strong>：IRIG-B码（精度1μs）或IEEE 1588（PTP，精度&lt;1μs），用于故障录波和PMU</li>
+</ul>
+<hr>
+<h3>变压器差动保护</h3>
+<p><strong>ID</strong>: 2117 | <strong>标签</strong>: <code>差动保护</code>, <code>变压器</code>, <code>励磁涌流</code></p>
+<p><strong>基本原理</strong>：</p>
+<p>比较变压器各侧电流的相量和（经幅值和相位校正后）：</p>
+<ul>
+<li><strong>幅值校正</strong>：I_H&quot; = I_H × (CT_H变比) / (基准侧CT变比) 或直接用平衡系数</li>
+<li><strong>相位校正</strong>：Y侧CT接成Δ形（或Δ侧CT接成Y形），消除30°相位差。大多数微机保护通过软件完成相位补偿</li>
+<li>Y/Δ-11接线变压器校正示例：I_A_Y&quot; = (I_A_Y - I_B_Y)/√3</li>
+</ul>
+<p><strong>比率制动特性</strong>：</p>
+<pre><code>[object Object]</code></pre><ul>
+<li><strong>I_op_min</strong>（最小动作电流）：整定值约0.2~0.5I_n，躲过正常运行时最大不平衡电流</li>
+<li><strong>拐点电流</strong>I_res0：转折点，约为0.5~1.0I_n</li>
+<li><strong>比率制动系数K</strong>：折线第二段斜率，典型0.3~0.5（满足外部短路时可靠不动作）</li>
+</ul>
+<p><strong>不平衡电流的来源及对策</strong>：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>励磁涌流识别</strong>（防止空载合闸误动）：</p>
+<p><strong>1. 二次谐波制动法</strong>（最常用）：</p>
+<ul>
+<li>励磁涌流中含大量二次谐波（可达基波的15%~80%），而内部故障电流基本无二次谐波</li>
+<li>制动判据：I_2 / I_1 &gt; K_2 （K_2典型值0.12~0.20）</li>
+<li>三相&quot;或&quot;门制动：任一相涌流特征明显则三相差动全部闭锁</li>
+<li>局限性：现代变压器铁芯材料改进（高磁导率硅钢片），二次谐波含量降低，可能降低制动可靠性</li>
+</ul>
+<p><strong>2. 间断角识别法</strong>：</p>
+<ul>
+<li>励磁涌流波形有明显间断角（θ_j约为60°~120°），内部故障电流无间断</li>
+<li>判据：θ_j &gt; 65° 判别为涌流（需高采样频率支持）</li>
+</ul>
+<p><strong>3. 波形对称识别法</strong>（较新方法）：</p>
+<ul>
+<li>涌流波形正半波与负半波不对称（偏向时间轴一侧），故障电流基本对称</li>
+<li>比较前半周波与后半周波波形的相似度</li>
+</ul>
+<p><strong>差动速断保护</strong>：</p>
+<ul>
+<li>高定值差动保护，不经过涌流闭锁和比率制动</li>
+<li>整定值：I_op_quick = K_k × I_k_min（可靠系数×最小短路电流）或6~12倍额定电流</li>
+<li>作用：在内部严重故障（短路电流远大于涌流）时快速跳闸，不受涌流制动延迟的影响</li>
+</ul>
+<p><strong>CT断线闭锁</strong>：</p>
+<ul>
+<li>检测差流是否存在但无制动电流变化 → 判断CT断线</li>
+<li>判据：差动电流大于整定值但仅一相，且该相电压无突变（无故障特征）</li>
+<li>CT断线后保护退出（也可选择不闭锁仅发信号，由运行人员处理）</li>
+</ul>
+<p><strong>工程整定要点</strong>（参照DL/T 684-2012）：</p>
+<ul>
+<li>最小动作电流 I_op_min = K_k × (f_i + ΔU + Δm) × I_n，其中f_i为CT误差（0.01<del>0.05），ΔU为分接头调整范围（典型0.05</del>0.10），Δm为平衡系数误差（0.02<del>0.05），K_k为可靠系数（1.3</del>1.5）</li>
+<li>比率制动系数K一般取0.3~0.5，通过最大外部短路电流下灵敏度校核确定</li>
+<li>二次谐波制动比K_2经验值为0.15~0.20，实际按现场实测波形微调</li>
+</ul>
+<p>→ 关联：<a href="%E7%94%B5%E6%B0%94%E5%9F%BA%E7%A1%80%E7%90%86%E8%AE%BA.md">电气基础理论</a> §1.3 — 变压器工作原理</p>
+<hr>
+<h2>2.8 调度自动化（2 条目）</h2>
+<h3>SCADA系统</h3>
+<p><strong>ID</strong>: 2110 | <strong>标签</strong>: <code>SCADA</code>, <code>RTU</code>, <code>遥测</code></p>
+<p><strong>四遥功能定义</strong>：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>SOE（事件顺序记录）</strong>：分辨率为1~5ms，记录开关变位顺序和时间，用于故障时序分析</p>
+<p><strong>终端设备对比</strong>：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>通信规约（协议）演变</strong>：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>104规约帧格式</strong>（应用层）：</p>
+<ul>
+<li>启动字符 68H + 长度L + 长度L + 启动字符68H + 控制域（8字节） + ASDU（应用服务数据单元）</li>
+<li>主要类型：＜1（周期YC）、＜3（变化YX）、＜5（YC召唤确认）、＜7（YX召唤确认）、＜9（SOE）、＜30（YK命令）、＜37（总召唤）</li>
+</ul>
+<p><strong>数据采集精度要求</strong>（依据Q/GDW 162-2007）：</p>
+<ul>
+<li>模拟量采集精度：0.5%~1.0%（功率类），0.2%~0.5%（电流/电压）</li>
+<li>遥测越死区传送阈值：U（0.5%~1%），P（1%<del>2%），f（0.01</del>0.02Hz）</li>
+<li>遥信变位响应时间：从变位到主站画面刷新典型&lt;3~5s</li>
+</ul>
+<p>→ 关联：<a href="%E7%94%B5%E6%B0%94%E8%87%AA%E5%8A%A8%E5%8C%96.md">电气自动化</a> §3.5 工业通信协议</p>
+<hr>
+<h3>EMS能量管理系统</h3>
+<p><strong>ID</strong>: 2111 | <strong>标签</strong>: <code>EMS</code>, <code>状态估计</code>, <code>调度</code></p>
+<p><strong>EMS组成结构</strong>（四层功能）：</p>
+<pre><code>[object Object]</code></pre><p><strong>状态估计</strong>（核心在线应用）：</p>
+<ul>
+<li><strong>数学模型</strong>：J(x) = [z - h(x)]ᵀR⁻¹[z - h(x)] → min<ul>
+<li>z：量测向量（SCADA遥测值，冗余度1.5~2.5）</li>
+<li>h(x)：量测函数（由状态变量x计算的理论值）</li>
+<li>R：量测误差协方差矩阵（权重矩阵，精度高的权重高）</li>
+<li>x：状态变量（各节点电压幅值和相角，维数2N-1）</li>
+</ul>
+</li>
+<li><strong>求解方法</strong>：加权最小二乘法（WLS），迭代求解</li>
+<li><strong>不良数据检测</strong>：标准化残差r_N &gt; ε → 检测到坏数据 → 逐一剔除</li>
+<li><strong>量测配置要求</strong>：可观测性分析确保网络全部节点电压/相角均可唯一确定</li>
+<li><strong>精度指标</strong>：电压幅值偏差&lt;0.5%，相角偏差&lt;0.5°，功率偏差&lt;1%~3%</li>
+</ul>
+<p><strong>自动发电控制（AGC/EDC）</strong>：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>AGC控制模式</strong>：</p>
+<ul>
+<li><strong>定频率控制（FFC）</strong>：控制孤网或主网频率，调整机组出力使频率恢复至50Hz</li>
+<li><strong>定交换功率控制（FTC）</strong>：控制联络线功率为计划值（用于弱联网系统）</li>
+<li><strong>频率与联络线偏差控制（TBC）</strong>：ACE = ΔP_tie + βΔf，最常用的互联电网控制模式<ul>
+<li>ACE：区域控制偏差</li>
+<li>β：频率偏差系数（自然频率特性系数+人工修正）</li>
+<li>CPS1/CPS2标准：NERC考核标准，CPS1要求滚动12个月≥100%</li>
+</ul>
+</li>
+</ul>
+<p><strong>自动电压无功控制（AVC）</strong>：</p>
+<ul>
+<li><strong>九区图控制法</strong>（传统，基于变电站层级）：<ul>
+<li>横轴：无功Q（电压/无功），纵轴：电压U</li>
+<li>九个区域：正常区（不动作），越上限/下限（投切电容器/电抗器或调分接头）</li>
+</ul>
+</li>
+<li><strong>三层协调控制</strong>（现代）：<ul>
+<li>全网AVC：根据状态估计结果计算最优无功潮流</li>
+<li>区域AVC：协调区域内各厂站无功设备</li>
+<li>厂站AVC：就地闭环控制（AVR/分接头/电容器）</li>
+</ul>
+</li>
+</ul>
+<p><strong>安全分析</strong>：</p>
+<ul>
+<li><strong>静态安全分析（SCA）</strong>：N-1扫描，检验各元件退出后的潮流不越限，扫描速度影响在线应用的实时性</li>
+<li><strong>动态安全分析（DSA）</strong>：在线时域仿真，评估预想故障集下的暂态稳定性</li>
+<li><strong>安全约束调度（SCD）</strong>：对潜在越限的N-1场景提出预防性校正措施（再调度/切机/切负荷）</li>
+</ul>
+<p><strong>负荷预测</strong>：</p>
+<ul>
+<li><strong>超短期</strong>（未来5min~1h，精度1%~2%）：用于AGC实时调度，时间序列模型+实时气象修正</li>
+<li><strong>短期</strong>（未来1h~7天，精度2%~4%）：用于日发电计划和机组组合，相似日法+神经网络</li>
+<li><strong>中期</strong>（未来1月~1年，精度3%~6%）：用于检修计划和燃料采购，回归模型</li>
+<li><strong>长期</strong>（未来1~20年，精度5%~10%）：用于电网规划，经济计量模型</li>
+</ul>
+<p><strong>典型指标要求</strong>（依据DL/T 516-2006《电力调度自动化系统运行管理规程》）：</p>
+<ul>
+<li>SCADA月可用率 ≥ 99.9%</li>
+<li>状态估计月可用率 ≥ 98%</li>
+<li>遥测合格率 ≥ 97%（主要遥测），≥ 95%（次要遥测）</li>
+<li>AGC调节合格率 ≥ 99%</li>
+<li>厂站远动装置平均无故障时间MTBF ≥ 20000h</li>
+</ul>
+<hr>
+<h2>Capture Notes</h2>
+<ul>
+<li>raw/ 与 areas/ 两版合并：保留 areas 原有 11 条 + 新增 raw 独有 6 条</li>
+<li>新增子模块 2.5 用电技术</li>
+<li>新增条目：火力发电原理、变电站主接线形式、GIS组合电器、电缆选型原则、电气安全防护、变压器差动保护</li>
+<li>2026-06 大版本更新：全部 17 个条目扩展为详细技术说明，包含公式、数值参量、工程应用要点</li>
+</ul>
+
+  </div>
+</section>
+
+<section id="sec-2" class="content-section">
+  <div class="section-header">
+    <h2 class="section-title">电气自动化</h2>
+    <div style="font-size:13px;color:var(--text-dim);font-family:var(--font-mono);margin-bottom:16px">原始模块：3 · 子模块：PLC · 变频器 · 伺服系统 · DCS & SCADA · 工业通信 · 组态软件 · 工控安全 · 工业机器人</div>
+  </div>
+  <div class="section-body">
+    <h1>电气自动化</h1>
+<blockquote>
+<p>原始模块：3 · 子模块：PLC · 变频器 · 伺服系统 · DCS &amp; SCADA · 工业通信 · 组态软件 · 工控安全 · 工业机器人</p>
+</blockquote>
+<h2>概述</h2>
+<p>工业电气自动化控制系统的主要组成部分，共 <strong>12</strong> 个条目。</p>
+<p><strong>关联页面</strong>：<a href="%E5%B7%A5%E4%B8%9A%E7%94%B5%E6%B0%94%E6%88%90%E5%A5%97.md">工业电气成套</a> · <a href="%E5%BC%B1%E7%94%B5%E4%B8%8E%E6%99%BA%E8%83%BD%E5%8C%96.md">弱电与智能化</a> · <a href="%E4%BA%A7%E5%93%81%E7%9F%A5%E8%AF%86%E5%BA%93.md">产品知识库</a> · <a href="%E7%94%B5%E8%83%BD%E8%B4%A8%E9%87%8F%E6%B2%BB%E7%90%86.md">电能质量治理</a></p>
+<hr>
+<h2>3.1 PLC（3 条目）</h2>
+<h3>PLC工作原理</h3>
+<p><strong>ID</strong>: 2201 | <strong>标签</strong>: <code>PLC</code>, <code>扫描周期</code></p>
+<p><strong>循环扫描工作方式</strong>：每个扫描周期依次经历以下阶段：</p>
+<p><strong>阶段一：自诊断与通讯处理</strong></p>
+<ul>
+<li>CPU 自检（ROM/RAM/看门狗）</li>
+<li>处理通信任务（与编程器/上位机/其他 PLC 的数据交换）</li>
+<li>典型耗时：0.5~3ms</li>
+</ul>
+<p><strong>阶段二：输入采样</strong></p>
+<ul>
+<li>CPU 以扫描方式依次读取所有输入端子的 ON/OFF 状态及模拟量数据</li>
+<li>将状态存入 <strong>I/O 映像区（输入映像寄存器）</strong></li>
+<li>采样结束后，即使外部输入发生变化，映像寄存器内容<strong>保持不变</strong>直到下个周期</li>
+</ul>
+<p><strong>阶段三：用户程序执行</strong></p>
+<ul>
+<li>CPU <strong>从上到下、从左到右</strong>依次扫描用户程序</li>
+<li>从<strong>输入映像寄存器</strong>读取输入状态，从<strong>输出映像寄存器/元件映像寄存器</strong>读取当前状态</li>
+<li>运算结果存入<strong>元件映像寄存器</strong>（不立即输出）</li>
+<li>执行过程中<strong>只有输入映像寄存器内容不变</strong></li>
+</ul>
+<p><strong>阶段四：输出刷新</strong></p>
+<ul>
+<li>CPU 将<strong>输出映像寄存器</strong>状态<strong>一次性</strong>传送到<strong>输出锁存电路</strong></li>
+<li>通过输出电路驱动外部负载</li>
+</ul>
+<p><strong>扫描周期时间估算</strong>：</p>
+<pre><code>[object Object]</code></pre><p><strong>各品牌扫描周期</strong>：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>I/O 响应延迟计算</strong>：</p>
+<ul>
+<li>最小响应时间 = 输入延迟 + 1×扫描周期 + 输出延迟</li>
+<li>最大响应时间 = 输入延迟 + 2×扫描周期 + 输出延迟</li>
+</ul>
+<p><strong>实例</strong>（西门子 S7-400 数字量）：</p>
+<ul>
+<li>用户程序执行 18.0ms + 过程映像传送 0.109ms + OS 执行 0.31ms = 理论周期 18.419ms</li>
+<li>考虑通信负载 20% = 23.024ms → 最长响应时间约 <strong>46.1ms</strong></li>
+</ul>
+<p><strong>中断处理</strong>：外部输入中断（上升沿/下降沿）、定时中断、高速计数器中断、通信中断。西门子 S7-1500 支持 16 级中断优先级。</p>
+<p><strong>看门狗（WDT）</strong>：</p>
+<ul>
+<li>原理：独立定时器监控系统是否&quot;跑飞&quot;，正常时程序定期&quot;喂狗&quot;，异常时超时触发系统复位</li>
+<li>默认值 S7-1200/1500 为 <strong>150ms</strong>（硬件看门狗）</li>
+<li>超时后 CPU 停机并报错</li>
+</ul>
+<hr>
+<h3>PLC选型</h3>
+<p><strong>ID</strong>: 2202 | <strong>标签</strong>: <code>PLC</code>, <code>选型</code>, <code>I/O</code></p>
+<p><strong>I/O 点数估算</strong>：</p>
+<pre><code>[object Object]</code></pre><p>最终订货需按厂商模块点数规格圆整。</p>
+<p><strong>存储器容量估算</strong>（经验公式）：</p>
+<pre><code>[object Object]</code></pre><p><strong>主流品牌性能对比</strong>：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>选型建议</strong>：</p>
+<ul>
+<li>小型项目（≤256点，3~4轴）：三菱 FX5U / 西门子 S7-1200</li>
+<li>中型项目（512~2048点，多轴）：西门子 S7-1200 / 汇川 AM600（EtherCAT 高速总线）</li>
+<li>大型项目（&gt;2048点，需冗余）：西门子 S7-1500</li>
+</ul>
+<p><strong>I/O 模块类型</strong>：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p>→ 关联：<a href="%E4%BA%A7%E5%93%81%E7%9F%A5%E8%AF%86%E5%BA%93.md">产品知识库</a> §9.6 — 汇川竞品</p>
+<hr>
+<h3>PID控制算法</h3>
+<p><strong>ID</strong>: 2210 | <strong>标签</strong>: <code>PID</code>, <code>闭环控制</code>, <code>参数整定</code></p>
+<p><strong>连续 PID 公式</strong>（并联式）：</p>
+<ul>
+<li>u(t) = Kp×e(t) + Ki×∫e(t)dt + Kd×de(t)/dt</li>
+<li>也可写作：u = Kp×(e + 1/Ti×∫e·dt + Td×de/dt)</li>
+<li>P（比例）：对当前偏差即时响应，Kp 越大响应越快，过大会引起振荡</li>
+<li>I（积分）：消除稳态误差，累积历史偏差</li>
+<li>D（微分）：预测偏差变化趋势，抑制超调，但对噪声敏感</li>
+</ul>
+<p><strong>位置式 PID</strong>（离散化）：</p>
+<ul>
+<li>u(k) = Kp×e(k) + Ki×Σe(j)×Δt + Kd×[e(k)-e(k-1)]/Δt</li>
+<li>输出绝对控制量，需累加所有历史误差，<strong>易产生积分饱和</strong></li>
+</ul>
+<p><strong>增量式 PID</strong>：</p>
+<ul>
+<li>Δu(k) = Kp×[e(k)-e(k-1)] + Ki×e(k)×Δt + Kd×[e(k)-2e(k-1)+e(k-2)]/Δt</li>
+<li>仅输出增量，仅依赖最近三次误差值，<strong>天然抗积分饱和</strong></li>
+<li>用于电机调速、伺服控制</li>
+</ul>
+<p><strong>积分饱和（Anti-windup）</strong>：执行器已达极限但误差未消，积分持续累加造成滞后。常用处理方法：</p>
+<ul>
+<li><strong>积分限幅</strong>：设定积分上下限</li>
+<li><strong>积分分离</strong>：|e(k)|&gt;阈值时取消积分（仅 PD），|e(k)|&lt;阈值时恢复积分</li>
+<li><strong>遇限削弱</strong>：输出饱和时冻结积分</li>
+<li><strong>Back-calculation</strong>：用(饱和输出 - 实际输出)反馈驱动积分器回退</li>
+</ul>
+<p><strong>Ziegler-Nichols 临界比例度法整定表</strong>：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p>Ku 为临界增益（等幅振荡），Pu 为临界振荡周期。</p>
+<p><strong>工程经验参数范围</strong>：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>采样周期选择</strong>（香农采样定理 fs ≥ 2fmax）：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>PID 参数影响</strong>：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><blockquote>
+<p>工业中约 <strong>80% 的回路仅需 PI 控制</strong>，Kd 默认为 0。</p>
+</blockquote>
+<hr>
+<h2>3.2 变频器（2 条目）</h2>
+<h3>变频器原理</h3>
+<p><strong>ID</strong>: 2203 | <strong>标签</strong>: <code>VFD</code>, <code>V/F</code>, <code>矢量控制</code></p>
+<p><strong>基本调速公式</strong>（异步电机）：n = 60f(1-s)/p，其中 f 为电源频率，p 为磁极对数，s 为转差率。</p>
+<p><strong>主电路拓扑</strong>（交-直-交电压型）：</p>
+<ul>
+<li><strong>整流侧</strong>：三相不可控二极管桥式整流</li>
+<li><strong>直流环节</strong>：电解电容滤波（可能含直流电抗器）</li>
+<li><strong>逆变侧</strong>：IGBT 模块（两电平或三电平 NPC）</li>
+</ul>
+<p><strong>三种控制方式对比</strong>：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>V/F 控制（恒压频比）</strong>：U/f = 常数。低频时定子电阻压降占比显著，需<strong>转矩提升</strong>（低频补偿电压 V0 = 0%~20%Umax）。预定义曲线：2.0 次幂降转矩（风机泵类），自定义三段折线。</p>
+<p><strong>矢量控制坐标变换</strong>：</p>
+<ul>
+<li><strong>Clark 变换</strong>（三相静止 abc → 两相静止 αβ）：
+[iα, iβ]ᵀ = 2/3 × [1 -1/2 -1/2; 0 √3/2 -√3/2] × [ia, ib, ic]ᵀ</li>
+<li><strong>Park 变换</strong>（两相静止 αβ → 两相旋转 dq）：
+[id, iq]ᵀ = [cosθ sinθ; -sinθ cosθ] × [iα, iβ]ᵀ</li>
+<li>dq 坐标系下：<strong>id</strong> 为励磁分量（决定转子磁链），<strong>iq</strong> 为转矩分量（T = Kt·iq）</li>
+</ul>
+<p><strong>SVPWM vs SPWM</strong>：</p>
+<ul>
+<li>SPWM 直流电压利用率 0.866（最大调制比 m≤1）</li>
+<li><strong>SVPWM</strong> 直流电压利用率 <strong>1.15</strong>（比 SPWM 高约 15%），谐波更低，计算量大</li>
+</ul>
+<p><strong>变频器输入端谐波</strong>（6n±1 次，三相桥式整流）：</p>
+<ul>
+<li>5 次（250Hz）：~20%（1/5）</li>
+<li>7 次（350Hz）：~14.3%（1/7）</li>
+<li>11 次（550Hz）：~9.1%（1/11）</li>
+<li>未加滤波时电流 THD ≈ 30%~50%</li>
+</ul>
+<p>→ 关联：<a href="%E7%94%B5%E8%83%BD%E8%B4%A8%E9%87%8F%E6%B2%BB%E7%90%86.md">电能质量治理</a> §6.3 — 变频器是主要谐波源</p>
+<hr>
+<h3>变频器选型</h3>
+<p><strong>ID</strong>: 2204 | <strong>标签</strong>: <code>变频器</code>, <code>选型</code></p>
+<p><strong>负载类型选型系数</strong>：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>重载/轻载选型</strong>（变频器额定电流 ≥ 电机额定电流 × 选型系数）：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>电抗器与滤波器选型</strong>：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>变频器对电机的影响</strong>：</p>
+<ul>
+<li>谐波导致电机温升提高 <strong>8~15℃</strong>，普通电机绝缘寿命缩短 <strong>30%~50%</strong></li>
+<li>共模电压通过杂散电容感应出轴电压（10<del>30V），轴承润滑膜击穿阈值约 15</del>20V</li>
+<li>抑制措施：du/dt 滤波器、接地碳刷（轴电压&lt;3V）、变频专用电机（F/H 级绝缘）</li>
+</ul>
+<p><strong>制动电阻选型估算</strong>（380V 系统）：</p>
+<ul>
+<li>阻值 ≈ 700²/(0.7×P电机) → 如 7.5kW 取 <strong>100Ω</strong></li>
+<li>功率 = (0.1~0.3)×P电机 → 如 7.5kW 取 <strong>800W</strong>（偶发制动）</li>
+</ul>
+<hr>
+<h2>3.3 伺服系统（2 条目）</h2>
+<h3>伺服系统组成</h3>
+<p><strong>ID</strong>: 2205 | <strong>标签</strong>: <code>伺服</code>, <code>编码器</code>, <code>闭环</code></p>
+<p><strong>三环控制结构</strong>（从内到外）：<strong>电流环 → 速度环 → 位置环</strong></p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p>工程经验法则：<strong>内环带宽 = 外环带宽的 5~10 倍</strong></p>
+<ul>
+<li>位置环带宽 ≤ 速度环带宽 / 4</li>
+<li>典型带宽：电流环 ~1000Hz，速度环 ~300Hz，位置环 ~100Hz</li>
+</ul>
+<p><strong>位置环</strong>：通常仅 P 控制 + 前馈补偿</p>
+<ul>
+<li>速度给定 = Kpp×(θ* - θ) + Kvf×ω*</li>
+<li>Kpp 为位置比例增益，Kvf 为速度前馈系数</li>
+</ul>
+<p><strong>速度环</strong>：PI 控制（一般不使用微分项，因噪声放大严重）</p>
+<ul>
+<li>iq* = Ksp(ω* - ω) + Ksi∫(ω* - ω)dt</li>
+</ul>
+<p><strong>编码器类型</strong>：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>增益调整顺序</strong>：先调电流环（驱动器固设）→ 速度环（PI 从小到大）→ 位置环（逐步增加增益）→ 加入前馈系数</p>
+<hr>
+<h3>伺服电机类型</h3>
+<p><strong>ID</strong>: 2206 | <strong>标签</strong>: <code>伺服电机</code>, <code>永磁</code></p>
+<p><strong>PMSM 永磁同步电机</strong>：定子通入正弦交流电产生旋转磁场，拖动永磁体转子同步旋转。转速严格 = 60f/p。</p>
+<p><strong>SPM vs IPM</strong>：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>PMSM 电磁转矩公式</strong>（含磁阻转矩）：</p>
+<ul>
+<li>Te = 3/2 p[ψf×iq + (Ld - Lq)×id×iq]</li>
+<li>对于 SPM（Ld = Lq）：Te = Kt×iq</li>
+</ul>
+<p><strong>关键参数换算</strong>：</p>
+<ul>
+<li><strong>转矩常数 Kt</strong>（Nm/A）= T/I （转矩/电流）</li>
+<li><strong>反电动势常数 Ke</strong>（V/KRPM）= E/N （电压/转速）</li>
+<li><strong>Kt = Ke / 104.7</strong>（物理本质相同，单位不同）</li>
+<li><strong>额定功率</strong> P(kW) = N(RPM) × T(Nm) / 9549.3</li>
+</ul>
+<p><strong>过载能力</strong>：伺服电机短时过载倍数通常为 <strong>3 倍</strong>（受驱动器输出电流限制）</p>
+<p><strong>正弦波（PMSM）vs 梯形波（BLDC）</strong>：</p>
+<ul>
+<li>PMSM：分布式绕组，正弦反电动势，FOC 控制，转矩波动小</li>
+<li>BLDC：集中式绕组，梯形波反电动势，六步方波控制，有换相转矩脉动</li>
+</ul>
+<hr>
+<h2>3.4 DCS &amp; SCADA（2 条目）</h2>
+<h3>DCS集散控制系统</h3>
+<p><strong>ID</strong>: 2207 | <strong>标签</strong>: <code>DCS</code>, <code>分散控制</code>, <code>集中管理</code></p>
+<p><strong>DCS vs PLC 核心区别</strong>：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>分层结构</strong>（四级）：</p>
+<pre><code>[object Object]</code></pre><p><strong>冗余配置</strong>：</p>
+<ul>
+<li><strong>控制器 1:1 热备</strong>：专用冗余同步总线，无扰切换（ABB AC800M &lt;10ms，艾默生 DeltaV &lt;1 次扫描周期）</li>
+<li><strong>电源冗余</strong>：双重或三重冗余，支持热插拔</li>
+<li><strong>网络冗余</strong>：A/B 双网，PROFINET/EtherNet/IP 双网</li>
+</ul>
+<p><strong>IO 卡件类型</strong>：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>控制周期</strong>：快回路 50<del>100ms（ETS/FSSS 保护），常规 200</del>250ms（PID），慢速 500~1000ms（温度）。</p>
+<p><strong>国内 DCS 厂商市场排名</strong>（2024-2025）：</p>
+<ul>
+<li><strong>中控技术</strong>：约 <strong>40%+</strong>（化工&gt;50%、石化&gt;50%）</li>
+<li><strong>和利时</strong>：约 12~15%（核电、火电）</li>
+<li><strong>艾默生</strong>：约 10~15%（石化、电力，外资第一）</li>
+<li><strong>国能智深</strong>：火电超超临界机组，500+ 台项目</li>
+</ul>
+<p>→ 关联：<a href="%E5%BC%B1%E7%94%B5%E4%B8%8E%E6%99%BA%E8%83%BD%E5%8C%96.md">弱电与智能化</a> §4.4 BAS — 架构理念相似</p>
+<hr>
+<h3>SCADA系统架构</h3>
+<p><strong>ID</strong>: 2211 | <strong>标签</strong>: <code>SCADA</code>, <code>RTU</code>, <code>四遥</code></p>
+<p><strong>四遥功能</strong>：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>系统组成</strong>：</p>
+<ul>
+<li><strong>前置机 FEP</strong>：负责与所有 RTU/PLC/IED 通信，协议转换（IEC 104/DNP3/Modbus），数据预处理</li>
+<li><strong>SCADA 服务器</strong>：双机热备（切换 &lt;2~5秒），实时数据处理</li>
+<li><strong>历史服务器</strong>：数据存储，三级金字塔（秒级原始 7<del>30天，分钟级聚合 3</del>12月，小时级聚合 1~5年）</li>
+<li><strong>操作员站/工程师站/Web 发布服务器</strong></li>
+</ul>
+<p><strong>通道类型</strong>：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>实时数据库容量</strong>：中小型约 10 万点，大型可达 <strong>60 万~100 万+点</strong></p>
+<ul>
+<li>写性能：单节点约 5 万点/秒</li>
+<li>历史压缩比：TDengine ≥10:1，金仓数据库 82.3%</li>
+</ul>
+<p><strong>传统 SCADA vs 云 SCADA</strong>：</p>
+<ul>
+<li>传统：C/S 架构，本地控制响应 &lt;1ms，物理隔离安全，扩展困难</li>
+<li>云 SCADA：边缘+云协同，边缘 &lt;5ms/云端 50~200ms，K8s 弹性扩展，百万级点</li>
+</ul>
+<p>→ 关联：<a href="%E7%94%B5%E5%8A%9B%E7%B3%BB%E7%BB%9F.md">电力系统</a> §2.8 — SCADA在调度自动化中的应用</p>
+<hr>
+<h2>3.5 工业通信（1 条目）</h2>
+<h3>工业通信协议</h3>
+<p><strong>ID</strong>: 2208 | <strong>标签</strong>: <code>工业以太网</code>, <code>Profinet</code>, <code>Modbus</code></p>
+<p><strong>Modbus 协议</strong>（最广泛的串行/以太网工业协议）：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>Modbus 功能码</strong>：</p>
+<ul>
+<li>01（0x01）：读线圈</li>
+<li>02（0x02）：读离散输入</li>
+<li>03（0x03）：读保持寄存器（最常用）</li>
+<li>04（0x04）：读输入寄存器</li>
+<li>05（0x05）：写单线圈</li>
+<li>06（0x06）：写单寄存器</li>
+<li>15（0x0F）：写多线圈</li>
+<li>16（0x10）：写多寄存器</li>
+</ul>
+<p><strong>现场总线对比</strong>：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>工业以太网对比</strong>：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>应用选型</strong>：</p>
+<ul>
+<li>西门子生态 → <strong>PROFINET</strong></li>
+<li>运动控制/EtherCAT 生态 → <strong>EtherCAT</strong></li>
+<li>罗克韦尔/AB 生态 → <strong>EtherNet/IP</strong></li>
+<li>Modbus 兼容最广，适合多品牌混用</li>
+</ul>
+<p>→ 关联：<a href="%E5%BC%B1%E7%94%B5%E4%B8%8E%E6%99%BA%E8%83%BD%E5%8C%96.md">弱电与智能化</a> §4.5 系统集成 · <a href="%E7%94%B5%E5%8A%9B%E7%B3%BB%E7%BB%9F.md">电力系统</a> §2.8 SCADA</p>
+<hr>
+<h2>3.6 组态软件（1 条目）</h2>
+<h3>组态软件</h3>
+<p><strong>ID</strong>: 2209 | <strong>标签</strong>: <code>HMI</code>, <code>组态</code>, <code>人机界面</code></p>
+<p><strong>核心功能</strong>：可视化界面、数据采集、报警管理、趋势曲线、报表、用户权限、历史数据存储。</p>
+<p><strong>主流品牌对比</strong>：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>选型依据</strong>：与 PLC 品牌匹配（首选同品牌 HMI/组态）、驱动库覆盖、点数规模、冗余要求、Web 发布。</p>
+<hr>
+<h2>3.7 工业机器人（1 条目）</h2>
+<h3>工业机器人分类</h3>
+<p><strong>ID</strong>: 2212 | <strong>标签</strong>: <code>机器人</code>, <code>六轴</code>, <code>SCARA</code></p>
+<p><strong>主要类型对比</strong>：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>四大家族参数对比</strong>：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>选型原则</strong>：</p>
+<ul>
+<li>精密装配（3C 电子）→ 发那科（±0.02mm）或 SCARA（±0.01mm）</li>
+<li>高速分拣 → Delta（200 次/分钟）</li>
+<li>重载搬运/焊接 → 库卡（1300kg）或 ABB</li>
+<li>人机协作 → 库卡 LBR iiwa（七轴 + 力控 0.1N）</li>
+</ul>
+<p>→ 关联：<a href="%E7%94%B5%E6%B0%94%E8%87%AA%E5%8A%A8%E5%8C%96.md">电气自动化</a> §3.3 伺服系统 — 机器人驱动基础</p>
+<hr>
+<h2>Capture Notes</h2>
+<ul>
+<li>raw/ 与 areas/ 两版合并：保留 areas 原有 9 条 + 新增 raw 独有 3 条</li>
+<li>新增子模块 3.7 工业机器人；3.4 扩展为 DCS &amp; SCADA</li>
+<li>新增条目：PID控制算法、SCADA系统架构、工业机器人分类</li>
+<li>工业通信条目合并了 Modbus 和 PROFINET 具体协议细节</li>
+<li>2026-06 大版本更新：全部 12 个条目扩展为详细技术说明，包含公式、数值参量、工程应用要点</li>
+</ul>
+
+  </div>
+</section>
+
+<section id="sec-3" class="content-section">
+  <div class="section-header">
+    <h2 class="section-title">弱电与智能化</h2>
+    <div style="font-size:13px;color:var(--text-dim);font-family:var(--font-mono);margin-bottom:16px">原始模块：4 · 子模块：综合布线 · 安防系统 · 消防报警 · 楼宇自控 · 系统集成 · 智能照明 · 物联网IoT</div>
+  </div>
+  <div class="section-body">
+    <h1>弱电与智能化</h1>
+<blockquote>
+<p>原始模块：4 · 子模块：综合布线 · 安防系统 · 消防报警 · 楼宇自控 · 系统集成 · 智能照明 · 物联网IoT</p>
+</blockquote>
+<h2>概述</h2>
+<p>建筑弱电工程与智能化系统的主要领域，共 <strong>12</strong> 个条目。</p>
+<p><strong>关联页面</strong>：<a href="%E7%94%B5%E6%B0%94%E8%87%AA%E5%8A%A8%E5%8C%96.md">电气自动化</a> · <a href="%E8%A7%84%E8%8C%83%E4%B8%8E%E6%A0%87%E5%87%86.md">规范与标准</a> · <a href="%E5%B7%A5%E4%B8%9A%E7%94%B5%E6%B0%94%E6%88%90%E5%A5%97.md">工业电气成套</a> · <a href="%E9%A1%B9%E7%9B%AE%E4%B8%8E%E6%96%B9%E6%A1%88.md">项目与方案</a></p>
+<hr>
+<h2>4.1 综合布线（1 条目）</h2>
+<h3>综合布线系统</h3>
+<p><strong>ID</strong>: 2301 | <strong>标签</strong>: <code>布线</code>, <code>光纤</code>, <code>六类</code></p>
+<p><strong>六大子系统</strong>（GB 50311-2016 / EIA/TIA 568）：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>双绞线类别参数对比</strong>：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>光纤类型</strong>（OS 单模 / OM 多模）：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>信息点线缆估算</strong>：C = [0.55×(L+S)+6]×n，其中L为最远距离，S为最近距离，n为总数</p>
+<hr>
+<h2>4.2 安防系统（3 条目）</h2>
+<h3>安防系统组成</h3>
+<p><strong>ID</strong>: 2303 | <strong>标签</strong>: <code>CCTV</code>, <code>门禁</code>, <code>入侵</code></p>
+<p>安全防范系统组成：视频监控CCTV + 门禁控制ACS + 入侵报警 + 电子巡更 + 周界防范。以IP网络摄像机为主流，TCP/IP联网架构，支持与消防/BAS联动。</p>
+<hr>
+<h3>视频监控系统</h3>
+<p><strong>ID</strong>: 2309 | <strong>标签</strong>: <code>监控</code>, <code>IPCamera</code>, <code>NVR</code></p>
+<p><strong>IP摄像机分辨率与码率</strong>（H.265编码）：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>NVR存储容量计算</strong>：</p>
+<ul>
+<li>单路每日容量(GB) = 码率(Mbps)×3600×24/8/1024 = 码率×10.55</li>
+<li>经验值（H.265，一路1天）：2MP≈26GB，4MP≈42GB，8MP≈60GB</li>
+<li>常用口决（H.265）：200万≈20GB/天，400万≈40GB/天</li>
+</ul>
+<p><strong>AI分析能力</strong>：人脸识别准确率 98%~99.5%（配合前端抓拍机），车牌识别率&gt;99%</p>
+<p><strong>摄像机选型</strong>：枪机（固定通道）、球机（PTZ大范围巡航）、半球（室内美观）、防爆（石化矿井）、全景（360°替代多台枪机）</p>
+<p><strong>PoE供电标准</strong>：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><hr>
+<h3>门禁系统</h3>
+<p><strong>ID</strong>: 2310 | <strong>标签</strong>: <code>门禁</code>, <code>生物识别</code>, <code>电磁锁</code></p>
+<p><strong>读卡技术对比</strong>：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>控制器架构</strong>：主控TCP/IP + 分控RS485二级架构为主流，单台服务器可纳管至1016个门区。读卡器→控制器用Wiegand 26/34位或RS485；控制器→服务器用TCP/IP（SSL/TLS加密）。</p>
+<p><strong>高级逻辑</strong>：</p>
+<ul>
+<li><strong>反潜回（Anti-passback）</strong>：进出必刷卡形成闭环，防止尾随</li>
+<li><strong>双门互锁</strong>：两道门不能同时打开，用于银行金库、数据中心</li>
+<li><strong>消防联动</strong>：火灾时自动释放所有电磁锁（断电开锁），干接点信号输入</li>
+</ul>
+<hr>
+<h2>4.3 消防报警（1 条目）</h2>
+<h3>火灾自动报警系统</h3>
+<p><strong>ID</strong>: 2302 | <strong>标签</strong>: <code>FAS</code>, <code>探测器</code>, <code>联动</code></p>
+<p><strong>GB 50116-2013 核心要求</strong>：</p>
+<p><strong>探测器选型</strong>：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>联动控制关键要求</strong>：</p>
+<ul>
+<li>联动触发信号必须采用<strong>两个独立报警装置</strong>的&quot;与&quot;逻辑组合（4.1.6强条）</li>
+<li>消防水泵、防排烟风机除联动控制外，须在消控室设<strong>手动直接控制装置</strong>（4.1.4强条）</li>
+<li>防火卷帘两步降：感烟探测器→半降（距地1.8m），感温探测器→全降</li>
+<li>应急广播确认火灾后同时向全楼广播</li>
+</ul>
+<p><strong>系统类型</strong>：</p>
+<ul>
+<li><strong>区域报警系统</strong>：仅报警无联动，适用≤50m二类高层</li>
+<li><strong>集中报警系统</strong>：含联动控制，适用一类高层</li>
+<li><strong>控制中心报警系统</strong>：超高层/大型建筑群，多台集中控制器组网</li>
+</ul>
+<hr>
+<h2>4.4 楼宇自控（2 条目）</h2>
+<h3>BAS楼宇自控系统</h3>
+<p><strong>ID</strong>: 2304 | <strong>标签</strong>: <code>BAS</code>, <code>DDC</code>, <code>暖通</code></p>
+<p><strong>DDC控制器 IO 点位</strong>：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>典型DDC点数</strong>：小型（AI×4+DI×8+DO×4），中型（AI×8+AO×4+DI×12+DO×8），大型（AI×16<del>32+AO×8</del>16+DI×24<del>32+DO×16</del>24）</p>
+<p><strong>HVAC典型控制策略</strong>：</p>
+<ul>
+<li>夏季：送风温度设定值(如16°C)实测偏差→PID调节冷水阀开度</li>
+<li>冬季：切换热水阀控制+防冻保护（盘管前温度&lt;5°C时关新风阀、热水阀100%、停风机）</li>
+<li>VAV变风量：CO₂传感器反馈调节变频风机转速</li>
+<li>联锁顺序：风机启动→开风阀→开水阀（禁止风机未启先开水阀）</li>
+</ul>
+<p><strong>BACnet协议</strong>（楼宇自控国际标准）：</p>
+<ul>
+<li><strong>BACnet/IP</strong>：以太网，100/1000Mbps</li>
+<li><strong>BACnet MS/TP</strong>：RS-485，9.6~115.2kbps</li>
+<li>30+种标准对象（AI/AO/BI/BO/Schedule/Calendar）</li>
+<li>标准服务：ReadProperty、WriteProperty、SubscribeCOV</li>
+</ul>
+<p>→ 关联：<a href="%E7%94%B5%E6%B0%94%E8%87%AA%E5%8A%A8%E5%8C%96.md">电气自动化</a> §3.4 DCS — 两者架构理念相似</p>
+<hr>
+<h3>能耗监测系统</h3>
+<p><strong>ID</strong>: 2305 | <strong>标签</strong>: <code>能耗监测</code>, <code>分项计量</code></p>
+<p><strong>分项计量</strong>：照明/空调/动力/特殊四类分项能耗数据采集。远传智能电表（0.5S级）+ 数据网关 + 管理平台。</p>
+<p><strong>系统架构</strong>：智能电表（RS485/DLT645）→ 采集器 → 数据网关（4G/以太网）→ 管理平台</p>
+<p><strong>节能效果</strong>：通过精细化管理，目标节能率 <strong>10%~30%</strong>。</p>
+<p><strong>相关标准</strong>：GB/T 29149-2012《公共建筑能源管理系统技术规程》，国家机关办公建筑和大型公共建筑能耗监测系统建设导则。</p>
+<hr>
+<h2>4.5 系统集成（1 条目）</h2>
+<h3>智能建筑系统集成</h3>
+<p><strong>ID</strong>: 2306 | <strong>标签</strong>: <code>IBMS</code>, <code>集成平台</code></p>
+<p><strong>IBMS集成平台</strong>统一管理BAS/FAS/SAS/OAS等子系统。通过OPC/Modbus/BACnet网关实现协议转换。</p>
+<p><strong>典型架构</strong>：</p>
+<ul>
+<li><strong>接口层</strong>：各子系统网关（OPC Server / BACnet Router / Modbus Gateway）</li>
+<li><strong>数据层</strong>：实时数据库 + 历史数据库</li>
+<li><strong>应用层</strong>：集中监控、联动策略（如&quot;火灾报警→门禁释放→视频联动→照明强启&quot;）、报表</li>
+</ul>
+<p><strong>系统集成内容</strong>：楼宇自控(BAS) + 消防报警(FAS) + 安防(SAS) + 办公自动化(OAS) + 智能照明 + 能耗监测 + 一卡通</p>
+<p>→ 关联：<a href="%E7%94%B5%E6%B0%94%E8%87%AA%E5%8A%A8%E5%8C%96.md">电气自动化</a> §3.5 工业通信协议</p>
+<hr>
+<h2>4.6 智能照明（2 条目）</h2>
+<h3>智能照明控制</h3>
+<p><strong>ID</strong>: 2307 | <strong>标签</strong>: <code>DALI</code>, <code>调光</code>, <code>KNX</code></p>
+<p><strong>DALI协议</strong>（IEC 62386，数字可寻址照明接口）：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>DALI-2 vs DALI v1</strong>：DALI-2 强制双向通信，控制器+输入设备+镇流器均需认证，互操作性显著提升。</p>
+<p><strong>KNX/EIB 总线</strong>：楼宇自动化分布式对等通信总线，覆盖照明/窗帘/暖通/安防。通过<strong>KNX/DALI网关</strong>将DALI子系统集成。</p>
+<p><strong>调光方式对比</strong>：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>节能率</strong>：采用智能照明控制可节能 <strong>30%~60%</strong>（场景控制+定时控制+感应控制+调光调色温）</p>
+<hr>
+<h3>LED照明驱动</h3>
+<p><strong>ID</strong>: 2308 | <strong>标签</strong>: <code>LED</code>, <code>驱动电源</code></p>
+<p><strong>AC-DC+DC-DC两级拓扑</strong>：PFC（功率因数校正）前级 + LLC谐振半桥/反激后级。</p>
+<p><strong>调光方式</strong>：</p>
+<ul>
+<li><strong>PWM调光</strong>：恒流源输出占空比调节，无色偏，调光深度大</li>
+<li><strong>模拟调光</strong>：连续调节输出电流，有轻微色偏</li>
+</ul>
+<p><strong>关键指标</strong>：</p>
+<ul>
+<li>功率因数 <strong>&gt;0.9</strong>（带PFC）</li>
+<li>效率 <strong>&gt;90%</strong>（先进可达93%~95%）</li>
+<li>THD &lt;20%</li>
+<li>恒流精度 ±3%~±5%</li>
+</ul>
+<hr>
+<h2>4.7 物联网IoT（2 条目）</h2>
+<h3>LoRa物联网通信</h3>
+<p><strong>ID</strong>: 2311 | <strong>标签</strong>: <code>LoRa</code>, <code>LPWAN</code>, <code>IoT</code></p>
+<p><strong>无线通信协议对比</strong>：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>LoRaWAN设备类</strong>：</p>
+<ul>
+<li><strong>Class A</strong>（默认）：每个上行后开2个短接收窗，功耗最低</li>
+<li><strong>Class B</strong>：在基站同步信标周期定时开窗，功耗中等</li>
+<li><strong>Class C</strong>：持续监听下行，功耗最大（需供电）</li>
+</ul>
+<p><strong>扩频因子SF与速率</strong>（125kHz BW）：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p>ADR（自适应速率）自动在SF7~SF12间切换。中国频段：<strong>CN470-510MHz</strong>，96个上行信道。</p>
+<hr>
+<h3>边缘计算在电力中的应用</h3>
+<p><strong>ID</strong>: 2312 | <strong>标签</strong>: <code>边缘计算</code>, <code>配电物联网</code></p>
+<p><strong>配电物联网架构（云-管-边-端）</strong>：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>边缘网关功能</strong>：</p>
+<ul>
+<li><strong>协议转换</strong>：OPC UA / Modbus / IEC 61850 / DL/T 860 / LoRa</li>
+<li><strong>数据聚合</strong>：清洗降噪压缩上传，减少带宽65%+</li>
+<li><strong>本地AI推理</strong>：内置LSTM/CNN轻量化模型</li>
+<li><strong>响应延迟</strong>：本地&lt;50ms（比云端低82%）</li>
+</ul>
+<p><strong>应用场景</strong>：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p>→ 关联：<a href="%E7%94%B5%E5%8A%9B%E7%B3%BB%E7%BB%9F.md">电力系统</a> §2.4 配电系统</p>
+<hr>
+<h2>Capture Notes</h2>
+<ul>
+<li>raw/ 与 areas/ 两版合并：保留 areas 原有 8 条 + 新增 raw 独有 4 条</li>
+<li>新增子模块 4.7 物联网IoT；安防子模块扩展为 3 条细分类目</li>
+<li>新增条目：视频监控系统、门禁系统、LoRa物联网通信、边缘计算在电力中的应用</li>
+<li>智能照明条目合并了 DALI 协议细节</li>
+<li>2026-06 大版本更新：全部 12 个条目扩展为详细技术说明，含具体数值参量和标准引用</li>
+</ul>
+
+  </div>
+</section>
+
+<section id="sec-4" class="content-section">
+  <div class="section-header">
+    <h2 class="section-title">新能源与储能</h2>
+    <div style="font-size:13px;color:var(--text-dim);font-family:var(--font-mono);margin-bottom:16px">原始模块：5 · 子模块：光伏发电 · 风力发电 · 储能技术 · 氢能与燃料电池 · 微电网 · 双碳政策</div>
+  </div>
+  <div class="section-body">
+    <h1>新能源与储能</h1>
+<blockquote>
+<p>原始模块：5 · 子模块：光伏发电 · 风力发电 · 储能技术 · 氢能与燃料电池 · 微电网 · 双碳政策</p>
+</blockquote>
+<h2>概述</h2>
+<p>新能源发电与储能技术的主要方向，共 <strong>8</strong> 个条目。</p>
+<p><strong>关联页面</strong>：<a href="%E7%94%B5%E5%8A%9B%E7%B3%BB%E7%BB%9F.md">电力系统</a> · <a href="%E7%94%B5%E8%83%BD%E8%B4%A8%E9%87%8F%E6%B2%BB%E7%90%86.md">电能质量治理</a> · <a href="%E7%94%B5%E6%B0%94%E8%87%AA%E5%8A%A8%E5%8C%96.md">电气自动化</a> · <a href="%E4%BA%A7%E5%93%81%E7%9F%A5%E8%AF%86%E5%BA%93.md">产品知识库</a> · <a href="%E9%A1%B9%E7%9B%AE%E4%B8%8E%E6%96%B9%E6%A1%88.md">项目与方案</a></p>
+<hr>
+<h2>5.1 光伏发电（2 条目）</h2>
+<h3>光伏发电原理</h3>
+<p><strong>ID</strong>: 2401 | <strong>标签</strong>: <code>光伏</code>, <code>电池片</code>, <code>逆变器</code></p>
+<p><strong>光生伏特效应</strong>：光子能量 hν &gt; Eg 时，价带电子跃迁至导带，产生电子-空穴对。P-N 结内建电场将电子推向 N 区、空穴推向 P 区，形成光生电动势。</p>
+<p><strong>等效电路（单二极管五参数模型）</strong>：</p>
+<p>I = Iph - I0[exp(q(V+IRs)/nkT) - 1] - (V+IRs)/Rsh</p>
+<p>其中 q=1.602×10⁻¹⁹C（电子电荷），k=1.381×10⁻²³J/K（玻尔兹曼常数），n=1~2（理想因子），Rs 为串联电阻（mΩ级），Rsh 为并联电阻（kΩ级）。</p>
+<p><strong>效率极限</strong>：单结太阳电池 Shockley-Queisser 理论效率极限 <strong>33.7%</strong>。</p>
+<p><strong>各类电池效率对比</strong>：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>STC标准测试条件</strong>：辐照度 1000W/m²，温度 25°C，光谱 AM1.5G</p>
+<p><strong>温度系数</strong>（典型值/°C）：</p>
+<ul>
+<li>Pmax：<strong>-0.35% ~ -0.45%/°C</strong>（组件温度 65°C 时比25°C功率衰减约16%）</li>
+<li>Voc：-0.25% ~ -0.35%/°C</li>
+<li>Isc：+0.04% ~ +0.06%/°C</li>
+</ul>
+<p><strong>组件串联</strong>：光伏阵列设计需考虑串联数 N = Vdc_max / Voc，确保逆变器 MPPT 电压范围覆盖组件工作点。</p>
+<hr>
+<h3>光伏逆变器分类</h3>
+<p><strong>ID</strong>: 2402 | <strong>标签</strong>: <code>光伏逆变器</code>, <code>组串式</code></p>
+<p><strong>三种类型对比</strong>：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>组串式 vs 集中式</strong>：组串式 MPPT 粒度细，遮挡/地形复杂时发电量提升 <strong>3%~10%</strong>；容配比可达 1.3~1.8；模块化运维，单台故障不影响全局。集中式初始投资较低，适用于平坦开阔场地。</p>
+<p><strong>欧洲效率加权</strong>：η_Euro = 0.03η₅% + 0.06η₁₀% + 0.13η₂₀% + 0.10η₃₀% + 0.48η₅₀% + 0.20η₁₀₀%</p>
+<p>→ 关联：<a href="%E4%BA%A7%E5%93%81%E7%9F%A5%E8%AF%86%E5%BA%93.md">产品知识库</a> §9.6 — 华为、阳光电源竞品</p>
+<hr>
+<h2>5.2 风力发电（1 条目）</h2>
+<h3>风力发电原理</h3>
+<p><strong>ID</strong>: 2403 | <strong>标签</strong>: <code>风电</code>, <code>双馈</code>, <code>直驱</code></p>
+<p><strong>贝兹极限</strong>：理想风力机最大风能利用系数 Cp_max = 16/27 ≈ <strong>59.3%</strong>，实际 Cp = 0.35~0.50。</p>
+<p><strong>功率方程</strong>：P = ½ρAv³Cp(λ,β)</p>
+<ul>
+<li>ρ=1.225kg/m³（空气密度，15°C海平面）</li>
+<li>A = πR²（风轮扫掠面积）</li>
+<li>v：风速（m/s），λ=ωR/v（叶尖速比），β：桨距角</li>
+</ul>
+<p><strong>切入/额定/切出风速</strong>：切入 3<del>4m/s → 额定 10</del>15m/s → 切出 25m/s</p>
+<p><strong>变速恒频控制策略</strong>：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>双馈（DFIG）vs 直驱（PMSG）</strong>：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>DFIG 功率流向</strong>：次同步（ωr&lt;ωs）转子从电网吸收滑差功率；超同步（ωr&gt;ωs）转子向电网回馈滑差功率。</p>
+<hr>
+<h2>5.3 储能技术（2 条目）</h2>
+<h3>磷酸铁锂电池储能</h3>
+<p><strong>ID</strong>: 2404 | <strong>标签</strong>: <code>LFP</code>, <code>储能</code>, <code>电池</code></p>
+<p><strong>电芯参数</strong>：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>循环寿命</strong>：25°C/0.5C充放 → 80%SOH 约 <strong>3000~5000次</strong>，70%SOH 约 <strong>6000~8000次</strong>。主流 314Ah 电芯设计寿命≥10年。</p>
+<p><strong>系统组成</strong>（典型 5MWh 预制舱）：
+电芯(3.2V/314Ah) → 模组(1P20S=20串, 64V, ~20kWh) → 电池簇(1P416S, ~1331V, <del>376kWh) → 电池堆(9</del>12簇, 5MWh, 20尺集装箱)</p>
+<p><strong>温控对比</strong>：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>BMS 三级架构</strong>：BMU（电池采集单元：单体电压/温度/均衡）→ BCU（电池簇主控：簇级保护/均衡）→ BAU（系统总控：与PCS/EMS联动）。SOC 估算精度 ≤3%，SOH ≤5%。</p>
+<p>→ 关联：<a href="%E4%BA%A7%E5%93%81%E7%9F%A5%E8%AF%86%E5%BA%93.md">产品知识库</a> §9.3 储能设备</p>
+<hr>
+<h3>储能PCS变流器</h3>
+<p><strong>ID</strong>: 2405 | <strong>标签</strong>: <code>PCS</code>, <code>储能变流器</code></p>
+<p><strong>拓扑选择</strong>：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>四象限运行</strong>：PCS 支持双向充放电，充放电转换时间 <strong>&lt;20ms</strong>。</p>
+<p><strong>构网型控制</strong>（支持黑启动）：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>VSG 核心参数</strong>：虚拟惯量 J=0.1<del>10s²，阻尼系数 D=1</del>100kW/Hz
+<strong>PCS 效率</strong>：≥97%，典型容量 100kW~3.45MW</p>
+<p>→ 关联：<a href="%E4%BA%A7%E5%93%81%E7%9F%A5%E8%AF%86%E5%BA%93.md">产品知识库</a> §9.3 储能设备</p>
+<hr>
+<h2>5.4 氢能与燃料电池（1 条目）</h2>
+<h3>氢燃料电池</h3>
+<p><strong>ID</strong>: 2406 | <strong>标签</strong>: <code>氢能</code>, <code>燃料电池</code>, <code>PEMFC</code></p>
+<p><strong>PEMFC 极化曲线</strong>：Vcell = ENernst - ηact - ηohm - ηconc</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>关键参数</strong>：工作温度 60<del>80°C，功率密度 **0.5</del>1.5W/cm²**，系统效率(LHV) <strong>40%~60%</strong>，氢耗约 <strong>0.8~1.0kg/kWh</strong>。</p>
+<p><strong>电解槽制氢对比</strong>：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><hr>
+<h2>5.5 微电网（1 条目）</h2>
+<h3>微电网系统</h3>
+<p><strong>ID</strong>: 2407 | <strong>标签</strong>: <code>微电网</code>, <code>EMS</code>, <code>孤岛</code></p>
+<p><strong>三种拓扑</strong>：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>并网切换（STS静态开关）</strong>：切换时间 <strong>&lt;5~20ms</strong>（先进&lt;10ms），额定功率200~600kW</p>
+<p><strong>分层EMS控制</strong>：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>运行模式</strong>：并网→PQ控制，孤岛→V/f控制，切换→下垂控制+预同步</p>
+<p><strong>孤岛检测</strong>：被动法（电压/频率/相位监测）NDZ大；主动法（注入扰动信号）NDZ小但可能影响电能质量。</p>
+<hr>
+<h2>5.6 双碳政策（1 条目）</h2>
+<h3>双碳目标与新型电力系统</h3>
+<p><strong>ID</strong>: 2408 | <strong>标签</strong>: <code>双碳</code>, <code>新型电力系统</code></p>
+<p><strong>核心目标</strong>：</p>
+<ul>
+<li><strong>2030碳达峰</strong>，<strong>2060碳中和</strong></li>
+<li>2030年风光总装机 <strong>12亿kW以上</strong>（已于2024年7月提前实现，达12.1亿kW）</li>
+<li>2060年非化石能源消费比重 <strong>80%以上</strong></li>
+</ul>
+<p><strong>新型电力系统四大特征</strong>：</p>
+<ol>
+<li><strong>高比例新能源</strong>：风光成为电源主体，2060年装机占比&gt;85%，发电量占比~69%</li>
+<li><strong>高比例电力电子</strong>：逆变器/变流器改变系统动态行为（低惯量、弱阻尼）</li>
+<li><strong>源网荷储互动</strong>：柔性负荷+储能参与调节，从&quot;源随荷动&quot;到&quot;源网荷储协同&quot;</li>
+<li><strong>多能互补</strong>：风/光/水/火/核/储协同，电/热/冷/气/氢综合利用</li>
+</ol>
+<p><strong>十大关键技术</strong>：高效可再生能源、煤电灵活性+CCUS、SiC/GaN电力电子、<strong>长寿命储能</strong>、<strong>氢能全链条</strong>、超导输电、新型电力系统仿真调度、<strong>数字化智能化</strong>(5G/AI)、能源互联网、电力市场。</p>
+<hr>
+<h2>Capture Notes</h2>
+<ul>
+<li>完整提取自原始 HTML 知识库，共 8 条，原文全部保留</li>
+<li>2026-06 大版本更新：全部 8 个条目扩展为详细技术说明，含公式、数值参量和工程应用要点</li>
+</ul>
+
+  </div>
+</section>
+
+<section id="sec-5" class="content-section">
+  <div class="section-header">
+    <h2 class="section-title">电能质量治理</h2>
+    <div style="font-size:13px;color:var(--text-dim);font-family:var(--font-mono);margin-bottom:16px">原始模块：6 · 子模块：问题分类 · 无功补偿 · 谐波治理 · 低电压治理 · 调压设备 · 柔性直流 · 工程案例库</div>
+  </div>
+  <div class="section-body">
+    <h1>电能质量治理</h1>
+<blockquote>
+<p>原始模块：6 · 子模块：问题分类 · 无功补偿 · 谐波治理 · 低电压治理 · 调压设备 · 柔性直流 · 工程案例库</p>
+</blockquote>
+<h2>概述</h2>
+<p>电能质量问题分类与治理技术，共 <strong>13</strong> 个条目。</p>
+<p><strong>关联页面</strong>：<a href="%E7%94%B5%E6%B0%94%E5%9F%BA%E7%A1%80%E7%90%86%E8%AE%BA.md">电气基础理论</a> · <a href="%E7%94%B5%E5%8A%9B%E7%B3%BB%E7%BB%9F.md">电力系统</a> · <a href="%E7%94%B5%E6%B0%94%E8%87%AA%E5%8A%A8%E5%8C%96.md">电气自动化</a> · <a href="%E6%96%B0%E8%83%BD%E6%BA%90%E4%B8%8E%E5%82%A8%E8%83%BD.md">新能源与储能</a> · <a href="%E5%B7%A5%E4%B8%9A%E7%94%B5%E6%B0%94%E6%88%90%E5%A5%97.md">工业电气成套</a> · <a href="%E4%BA%A7%E5%93%81%E7%9F%A5%E8%AF%86%E5%BA%93.md">产品知识库</a> · <a href="%E8%A7%84%E8%8C%83%E4%B8%8E%E6%A0%87%E5%87%86.md">规范与标准</a></p>
+<hr>
+<h2>6.1 问题分类（1 条目）</h2>
+<h3>电能质量指标</h3>
+<p><strong>ID</strong>: 2501 | <strong>标签</strong>: <code>电能质量</code>, <code>THD</code>, <code>谐波</code></p>
+<p><strong>六大指标及国家标准限值</strong>：</p>
+<p><strong>1. 谐波（GB/T 14549-1993）</strong>：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p>THD = (√ΣUh²)/U1 × 100%，测量取 95% 概率值，周期 ≥ 168h</p>
+<p><strong>2. 频率偏差（GB/T 15945）</strong>：正常运行 ±0.2Hz（系统容量≥300万kW）/ ±0.5Hz（&lt;300万kW）</p>
+<p><strong>3. 三相电压不平衡（GB/T 15543）</strong>：负序分量 ≤<strong>2%</strong>（正常），<strong>≤4%</strong>（短时）；单个用户引起 ≤1.3%</p>
+<p><strong>4. 电压波动与闪变（GB/T 12326）</strong>：Pst ≤<strong>1.0</strong>（≤110kV），Pst ≤<strong>0.8</strong>（&gt;110kV）</p>
+<p><strong>5. 电压偏差（GB/T 12325）</strong>：10kV及以下三相 ±7%，220V单相 +7%/-10%</p>
+<p><strong>6. 暂时过电压和瞬态过电压（GB/T 18481）</strong>：按变电站/线路侧分级限值</p>
+<p>→ 关联：<a href="%E8%A7%84%E8%8C%83%E4%B8%8E%E6%A0%87%E5%87%86.md">规范与标准</a> — GB/T 14549</p>
+<hr>
+<h2>6.2 无功补偿（2 条目）</h2>
+<h3>无功补偿原理</h3>
+<p><strong>ID</strong>: 2502 | <strong>标签</strong>: <code>无功补偿</code>, <code>功率因数</code>, <code>SVG</code></p>
+<p><strong>补偿容量计算</strong>：Qc = P(tanφ1 - tanφ2)</p>
+<p>其中 P 为有功功率(kW)，φ1/φ2 为补偿前后功率因数角。工程目标 cosφ ≥ 0.9。</p>
+<p><strong>并联电容器分组</strong>：</p>
+<ul>
+<li>每组容量不宜过大（低压 ≤200kvar）</li>
+<li>单组容量 ≤ 变压器容量 × 15%~20%</li>
+</ul>
+<p><strong>串联电抗器电抗率选择</strong>：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>投切方式对比</strong>：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><hr>
+<h3>SVG静止无功发生器</h3>
+<p><strong>ID</strong>: 2503 | <strong>标签</strong>: <code>SVG</code>, <code>VSC</code>, <code>动态补偿</code></p>
+<p><strong>VSC 主电路拓扑</strong>：</p>
+<ul>
+<li><strong>两电平三相全控桥</strong>：低压 380V~690V，小容量</li>
+<li><strong>NPC三电平</strong>：中压 6kV~10kV，中容量</li>
+<li><strong>级联H桥（链式SVG）</strong>：6kV~35kV+，大容量，<strong>中高压主流方案</strong></li>
+</ul>
+<p><strong>控制策略</strong>：dq 解耦双闭环（外环直流电压+无功，内环电流环）+ 相间/相内子模块电容电压均衡</p>
+<p><strong>SVG vs SVC 详细对比</strong>：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p>→ 关联：<a href="%E4%BA%A7%E5%93%81%E7%9F%A5%E8%AF%86%E5%BA%93.md">产品知识库</a> §9.5 电能质量设备</p>
+<hr>
+<h2>6.3 谐波治理（2 条目）</h2>
+<h3>谐波源识别</h3>
+<p><strong>ID</strong>: 2504 | <strong>标签</strong>: <code>谐波源</code>, <code>6脉波</code>, <code>特征次谐波</code></p>
+<p><strong>主要谐波源及特征谐波</strong>：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>谐波电流幅值规律</strong>：理想6脉波整流第n次谐波 ≈ 基波电流的 1/n，THDi ≈ 30%~50%（未滤波）</p>
+<p>→ 关联：<a href="%E7%94%B5%E6%B0%94%E8%87%AA%E5%8A%A8%E5%8C%96.md">电气自动化</a> §3.2 变频器</p>
+<hr>
+<h3>有源电力滤波器APF</h3>
+<p><strong>ID</strong>: 2505 | <strong>标签</strong>: <code>APF</code>, <code>有源滤波</code>, <code>谐波治理</code></p>
+<p><strong>谐波检测原理</strong>：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>控制策略</strong>：<strong>PI+重复控制复合</strong>（兼顾动态响应和稳态精度，目前主流），准PR控制也有应用。</p>
+<p><strong>APF 参数</strong>：三相四线制，容量 50<del>600A，补偿 2</del>50 次谐波，谐波滤除率 <strong>≥95%</strong>，全响应 &lt;5ms，效率 ≥97%。</p>
+<p><strong>APF vs 无源滤波器(PPF)</strong>：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p>→ 关联：<a href="%E4%BA%A7%E5%93%81%E7%9F%A5%E8%AF%86%E5%BA%93.md">产品知识库</a> §9.5 电能质量设备</p>
+<hr>
+<h2>6.4 低电压治理（1 条目）</h2>
+<h3>低电压治理措施</h3>
+<p><strong>ID</strong>: 2506 | <strong>标签</strong>: <code>低电压</code>, <code>调压</code>, <code>串补</code></p>
+<p><strong>末端电压偏低原因</strong>：供电距离超合理半径 → 线路阻抗压降大；功率因数过低（如0.7）→ 无功电流加剧电压损失；导线截面偏小；线路过负荷。</p>
+<p><strong>综合措施优先级</strong>：<strong>无功补偿</strong> → <strong>有载调压/线路调压器</strong> → <strong>线路改造</strong></p>
+<ul>
+<li><strong>就地无功补偿</strong>：最有效措施，将功率因数 0.75→0.98，末端电压显著改善</li>
+<li><strong>有载调压变压器</strong>：通过改变变比调整电压</li>
+<li><strong>线路调压器</strong>：长线路中间串接自动调压器</li>
+<li><strong>线路改造</strong>：增大导线截面、缩短供电半径</li>
+</ul>
+<p><strong>末级电压要求</strong>：10kV ±7%（9.3<del>10.7kV），380V ±7%（353.4</del>406.6V），220V +7%/-10%（198~235.4V）</p>
+<hr>
+<h2>6.5 调压设备（1 条目）</h2>
+<h3>有载调压变压器</h3>
+<p><strong>ID</strong>: 2507 | <strong>标签</strong>: <code>OLTC</code>, <code>有载调压</code></p>
+<p><strong>调压原理</strong>：带负荷切换变压器分接头（改变绕组匝数比），&quot;先接通后断开&quot;(make-before-break)原则，切换时间 30~100ms。</p>
+<p><strong>过渡电阻作用</strong>：限制相邻分接头切换时的环流（变压器电压差），熄灭电弧（能量 E=I²Rt）</p>
+<p><strong>调压范围</strong>：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>OLTC 类型</strong>：</p>
+<ul>
+<li><strong>油浸式</strong>：电弧使油碳化，每1<del>2年检查油质，电气寿命20</del>30万次</li>
+<li><strong>真空管式</strong>（已成主流）：无电弧污染，免维护10万次，电气寿命36万次+</li>
+</ul>
+<p><strong>与 AVC 协调</strong>：AVC统筹OLTC（慢速大幅调压）+ SVG（快速精细补偿），逆调压策略（高峰时偏高，低谷时偏低）</p>
+<p>→ 关联：<a href="%E5%B7%A5%E4%B8%9A%E7%94%B5%E6%B0%94%E6%88%90%E5%A5%97.md">工业电气成套</a> §7.2 配电变压器</p>
+<hr>
+<h2>6.6 柔性直流（1 条目）</h2>
+<h3>柔性直流输电</h3>
+<p><strong>ID</strong>: 2508 | <strong>标签</strong>: <code>柔直</code>, <code>VSC-HVDC</code>, <code>MMC</code></p>
+<p><strong>MMC 模块化多电平拓扑</strong>：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>SM 数量</strong>：N = Udc / Usm，±400kV 系统约需 1500 个 SM</p>
+<p><strong>MMC vs 两电平 VSC</strong>：</p>
+<ul>
+<li>MMC 谐波优异（无需大型滤波器），模块化易扩展至高压</li>
+<li>子模块冗余强，故障容错好</li>
+<li>损耗 1%~3%（低于两电平 VSC 但高于 LCC-HVDC）</li>
+</ul>
+<p><strong>技术参数</strong>：容量 100<del>3000MW，直流电压 ±100</del>±800kV，子模块造价约 8~10万元/个</p>
+<p><strong>应用场景</strong>：海上风电送出（海缆）、异步联网（不同频率/不同步系统互联）、城市供电（地下电缆）、多端直流网络</p>
+<p>→ 关联：<a href="%E6%96%B0%E8%83%BD%E6%BA%90%E4%B8%8E%E5%82%A8%E8%83%BD.md">新能源与储能</a> — 海上风电送出</p>
+<hr>
+<h2>6.7 工程案例库（5 条目）</h2>
+<p>实际工程项目案例，展示电能质量和电力系统技术的工程应用。</p>
+<h3>特高压工程案例</h3>
+<p><strong>ID</strong>: 3007 | <strong>标签</strong>: <code>特高压直流</code>, <code>案例</code></p>
+<p><strong>昌吉-古泉 ±1100kV 特高压直流工程</strong>（2019年投运，世界最高等级）：</p>
+<ul>
+<li>输送容量：1200万千瓦（12GW）</li>
+<li>线路长度：3324km（新疆昌吉→安徽古泉）</li>
+<li>技术突破：±1100kV 换流阀、200kV/500kV/1100kV 分级接入调压</li>
+</ul>
+<p>→ 关联：<a href="%E4%BA%A7%E5%93%81%E7%9F%A5%E8%AF%86%E5%BA%93.md">产品知识库</a> §9.1 高压开关产品</p>
+<hr>
+<h3>智能变电站工程案例</h3>
+<p><strong>ID</strong>: 3008 | <strong>标签</strong>: <code>智能站</code>, <code>IEC61850</code></p>
+<p><strong>典型智能站配置</strong>：</p>
+<ul>
+<li>全站 IEC 61850 标准，GOOSE 跳闸（端到端延迟 ≤3ms）</li>
+<li>电子式互感器（ECT/EVT）+ 合并单元（MU）+ 智能终端</li>
+<li>三层两网架构：站控层 MMS + 间隔层 GOOSE/SV 共网</li>
+<li>典型优势：二次回路大幅简化（光缆代替电缆），信息共享，高级应用（顺序控制/智能告警/状态监测）</li>
+</ul>
+<p>→ 关联：<a href="%E8%A7%84%E8%8C%83%E4%B8%8E%E6%A0%87%E5%87%86.md">规范与标准</a> §8.4 — IEC 61850</p>
+<hr>
+<h3>大型储能电站案例</h3>
+<p><strong>ID</strong>: 3009 | <strong>标签</strong>: <code>储能电站</code>, <code>液冷</code></p>
+<p><strong>某省网侧 200MW/400MWh 储能电站</strong>：</p>
+<ul>
+<li>采用 LFP 电池 + 液冷温控（电芯温差&lt;3°C）</li>
+<li>35kV 并网，PCS 采用三电平拓扑</li>
+<li>功能：调频（响应&lt;30ms）+ 调峰（2h满功率）+ 黑启动</li>
+<li>循环效率（RTE）：≥85%</li>
+</ul>
+<p>→ 关联：<a href="%E6%96%B0%E8%83%BD%E6%BA%90%E4%B8%8E%E5%82%A8%E8%83%BD.md">新能源与储能</a> §5.3 储能技术</p>
+<hr>
+<h3>工业园区配网项目</h3>
+<p><strong>ID</strong>: 3010 | <strong>标签</strong>: <code>配网自动化</code>, <code>FA</code></p>
+<p><strong>配网自动化(FA)工程</strong>：</p>
+<ul>
+<li>多用户分界开关（看门狗）+ 配电室无人化</li>
+<li>故障自动隔离恢复（集中型FA或智能分布式FA）</li>
+<li>配电终端（FTU/DTU）+ 光纤以太网通信</li>
+<li>馈线自动化动作时间：集中型约 30~60s，智能分布式 &lt;1s</li>
+</ul>
+<p>→ 关联：<a href="%E7%94%B5%E5%8A%9B%E7%B3%BB%E7%BB%9F.md">电力系统</a> §2.4 配电系统</p>
+<hr>
+<h3>海上风电送出工程</h3>
+<p><strong>ID</strong>: 3011 | <strong>标签</strong>: <code>海上风电</code>, <code>海缆</code></p>
+<p><strong>海上风电场送出方案对比</strong>：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>典型配置</strong>：海上风电场 220kV 海缆送出 + 陆上集控中心，或采用柔直送出方案</p>
+<p>→ 关联：<a href="%E6%96%B0%E8%83%BD%E6%BA%90%E4%B8%8E%E5%82%A8%E8%83%BD.md">新能源与储能</a> §5.2 风力发电、§6.6 柔性直流</p>
+<hr>
+<h2>Capture Notes</h2>
+<ul>
+<li>完整提取自原始 HTML 知识库，共 14 条，原文全部保留</li>
+<li>2026-06 大版本更新：全部 13 个条目扩展为详细技术说明，含标准限值、公式、数值参量和工程应用要点</li>
+</ul>
+
+  </div>
+</section>
+
+<section id="sec-6" class="content-section">
+  <div class="section-header">
+    <h2 class="section-title">工业电气成套</h2>
+    <div style="font-size:13px;color:var(--text-dim);font-family:var(--font-mono);margin-bottom:16px">原始模块：7 · 子模块：高低压开关柜 · 配电变压器 · MCC · UPS/EPS · 设计规范</div>
+  </div>
+  <div class="section-body">
+    <h1>工业电气成套</h1>
+<blockquote>
+<p>原始模块：7 · 子模块：高低压开关柜 · 配电变压器 · MCC · UPS/EPS · 设计规范</p>
+</blockquote>
+<h2>概述</h2>
+<p>工业电气成套设备的主要类型与设计规范，共 <strong>8</strong> 个条目。</p>
+<p><strong>关联页面</strong>：<a href="%E7%94%B5%E6%B0%94%E5%9F%BA%E7%A1%80%E7%90%86%E8%AE%BA.md">电气基础理论</a> · <a href="%E7%94%B5%E6%B0%94%E8%87%AA%E5%8A%A8%E5%8C%96.md">电气自动化</a> · <a href="%E5%BC%B1%E7%94%B5%E4%B8%8E%E6%99%BA%E8%83%BD%E5%8C%96.md">弱电与智能化</a> · <a href="%E8%A7%84%E8%8C%83%E4%B8%8E%E6%A0%87%E5%87%86.md">规范与标准</a> · <a href="%E4%BA%A7%E5%93%81%E7%9F%A5%E8%AF%86%E5%BA%93.md">产品知识库</a> · <a href="%E9%A1%B9%E7%9B%AE%E4%B8%8E%E6%96%B9%E6%A1%88.md">项目与方案</a></p>
+<hr>
+<h2>7.1 高低压开关柜（2 条目）</h2>
+<h3>高压开关柜</h3>
+<p><strong>ID</strong>: 2601 | <strong>标签</strong>: <code>开关柜</code>, <code>KYN28</code>, <code>五防</code></p>
+<p><strong>KYN28-12 中置柜主要参数</strong>：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>绝缘水平</strong>（12kV）：工频耐压 42kV(1min)，雷电冲击耐压 75kV</p>
+<p><strong>五防联锁</strong>：</p>
+<ol>
+<li>防止带负荷推拉断路器手车</li>
+<li>防止误分/误合断路器</li>
+<li>防止接地开关闭合时合断路器</li>
+<li>防止误入带电隔室</li>
+<li>防止带电时误合接地开关</li>
+</ol>
+<p><strong>VS1-12 真空断路器</strong>（配KYN28主流）：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>手车三位置</strong>：工作位置（一次+二次接通）、试验位置（一次断，二次通）、移开位置（全断开拉出柜外）</p>
+<p><strong>温升限值</strong>（GB/T 11022）：主回路触头（镀银）75K，与外部导体连接端子 75K</p>
+<p>→ 关联：<a href="%E4%BA%A7%E5%93%81%E7%9F%A5%E8%AF%86%E5%BA%93.md">产品知识库</a> §9.1 高压开关产品</p>
+<hr>
+<h3>低压配电柜</h3>
+<p><strong>ID</strong>: 2602 | <strong>标签</strong>: <code>低压柜</code>, <code>MNS</code>, <code>GCS</code></p>
+<p><strong>四种柜型对比</strong>：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>抽屉规格</strong>（MNS，模数 E=25mm）：</p>
+<ul>
+<li>1/4单元(8E/4)：200mm高×150mm宽，MNS单柜最多36个</li>
+<li>1/2单元(8E/2)：200mm×300mm，适用小功率</li>
+<li>1单元(8E)：200mm×600mm，标准回路</li>
+<li>2单元(16E)：400mm×600mm，大功率</li>
+<li>3单元(24E)：600mm×600mm，最大功率</li>
+</ul>
+<p><strong>选型建议</strong>：预算有限、回路少→GGD；性价比优先→GCK/GCS；高密度/高可靠性→MNS</p>
+<hr>
+<h2>7.2 配电变压器（2 条目）</h2>
+<h3>干式变压器</h3>
+<p><strong>ID</strong>: 2603 | <strong>标签</strong>: <code>干式变</code>, <code>SCB</code>, <code>环氧浇注</code></p>
+<p><strong>型号含义</strong>：SCB13-1000/10-0.4（S=三相，C=环氧浇注，B=低压箔绕，13=损耗水平，1000kVA，10/0.4kV）</p>
+<p><strong>能效等级对比</strong>（以1000kVA为例）：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>绝缘等级</strong>：F级（标准，耐温155°C，绕组温升≤100K），H级（选配，耐温180°C）</p>
+<p><strong>温控系统</strong>（PT100铂热电阻，埋设在低压线圈顶部）：</p>
+<ul>
+<li>风机启动：80~100°C</li>
+<li>超温报警：120~130°C</li>
+<li>超温跳闸：150~155°C</li>
+<li>标配 RS485 接口</li>
+</ul>
+<p><strong>过载能力</strong>：自冷(AN)可带 60%<del>70% 额定容量；强迫风冷(AF) 120% 长期运行，150% 约30min，200% 约5</del>10min</p>
+<p>→ 关联：<a href="%E7%94%B5%E6%B0%94%E5%9F%BA%E7%A1%80%E7%90%86%E8%AE%BA.md">电气基础理论</a> §1.3 变压器工作原理</p>
+<hr>
+<h3>油浸式变压器</h3>
+<p><strong>ID</strong>: 2604 | <strong>标签</strong>: <code>油浸变</code>, <code>非晶合金</code>, <code>瓦斯</code></p>
+<p><strong>能效系列对比</strong>（空载损耗降幅相对S11）：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>冷却方式</strong>：</p>
+<ul>
+<li><strong>ONAN</strong>（油自然循环+自然风冷）：中小容量基准</li>
+<li>ONAF（加风机强迫风冷）：散热提升30%~50%</li>
+<li>OFAF（油泵+风机强迫循环）：大容量(≥10MVA)</li>
+</ul>
+<p><strong>顶层油温</strong>：最高≤95°C，正常运行建议≤75°C，高出10°C视为内部故障</p>
+<p><strong>瓦斯保护</strong>（气体继电器QJ系列）：轻瓦斯（少量气体→报警），重瓦斯（严重故障油流冲击→<strong>跳闸</strong>）</p>
+<p><strong>油枕补偿</strong>：胶囊式（隔离空气，需吸湿器）/ 金属波纹管式（全密封免维护）</p>
+<hr>
+<h2>7.3 MCC（1 条目）</h2>
+<h3>MCC马达控制中心</h3>
+<p><strong>ID</strong>: 2605 | <strong>标签</strong>: <code>MCC</code>, <code>马达控制</code></p>
+<p><strong>主母线参数</strong>：额定绝缘电压 660V，主母线最大电流 4700A(IP30)/5500A(IP00)，短时耐受 100kA(1s)，峰值耐受 250kA。</p>
+<p><strong>抽屉单元功能</strong>：</p>
+<ul>
+<li>1/2单元：小功率（≤60A）</li>
+<li>1单元：中等功率（≤37kW）</li>
+<li>2/3单元：大功率</li>
+</ul>
+<p><strong>电机保护器功能</strong>：热过载保护（I²t热模型，带热记忆）、堵转保护、缺相保护、三相不平衡保护、接地故障保护（需零序CT）、过压/欠压保护、起动时间过长保护</p>
+<p><strong>智能MCC通信</strong>：支持 Profibus DP / Modbus RTU / EtherNet/IP 总线，可监测三相电流/电压/功率/功率因数/电能/运行时间，抽屉位置（连接/试验/抽插/隔离四位置机械联锁）</p>
+<p>→ 关联：<a href="%E7%94%B5%E6%B0%94%E8%87%AA%E5%8A%A8%E5%8C%96.md">电气自动化</a> §3.2 变频器、§3.3 伺服系统</p>
+<hr>
+<h2>7.4 UPS/EPS（2 条目）</h2>
+<h3>UPS不间断电源</h3>
+<p><strong>ID</strong>: 2606 | <strong>标签</strong>: <code>UPS</code>, <code>蓄电池</code></p>
+<p><strong>双变换在线式工作原理</strong>：
+市电→整流器(AC→DC)→直流母线→逆变器(DC→AC)→负载。负载始终由逆变器供电，与电网完全电气隔离。市电中断时电池无缝接管（切换时间 <strong>0ms</strong>）。</p>
+<p><strong>蓄电池对比</strong>：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>后备时间计算</strong>：Ah = (负载功率×后备时间) / (电池组电压×逆变效率)</p>
+<p><strong>旁路切换</strong>：在线式逆变→旁路 &lt;4ms（静态开关）；ECO模式（旁路优先）效率98%~99%但有切换中断风险</p>
+<p><strong>并机冗余</strong>：N（单机，基准）→ <strong>N+1</strong>（提升约100倍）→ <strong>2N</strong>（双总线）→ 2(N+1)（最高级别）</p>
+<p><strong>效率</strong>：工频机 85%~93%，高频机 <strong>94%~96%</strong>，ECO模式 98%~99%</p>
+<p>→ 关联：<a href="%E5%BC%B1%E7%94%B5%E4%B8%8E%E6%99%BA%E8%83%BD%E5%8C%96.md">弱电与智能化</a> — UPS为弱电系统供电</p>
+<hr>
+<h3>EPS应急电源</h3>
+<p><strong>ID</strong>: 2607 | <strong>标签</strong>: <code>EPS</code>, <code>应急电源</code></p>
+<p><strong>EPS vs UPS 核心区别</strong>：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>切换时间要求</strong>：普通应急照明&lt;5s，高危险区&lt;0.25s，金卤灯等气体放电灯宜&lt;3ms</p>
+<p><strong>持续供电时间</strong>：应急照明≥<strong>90min</strong>（GB17945-2010强制要求），消防电梯/排烟≥60min，水喷雾≥30min</p>
+<p><strong>充电要求</strong>：最长充电≤24h，最大连续过充电≤0.05C₅A</p>
+<p>→ 关联：<a href="%E8%A7%84%E8%8C%83%E4%B8%8E%E6%A0%87%E5%87%86.md">规范与标准</a> §8.5 — GB 50303施工验收规范</p>
+<hr>
+<h2>7.5 设计规范（1 条目）</h2>
+<h3>GB 50054低压配电设计规范</h3>
+<p><strong>ID</strong>: 2608 | <strong>标签</strong>: <code>GB50054</code>, <code>低压配电</code></p>
+<p><strong>配电室布置</strong>（操作通道宽度）：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>PE线最小截面</strong>：相线S≤16mm²→取S，16&lt;S≤35→取16mm²，S&gt;35→取S/2</p>
+<p><strong>保护配合</strong>：</p>
+<ul>
+<li>短路电流 ≥ 断路器脱扣器整定值的 <strong>1.3倍</strong></li>
+<li>IB ≤ In ≤ Iz 且 I2 ≤ 1.45Iz（过负荷保护）</li>
+<li>TN系统接地故障：Zs×Ia ≤ U0，固定式设备切断≤<strong>5s</strong>，手持≤<strong>0.4s</strong></li>
+</ul>
+<p><strong>强制性条文</strong>：</p>
+<ul>
+<li>装置外可导电部分严禁作为PEN的一部分</li>
+<li>TN-C系统严禁将PEN导体接入开关电器</li>
+<li>采用RCD时必须装设保护导体</li>
+</ul>
+<p>→ 关联：<a href="%E8%A7%84%E8%8C%83%E4%B8%8E%E6%A0%87%E5%87%86.md">规范与标准</a> — 完整的标准体系</p>
+<hr>
+<h2>Capture Notes</h2>
+<ul>
+<li>完整提取自原始 HTML 知识库，共 8 条，原文全部保留</li>
+<li>2026-06 大版本更新：全部 8 个条目扩展为详细技术说明，含具体数值参量和工程应用要点</li>
+</ul>
+
+  </div>
+</section>
+
+<section id="sec-7" class="content-section">
+  <div class="section-header">
+    <h2 class="section-title">规范与标准</h2>
+    <div style="font-size:13px;color:var(--text-dim);font-family:var(--font-mono);margin-bottom:16px">原始模块：8 · 子模块：国家标准 · 行业标准 · 国网企标 · 国际标准 · 施工验收 · 制图标准</div>
+  </div>
+  <div class="section-body">
+    <h1>规范与标准</h1>
+<blockquote>
+<p>原始模块：8 · 子模块：国家标准 · 行业标准 · 国网企标 · 国际标准 · 施工验收 · 制图标准</p>
+</blockquote>
+<h2>概述</h2>
+<p>电气工程领域各类标准规范，共 <strong>8</strong> 个条目。</p>
+<p><strong>关联页面</strong>：<a href="%E7%94%B5%E6%B0%94%E5%9F%BA%E7%A1%80%E7%90%86%E8%AE%BA.md">电气基础理论</a> · <a href="%E7%94%B5%E5%8A%9B%E7%B3%BB%E7%BB%9F.md">电力系统</a> · <a href="%E7%94%B5%E6%B0%94%E8%87%AA%E5%8A%A8%E5%8C%96.md">电气自动化</a> · <a href="%E5%BC%B1%E7%94%B5%E4%B8%8E%E6%99%BA%E8%83%BD%E5%8C%96.md">弱电与智能化</a> · <a href="%E7%94%B5%E8%83%BD%E8%B4%A8%E9%87%8F%E6%B2%BB%E7%90%86.md">电能质量治理</a> · <a href="%E5%B7%A5%E4%B8%9A%E7%94%B5%E6%B0%94%E6%88%90%E5%A5%97.md">工业电气成套</a> · <a href="%E4%BA%A7%E5%93%81%E7%9F%A5%E8%AF%86%E5%BA%93.md">产品知识库</a> · <a href="%E9%A1%B9%E7%9B%AE%E4%B8%8E%E6%96%B9%E6%A1%88.md">项目与方案</a></p>
+<hr>
+<h2>8.1 国家标准（2 条目）</h2>
+<h3>GB 50052供配电系统设计规范</h3>
+<p><strong>ID</strong>: 2701 | <strong>标签</strong>: <code>GB50052</code>, <code>负荷分级</code></p>
+<p><strong>负荷分级原则</strong>（3.0.1~3.0.2条）：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>应急电源类型选择</strong>：允许中断15s以上→柴油发电机组（<strong>最常用</strong>，自启动≤15s）；允许中断ms级→UPS（静态切换0ms）；允许中断0.25~5s→EPS（消防应急照明）；对电能质量要求极高→<strong>UPS+柴发双备份</strong>。</p>
+<p><strong>电源切换时间要求</strong>：电脑/服务器≤10ms→UPS；消防风机/水泵≤30s→柴发；应急照明≤5s→EPS；医院生命维持设备≤1.5s→UPS+柴发。</p>
+<p><strong>强制性条文</strong>（3.0.9）：应急电源与正常电源之间必须采取防止并列运行的措施。<strong>严禁</strong>应急电源与正常电源并列运行。</p>
+<p>→ 关联：<a href="%E7%94%B5%E5%8A%9B%E7%B3%BB%E7%BB%9F.md">电力系统</a> §2.4 配电系统、<a href="%E9%A1%B9%E7%9B%AE%E4%B8%8E%E6%96%B9%E6%A1%88.md">项目与方案</a> §10.1 设计方案</p>
+<hr>
+<h3>GB 50060高压配电设计规范</h3>
+<p><strong>ID</strong>: 2702 | <strong>标签</strong>: <code>GB50060</code>, <code>高压配电</code></p>
+<p><strong>适用范围</strong>：3~35kV交流高压配电装置设计。</p>
+<p><strong>主接线选择原则</strong>：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>配电装置最小安全净距</strong>（表4.1.1，以10kV为例）：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>高压开关柜布置要求</strong>：</p>
+<ul>
+<li>单排柜前操作通道：固定式≥<strong>1500mm</strong>，移开式（手车式）≥<strong>单车长+1200mm</strong></li>
+<li>双排面对面柜前操作通道：固定式≥<strong>2000mm</strong>，移开式≥<strong>双车长+900mm</strong></li>
+<li>柜后维护通道：≥<strong>800mm</strong></li>
+</ul>
+<p><strong>电缆敷设要求</strong>（8.1~8.7节）：</p>
+<ul>
+<li>直埋电缆深度：农田≥<strong>1.0m</strong>，一般≥<strong>0.7m</strong>（10kV及以上≥1.0m）</li>
+<li>电缆沟内支架间距：电力电缆水平≤<strong>0.8m</strong>，垂直≤<strong>1.5m</strong></li>
+<li>电力电缆与控制电缆<strong>同侧敷设时分层排列</strong>：电力→控制（从上至下）</li>
+<li>电缆最小弯曲半径：单芯交联聚乙烯电缆≥<strong>15D</strong>，多芯≥<strong>10D</strong>（D为电缆外径）</li>
+</ul>
+<hr>
+<h2>8.2 行业标准（2 条目）</h2>
+<h3>DL/T 5153火力发电厂设计规范</h3>
+<p><strong>ID</strong>: 2703 | <strong>标签</strong>: <code>DL/T5153</code>, <code>火力发电</code></p>
+<p><strong>厂用电接线原则</strong>：</p>
+<ul>
+<li><strong>高压厂用电压</strong>：发电机电压10.5~20kV→厂高变→6kV（60MW以上机组）/3kV（小机组）</li>
+<li><strong>低压厂用电压</strong>：6kV/3kV→厂低变→380/220V</li>
+<li><strong>厂用电率</strong>：燃煤电厂约<strong>5%~8%</strong>（含脱硫脱硝等环保设施），燃气电厂约<strong>2%~4%</strong></li>
+<li><strong>厂用电接线</strong>：高厂变+启动/备用变（<strong>暗备用</strong>），200MW及以上机组每段设快切装置</li>
+</ul>
+<p><strong>变压器选择原则</strong>：</p>
+<ul>
+<li>主变容量：按发电机额定容量扣除最大可能的厂用负荷</li>
+<li>高厂变容量：厂用计算负荷+<strong>10%~20%裕度</strong></li>
+<li>启动/备用变：应能替代最大一台高厂变容量</li>
+<li>高压厂用变压器阻抗：Ud=<strong>10.5%~16%</strong>（限制短路电流）</li>
+</ul>
+<p><strong>继电保护配置</strong>（发电机-变压器组典型）：</p>
+<ul>
+<li><strong>发电机差动保护</strong>（87G）：主保护，反映相间短路</li>
+<li><strong>主变差动保护</strong>（87T）：主保护</li>
+<li><strong>发电机匝间保护</strong>：横差保护/零序电压保护</li>
+<li><strong>失磁保护</strong>（40）：阻抗圆判据，反映励磁系统故障</li>
+<li><strong>过激磁保护</strong>（24）：V/f比值保护，防止铁心饱和</li>
+<li><strong>逆功率保护</strong>（32）：汽轮机主汽门关闭时解列</li>
+</ul>
+<p><strong>电缆选型与敷设</strong>：</p>
+<ul>
+<li>阻燃等级：主厂房及重要回路→<strong>C级及以上阻燃</strong>，消防回路→<strong>NH耐火</strong></li>
+<li>电缆截面选择：按持续允许电流→按经济电流密度→按电压降≤5%→按热稳定校验</li>
+<li>火灾报警及消防联动电缆采用**矿物绝缘电缆(BTTZ)**或耐火电缆</li>
+</ul>
+<hr>
+<h3>DL/T 5202电能量计量系统设计规范</h3>
+<p><strong>ID</strong>: 2708 | <strong>标签</strong>: <code>TMR</code>, <code>关口计量</code></p>
+<p><strong>电能量计量系统(TMR)架构</strong>：</p>
+<p>关口表计（0.2S/0.5S）→ 电量采集终端（ERTU）→ 主站系统 → 电费结算/考核</p>
+<p><strong>关口计量点设置</strong>：</p>
+<ul>
+<li>发电厂：<strong>主变高压侧</strong>（上网电量）、<strong>高厂变低压侧</strong>（厂用电量）</li>
+<li>变电站：<strong>主变各侧</strong>（网间交换电量）、<strong>线路两侧</strong>（供电关口）</li>
+<li>用户：<strong>产权分界点</strong>（计费点）</li>
+</ul>
+<p><strong>电能表准确度等级要求</strong>：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>电量采集终端(ERTU)功能</strong>：</p>
+<ul>
+<li>通过RS485采集多路电能表数据（最多<strong>64块表</strong>）</li>
+<li>数据存储周期≤1h，存储容量≥<strong>30天</strong></li>
+<li>15min冻结（分时电量）、日冻结（日累计电量）、月冻结（月累计电量）</li>
+<li>支持主站对时（误差&lt;1s/d），支持与主站远程通信（以太网/4G/光纤）</li>
+</ul>
+<p><strong>主站系统功能</strong>：</p>
+<ul>
+<li>自动采集<strong>日/月/季/年</strong>电量数据</li>
+<li>母线电量平衡率计算（**≥99.5%**为合格）</li>
+<li>网损/线损统计分析</li>
+<li>异常告警（表计停走、飞走、反向、参数变更）</li>
+</ul>
+<hr>
+<h2>8.3 国网企标（1 条目）</h2>
+<h3>国家电网企标Q/GDW</h3>
+<p><strong>ID</strong>: 2704 | <strong>标签</strong>: <code>Q/GDW</code>, <code>国网企标</code></p>
+<p><strong>国网企标体系</strong>（Q/GDW系列，高于国标/行标要求）：</p>
+<p><strong>智能变电站</strong>（Q/GDW 441系列）：</p>
+<ul>
+<li><strong>三层两网架构</strong>：站控层(MMS)+间隔层(GOOSE/SV)，双网分离或共网</li>
+<li><strong>电子互感器</strong>：Q/GDW 752规定ECT/EVT精度、动态范围、暂态响应</li>
+<li><strong>同步对时</strong>：全站采用**IEEE 1588(PTP)**或IRIG-B码对时，精度&lt;1μs</li>
+<li><strong>智能终端</strong>：Q/GDW 428标准，GOOSE跳闸&lt;<strong>3ms</strong></li>
+</ul>
+<p><strong>配网自动化</strong>（Q/GDW 370系列）：</p>
+<ul>
+<li>配电自动化终端（FTU/DTU/TTU）技术规范</li>
+<li><strong>馈线自动化</strong>：集中型FA动作时间<strong>30~60s</strong>，智能分布式FA&lt;<strong>1s</strong></li>
+<li>配网通信：光纤以太网优先，无线公网(LTE/4G)作为补充</li>
+<li><strong>故障指示器</strong>（Q/GDW 11581）：暂态录波型/外施信号型</li>
+</ul>
+<p><strong>电能质量</strong>（Q/GDW 1650系列）：</p>
+<ul>
+<li>并网逆变器：低电压穿越(LVRT)要求，有功/无功控制响应时间</li>
+<li>分布式电源接入配网：接入容量/电压等级/保护配置</li>
+<li>新能源场站：无功容量配置（<strong>容性±感性无功容量≥20%额定容量</strong>）</li>
+</ul>
+<p><strong>设备技术规范</strong>：</p>
+<ul>
+<li>Q/GDW 11387—变压器（包括非晶合金变、干式变损耗限值）</li>
+<li>Q/GDW 11284—高压开关柜（含燃弧试验要求：内部电弧故障耐受<strong>0.5s</strong>）</li>
+<li>Q/GDW 11245—避雷器/互感器/支柱绝缘子</li>
+</ul>
+<p>→ 关联：<a href="%E9%A1%B9%E7%9B%AE%E4%B8%8E%E6%96%B9%E6%A1%88.md">项目与方案</a> §10.3 国网项目流程</p>
+<hr>
+<h2>8.4 国际标准（1 条目）</h2>
+<h3>IEC 61850变电站通信标准</h3>
+<p><strong>ID</strong>: 2705 | <strong>标签</strong>: <code>IEC61850</code>, <code>GOOSE</code>, <code>智能站</code></p>
+<p><strong>IEC 61850 Ed2.0核心内容</strong>：</p>
+<p><strong>三大通信协议</strong>：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>GOOSE工作机制</strong>：</p>
+<ul>
+<li><strong>心跳+变位</strong>机制：正常时T0=1~5s发心跳报文；发生变位时立即以T1=2ms间隔重发2次、T2=4ms发1次、T3=8ms发1次</li>
+<li>数据对象模型：采用<strong>面向对象建模</strong>（逻辑节点LN→数据对象DO→数据属性DA）</li>
+<li>不采用TCP/IP中间层，直接映射到以太网数据帧（Ethertype 0x88B8）</li>
+</ul>
+<p><strong>SV采样值传输</strong>（IEC 61850-9-2LE）：</p>
+<ul>
+<li>采样率：保护用<strong>80点/周波</strong>（4800Hz@50Hz），计量用<strong>256点/周波</strong></li>
+<li>数据集：包含4路电压+4路电流（Ua/Ub/Uc/Un + Ia/Ib/Ic/In）</li>
+<li>采用ASN.1 PER编码（包效率极高）</li>
+</ul>
+<p><strong>站控层通信</strong>：</p>
+<ul>
+<li>全站<strong>统一数据模型</strong>（SCL/XML描述变电站一次/二次配置）</li>
+<li><strong>SCD文件</strong>（变电站配置文件）：包含一次接线、IED能力、通信网络、信号关联</li>
+<li>工具链：ICD→SCD→CID/CCD（标准化配置流程）</li>
+</ul>
+<p><strong>时间同步</strong>：</p>
+<ul>
+<li><strong>IEEE 1588 PTP</strong>精密时钟同步协议（<strong>T-CM混合模式</strong>，精度&lt;<strong>1μs</strong>）</li>
+<li>简单网络时间协议SNTP（精度1~10ms，仅适用于站控层）</li>
+<li>IRIG-B码（传统硬接线对时，精度&lt;<strong>1μs</strong>）</li>
+</ul>
+<p>→ 关联：<a href="%E7%94%B5%E6%B0%94%E8%87%AA%E5%8A%A8%E5%8C%96.md">电气自动化</a> §3.5 工业通信、<a href="%E7%94%B5%E5%8A%9B%E7%B3%BB%E7%BB%9F.md">电力系统</a> §2.6 继电保护</p>
+<hr>
+<h2>8.5 施工验收（1 条目）</h2>
+<h3>GB 50303建筑电气施工验收规范</h3>
+<p><strong>ID</strong>: 2706 | <strong>标签</strong>: <code>GB50303</code>, <code>施工验收</code></p>
+<p><strong>适用范围</strong>：建筑电气工程施工质量验收（强电+防雷接地部分）。</p>
+<p><strong>核心验收子分部</strong>：</p>
+<p><strong>变配电室</strong>（第4章）：</p>
+<ul>
+<li>接地干线：<strong>不少于2处</strong>与接地网连接，镀锌扁钢≥25×4mm</li>
+<li>变压器安装：<strong>气体继电器</strong>本体倾斜度1%~1.5%，油枕侧高1.5%</li>
+<li>高压柜：<strong>五防功能</strong>齐全，机械联锁试验灵活可靠</li>
+<li>低压柜：抽屉单元推拉/插入灵活，机械联锁位置准确</li>
+</ul>
+<p><strong>成套配电柜/控制柜</strong>（第5章）：</p>
+<ul>
+<li>基础槽钢：顶部高出抹平地面≥<strong>10mm</strong>（手车式柜≥20mm），水平度&lt;1‰</li>
+<li>柜体垂直度：每米&lt;<strong>1.5mm</strong>，相邻柜顶部高差&lt;<strong>2mm</strong></li>
+<li>接地：柜体与基础槽钢<strong>不少于2处可靠接地</strong></li>
+</ul>
+<p><strong>母线安装</strong>（第6章）：</p>
+<ul>
+<li>封闭母线：安装垂直度/水平度&lt;<strong>2mm/m</strong>，全长≤<strong>10mm</strong></li>
+<li>插接母线：<strong>穿楼板处</strong>设防水台阶（≥50mm），穿墙处密封防火</li>
+<li>母线搭接：力矩值按GB 50149规定，螺栓紧固力矩抽检<strong>5%</strong></li>
+</ul>
+<p><strong>电缆敷设</strong>（第7章）：</p>
+<ul>
+<li>电缆沟：支架间距≤<strong>1m</strong>（水平控制电缆≤0.8m），接地可靠</li>
+<li><strong>电缆终端头</strong>制作：严格按照工艺（热缩管/冷缩管收缩均匀）</li>
+<li>防火封堵：电缆穿墙/孔洞采用<strong>防火堵料</strong>封堵密实，耐火极限≥<strong>1h</strong></li>
+</ul>
+<p><strong>照明安装</strong>（第8~11章）：</p>
+<ul>
+<li>插座回路：<strong>≤10个</strong>插座/回路，额定电流≤<strong>16A</strong></li>
+<li>照明回路：灯头数≤<strong>25个</strong>/回路（不含回路灯数时，≤<strong>20个灯</strong>/回路）</li>
+<li><strong>I类灯具</strong>必须接PE线（金属外壳灯具）</li>
+<li>应急照明：连续供电时间≥<strong>90min</strong>（GB17945强制）</li>
+</ul>
+<p><strong>防雷接地</strong>（第12章）：</p>
+<ul>
+<li>接地装置：接地电阻≤<strong>1Ω</strong>（综合楼/变电所），≤<strong>4Ω</strong>（一般建筑）</li>
+<li>接闪带：支持卡间距≤1m，转弯处≤0.5m，焊接处防腐</li>
+<li><strong>等电位联结</strong>：总等电位(MEB)+局部等电位(LEB)，卫生间/泳池等LEB必须做</li>
+</ul>
+<p><strong>典型不合格项目</strong>：</p>
+<ul>
+<li>PE线/接地线截面不足（最常见，约**30%**的验收问题）</li>
+<li>配电箱内接线混乱、标识不清</li>
+<li>照明回路零线和相线接反</li>
+<li>电缆防火封堵不到位</li>
+</ul>
+<p>→ 关联：<a href="%E5%B7%A5%E4%B8%9A%E7%94%B5%E6%B0%94%E6%88%90%E5%A5%97.md">工业电气成套</a> §7.5 设计规范、<a href="%E5%BC%B1%E7%94%B5%E4%B8%8E%E6%99%BA%E8%83%BD%E5%8C%96.md">弱电与智能化</a></p>
+<hr>
+<h2>8.6 制图标准（1 条目）</h2>
+<h3>GB/T 4728电气简图用图形符号</h3>
+<p><strong>ID</strong>: 2707 | <strong>标签</strong>: <code>GB/T4728</code>, <code>电气制图</code></p>
+<p><strong>标准体系</strong>（等同采用IEC 60617，共13部分）：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>典型电气图形符号速查</strong>：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>制图基本原则</strong>（GB/T 6988《电气制图》）：</p>
+<ul>
+<li><strong>系统图</strong>（主接线图）：单线表示法为主（三线表示法用于不对称电路）</li>
+<li><strong>电路图</strong>：功能布局，<strong>从左到右/从上到下</strong>为能量流方向</li>
+<li><strong>接线图</strong>：物理位置布局，标注线号、端子号、电缆编号</li>
+<li><strong>图线宽度</strong>：主线0.5<del>1.0mm，辅线0.25</del>0.5mm</li>
+</ul>
+<p><strong>电气CAD图层命名规范</strong>（工程公司常用）：</p>
+<ul>
+<li>E-POWR：电力干线/配电系统</li>
+<li>E-LITE：照明</li>
+<li>E-EQPM：设备接线</li>
+<li>E-GRND：防雷接地</li>
+<li>E-FIRE：消防电气</li>
+</ul>
+<p>→ 关联：<a href="%E9%A1%B9%E7%9B%AE%E4%B8%8E%E6%96%B9%E6%A1%88.md">项目与方案</a> §10.1 设计方案图纸绘制</p>
+<hr>
+<h2>Capture Notes</h2>
+<ul>
+<li>完整提取自原始 HTML 知识库，共 8 条，原文全部保留</li>
+<li>2026-06 大版本更新：全部 8 个条目扩展为详细技术说明，含具体数值参量、标准条款编号和工程应用要点</li>
+</ul>
+
+  </div>
+</section>
+
+<section id="sec-8" class="content-section">
+  <div class="section-header">
+    <h2 class="section-title">产品知识库</h2>
+    <div style="font-size:13px;color:var(--text-dim);font-family:var(--font-mono);margin-bottom:16px">原始模块：9 · 子模块：高压开关产品 · 高压开关市场 · 储能设备 · 自动化设备 · 电能质量设备 · 竞品对比</div>
+  </div>
+  <div class="section-body">
+    <h1>产品知识库</h1>
+<blockquote>
+<p>原始模块：9 · 子模块：高压开关产品 · 高压开关市场 · 储能设备 · 自动化设备 · 电能质量设备 · 竞品对比</p>
+</blockquote>
+<h2>概述</h2>
+<p>我司核心产品及市场竞品信息，共 <strong>16</strong> 个条目。</p>
+<p><strong>关联页面</strong>：<a href="%E7%94%B5%E5%8A%9B%E7%B3%BB%E7%BB%9F.md">电力系统</a> · <a href="%E7%94%B5%E6%B0%94%E8%87%AA%E5%8A%A8%E5%8C%96.md">电气自动化</a> · <a href="%E6%96%B0%E8%83%BD%E6%BA%90%E4%B8%8E%E5%82%A8%E8%83%BD.md">新能源与储能</a> · <a href="%E7%94%B5%E8%83%BD%E8%B4%A8%E9%87%8F%E6%B2%BB%E7%90%86.md">电能质量治理</a> · <a href="%E5%B7%A5%E4%B8%9A%E7%94%B5%E6%B0%94%E6%88%90%E5%A5%97.md">工业电气成套</a> · <a href="%E8%A7%84%E8%8C%83%E4%B8%8E%E6%A0%87%E5%87%86.md">规范与标准</a> · <a href="%E9%A1%B9%E7%9B%AE%E4%B8%8E%E6%96%B9%E6%A1%88.md">项目与方案</a></p>
+<hr>
+<h2>9.1 高压开关产品（4 条目）</h2>
+<p>我司高压开关产品线，覆盖特高压到中压全系列。</p>
+<h3>特高压GIS</h3>
+<p><strong>ID</strong>: 2801 | <strong>标签</strong>: <code>特高压</code>, <code>GIS</code>, <code>1100kV</code></p>
+<p><strong>1100kV GIS 特高压全封闭组合电器</strong>：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>核心突破</strong>：打破国外垄断，国产化率&gt;95%。<strong>双断口灭弧室</strong>设计，采用<strong>自能式+压气式</strong>混合灭弧原理。2019年昌吉-古泉±1100kV特高压直流工程配套。</p>
+<p><strong>工程业绩</strong>：昌吉-古泉±1100kV直流、张北-雄安1000kV交流、乌东德-广东±800kV直流。</p>
+<p>→ 关联：<a href="%E7%94%B5%E5%8A%9B%E7%B3%BB%E7%BB%9F.md">电力系统</a> §2.2 输电系统</p>
+<hr>
+<h3>252kV高压开关</h3>
+<p><strong>ID</strong>: 2802 | <strong>标签</strong>: <code>SF6</code>, <code>断路器</code>, <code>252kV</code></p>
+<p><strong>252kV SF6断路器/GIS</strong>：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>产品系列</strong>：</p>
+<ul>
+<li><strong>LW□-252</strong>：瓷柱式SF6断路器，单极柱结构，弹簧操动机构</li>
+<li><strong>ZF□-252</strong>：252kV GIS，<strong>三相共箱</strong>母线（节约占地）</li>
+</ul>
+<p>→ 关联：<a href="%E7%94%B5%E5%8A%9B%E7%B3%BB%E7%BB%9F.md">电力系统</a> §2.3 变电站</p>
+<hr>
+<h3>126kV高压开关</h3>
+<p><strong>ID</strong>: 2803 | <strong>标签</strong>: <code>126kV</code>, <code>GIS</code></p>
+<p><strong>126kV GIS/罐式断路器</strong>：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>产品特点</strong>：</p>
+<ul>
+<li>罐式断路器：内附电流互感器（4~6绕组），结构紧凑</li>
+<li>GIS：适用于110kV变电站新建及改造，<strong>三相共箱</strong>结构</li>
+<li>间隔宽度：常规约<strong>1.2m</strong>（缩小占地面积的50%）</li>
+</ul>
+<hr>
+<h3>真空断路器VS1</h3>
+<p><strong>ID</strong>: 2809 | <strong>标签</strong>: <code>真空断路器</code>, <code>VS1</code></p>
+<p><strong>VS1-12 户内高压真空断路器</strong>：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>产品特点</strong>：</p>
+<ul>
+<li><strong>固封极柱</strong>：真空灭弧室用环氧树脂APG工艺固封（防凝露、防污秽）</li>
+<li>弹簧操动机构：手动/电动储能，操作电压AC/DC 220V</li>
+<li>适用开关柜：<strong>KYN28A-12</strong>中置柜（最主流配置）</li>
+</ul>
+<p>→ 关联：<a href="%E5%B7%A5%E4%B8%9A%E7%94%B5%E6%B0%94%E6%88%90%E5%A5%97.md">工业电气成套</a> §7.1 — KYN28配VS1</p>
+<hr>
+<h2>9.2 高压开关市场（1 条目）</h2>
+<h3>特高压GIS市场竞争格局</h3>
+<p><strong>ID</strong>: 2901 | <strong>标签</strong>: <code>特高压</code>, <code>市场格局</code></p>
+<p><strong>头部企业市场份额（2024年特高压GIS招标）</strong>：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>行业趋势</strong>：</p>
+<ul>
+<li>国网2024~2025年特高压投资预计<strong>超2000亿元</strong></li>
+<li>特高压GIS单间隔造价约<strong>800万~1200万元</strong></li>
+<li>国网推行<strong>标准化设计</strong>（&quot;六统一&quot;），降低定制化成本</li>
+<li><strong>一二次融合</strong>趋势明显：GIS+智能终端组合成标准方案</li>
+</ul>
+<hr>
+<h2>9.3 储能设备（2 条目）</h2>
+<h3>储能PCS变流器</h3>
+<p><strong>ID</strong>: 2804 | <strong>标签</strong>: <code>PCS</code>, <code>储能</code></p>
+<p><strong>模块化PCS变流器技术参数</strong>：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>构网型控制功能</strong>：</p>
+<ul>
+<li>支持并网/离网/并离网无缝切换</li>
+<li><strong>虚拟同步机（VSG）</strong> 控制：惯性支撑、一次调频、阻尼</li>
+<li>下垂控制：P-f、Q-V下垂特性</li>
+<li>黑启动能力：建立孤网（零起升压）</li>
+</ul>
+<p><strong>并机能力</strong>：最多<strong>10台</strong>模块直接并联（容量扩展至MW级），环流&lt;<strong>3%</strong></p>
+<p>→ 关联：<a href="%E6%96%B0%E8%83%BD%E6%BA%90%E4%B8%8E%E5%82%A8%E8%83%BD.md">新能源与储能</a> §5.3 — PCS原理</p>
+<hr>
+<h3>预制舱式储能系统</h3>
+<p><strong>ID</strong>: 2805 | <strong>标签</strong>: <code>预制舱</code>, <code>储能系统</code></p>
+<p><strong>产品参数</strong>：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>系统集成</strong>：电池堆+<strong>PCS变流器</strong>+<strong>BMS电池管理系统</strong>+<strong>EMS能量管理系统</strong>，全集成于20/40尺预制舱。<strong>BMS三级架构</strong>（BMU→BCU→BAU），SOC精度≤3%，全氟己酮消防+防爆泄压。</p>
+<p><strong>适用场景</strong>：新能源配储（光伏/风电）、独立调频调峰电站、工商业储能、电网侧黑启动。</p>
+<p>→ 关联：<a href="%E6%96%B0%E8%83%BD%E6%BA%90%E4%B8%8E%E5%82%A8%E8%83%BD.md">新能源与储能</a> §5.3、<a href="%E7%94%B5%E8%83%BD%E8%B4%A8%E9%87%8F%E6%B2%BB%E7%90%86.md">电能质量治理</a> §6.7</p>
+<hr>
+<h2>9.4 自动化设备（1 条目）</h2>
+<h3>开关柜智能操控装置</h3>
+<p><strong>ID</strong>: 2808 | <strong>标签</strong>: <code>操控装置</code>, <code>开关柜</code></p>
+<p><strong>多功能操控装置集成功能</strong>：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>主流品牌</strong>：<strong>珠海优特</strong>（市场占有率~40%）、长园深瑞、华通仪表。</p>
+<p><strong>配套应用</strong>：KYN28A-12、MNS、GCS等中低压开关柜。</p>
+<p>→ 关联：<a href="%E5%B7%A5%E4%B8%9A%E7%94%B5%E6%B0%94%E6%88%90%E5%A5%97.md">工业电气成套</a> §7.1 开关柜</p>
+<hr>
+<h2>9.5 电能质量设备（2 条目）</h2>
+<h3>SVG静止无功发生器</h3>
+<p><strong>ID</strong>: 2806 | <strong>标签</strong>: <code>SVG</code>, <code>无功补偿</code></p>
+<p><strong>产品参数</strong>：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>核心技术</strong>：<strong>级联H桥（链式SVG）<strong>为中高压主流方案，每相由多个H桥子模块串联，直接接入6~35kV电网。控制策略采用</strong>dq解耦双闭环</strong>（电压外环+电流内环）+ <strong>载波移相PWM</strong>（等效开关频率显著提高，降低输出谐波）。</p>
+<p><strong>与电容器组混合方案（SVG+FC）</strong>：SVG承担动态无功调节（感性/容性双向连续），并联电容器组(FC)提供稳态容性无功基础量——既满足动态响应要求，又降低总投资成本（SVG容量选为总无功需求的<strong>30%~50%</strong>）。</p>
+<p>→ 关联：<a href="%E7%94%B5%E8%83%BD%E8%B4%A8%E9%87%8F%E6%B2%BB%E7%90%86.md">电能质量治理</a> §6.2 SVG原理、§6.6 MMC拓扑</p>
+<hr>
+<h3>有源电力滤波器APF</h3>
+<p><strong>ID</strong>: 2807 | <strong>标签</strong>: <code>APF</code>, <code>有源滤波</code></p>
+<p><strong>产品参数</strong>：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>工作模式</strong>：谐波补偿（默认，最常用）、无功补偿（可设置功率因数目标）、三相不平衡补偿（零序+负序）。</p>
+<p><strong>关键技术</strong>：</p>
+<ul>
+<li>谐波检测：<strong>ip-iq法</strong>（dq变换+PLL），电压畸变下仍准确</li>
+<li>电流跟踪：PI+重复控制复合（兼顾动态和稳态）</li>
+<li><strong>LCL滤波器</strong>并网：有效滤除高频开关纹波</li>
+</ul>
+<p><strong>安装方案</strong>：</p>
+<ul>
+<li>集中补偿（配变低压侧整体补偿）</li>
+<li>就地补偿（非线性负载前端补偿——效果最佳）</li>
+<li>混合补偿（APF+PPF并联——兼顾性能与投资）</li>
+</ul>
+<p>→ 关联：<a href="%E7%94%B5%E8%83%BD%E8%B4%A8%E9%87%8F%E6%B2%BB%E7%90%86.md">电能质量治理</a> §6.3 APF原理</p>
+<hr>
+<h2>9.6 竞品对比（6 条目）</h2>
+<p>主要竞争对手产品与技术实力概览。</p>
+<h3>阳光电源</h3>
+<p><strong>ID</strong>: 2902 | <strong>标签</strong>: <code>阳光电源</code>, <code>逆变器</code>, <code>储能</code></p>
+<p><strong>核心产品实力</strong>：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>技术特点</strong>：</p>
+<ul>
+<li><strong>1+X模块化PCS</strong>：单模块1MW，簇级管理（精细化SOC控制，提升可用电量~5%）</li>
+<li>构网型储能：VSG控制算法成熟，工程化程度高</li>
+<li>逆变器最大效率达<strong>99.2%</strong>（组串式）</li>
+</ul>
+<p><strong>对比我司</strong>：阳光PCS在<strong>模块化设计</strong>和<strong>电站级EMS平台</strong>方面领先，我司优势在于<strong>高压开关设备+储能系统组合方案</strong>（一次设备联动）。</p>
+<p>→ 关联：<a href="%E6%96%B0%E8%83%BD%E6%BA%90%E4%B8%8E%E5%82%A8%E8%83%BD.md">新能源与储能</a> §5.1 光伏逆变器</p>
+<hr>
+<h3>宁德时代</h3>
+<p><strong>ID</strong>: 2903 | <strong>标签</strong>: <code>宁德时代</code>, <code>LFP</code>, <code>储能电池</code></p>
+<p><strong>核心产品实力</strong>：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>行业地位</strong>：<strong>全球动力/储能电池龙头</strong>（2024年全球储能电池出货~40%），具备从材料→电芯→系统全链条能力。</p>
+<p><strong>关键技术优势</strong>：</p>
+<ul>
+<li><strong>CTP（无模组）</strong> 技术：体积利用率提升20%~30%</li>
+<li><strong>钠离子电池</strong>：AB电池系统（钠锂混搭）</li>
+<li><strong>凝聚态电池</strong>：能量密度<strong>500Wh/kg</strong></li>
+</ul>
+<p><strong>对比我司</strong>：宁王为电池端供应商，我司为<strong>系统集成商</strong>——双方实际为合作关系。我司可向上游采购电池模组，自研PCS+BMS形成差异化优势。</p>
+<p>→ 关联：<a href="%E6%96%B0%E8%83%BD%E6%BA%90%E4%B8%8E%E5%82%A8%E8%83%BD.md">新能源与储能</a> §5.3 LFP电池</p>
+<hr>
+<h3>华为数字能源</h3>
+<p><strong>ID</strong>: 2904 | <strong>标签</strong>: <code>华为</code>, <code>数字能源</code>, <code>FusionSolar</code></p>
+<p><strong>核心产品实力</strong>：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>行业地位</strong>：<strong>组串式逆变器国内第一</strong>，全球第二（仅次于阳光电源），2024年数字能源业务收入~<strong>700亿元</strong>。</p>
+<p><strong>技术特点</strong>：</p>
+<ul>
+<li><strong>智能组串分断</strong>：组件级快速关断（AFCI电弧检测+保护，NEC 2017合规）</li>
+<li><strong>一拖一优化器</strong>：每块组件独立MPPT（阴影遮挡影响最小化）</li>
+<li><strong>AI BOOST</strong>：智能跟踪+预测运维</li>
+</ul>
+<p><strong>对比我司</strong>：华为强在<strong>数字平台+逆变器</strong>，在<strong>智能光伏</strong>领域优势明显。我司可发挥<strong>配电装备+储能集成</strong>组合优势，面向工商业和电网侧市场形成互补。</p>
+<p>→ 关联：<a href="%E6%96%B0%E8%83%BD%E6%BA%90%E4%B8%8E%E5%82%A8%E8%83%BD.md">新能源与储能</a> §5.1 光伏逆变器</p>
+<hr>
+<h3>ABB高压开关</h3>
+<p><strong>ID</strong>: 2905 | <strong>标签</strong>: <code>ABB</code>, <code>高压开关</code>, <code>VD4</code></p>
+<p><strong>核心产品实力</strong>：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>技术特点</strong>：</p>
+<ul>
+<li>VD4断路器：<strong>永磁操动机构</strong>可选（30万次免维护）</li>
+<li><strong>iVD4</strong>智能断路器：在线监测+物联网接入</li>
+<li>中压柜：UniGear<strong>数字化</strong>方案（传感器替代CT/PT）</li>
+</ul>
+<p><strong>行业地位</strong>：全球中高压开关<strong>第一阵营</strong>，在中国高端市场（数据中心、半导体、石化）占有率高。</p>
+<p><strong>对比我司</strong>：ABB品牌溢价高（价格通常高<strong>30%~50%</strong>）。我司主攻国产替代市场：<strong>产品性能接近ABB，价格低20%~30%</strong>，服务响应更快。</p>
+<p>→ 关联：<a href="%E4%BA%A7%E5%93%81%E7%9F%A5%E8%AF%86%E5%BA%93.md">产品知识库</a> §9.1 我司高压开关对标</p>
+<hr>
+<h3>台达电子</h3>
+<p><strong>ID</strong>: 2906 | <strong>标签</strong>: <code>台达</code>, <code>UPS</code>, <code>PLC</code></p>
+<p><strong>核心产品实力</strong>：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>行业地位</strong>：工业电源领域全球领先（电源管理市场份额<strong>全球前三</strong>），UPS高端市场有较强竞争力（仅次于华为/山特）。</p>
+<p><strong>对比我司</strong>：台达<strong>UPS极其强势</strong>（尤其在数据中心领域），我司EPS/UPS产品宜走<strong>消防/工业应急</strong>差异化路线，避免在数据中心领域正面竞争。</p>
+<p>→ 关联：<a href="%E5%B7%A5%E4%B8%9A%E7%94%B5%E6%B0%94%E6%88%90%E5%A5%97.md">工业电气成套</a> §7.4 UPS/EPS</p>
+<hr>
+<h3>汇川技术</h3>
+<p><strong>ID</strong>: 2907 | <strong>标签</strong>: <code>汇川</code>, <code>变频器</code>, <code>伺服</code></p>
+<p><strong>核心产品实力</strong>：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>2024年营收</strong>：<strong>~370亿元</strong>（含新能源车电驱约150亿+通用自动化约200亿）。</p>
+<p><strong>技术特点</strong>：</p>
+<ul>
+<li><strong>Easy系列PLC</strong>：国产替代入门级首选（兼容三菱FX系列）</li>
+<li>高速高精伺服：<strong>4ms</strong>以下整定，<strong>23位</strong>绝对值编码器</li>
+<li><strong>多轴同步</strong>：EtherCAT总线方案，<strong>128轴</strong>同步</li>
+</ul>
+<p><strong>对比我司</strong>：汇川在<strong>驱动和控制</strong>领域遥遥领先，但在配电设备领域无布局。自动化+配电<strong>总包方案</strong>是我司互补方向。</p>
+<p>→ 关联：<a href="%E7%94%B5%E6%B0%94%E8%87%AA%E5%8A%A8%E5%8C%96.md">电气自动化</a> — PLC、变频器、伺服系统</p>
+<hr>
+<h2>Capture Notes</h2>
+<ul>
+<li>完整提取自原始 HTML 知识库，共 16 条，原文全部保留</li>
+<li>2026-06 大版本更新：全部 16 个条目扩展为详细技术说明，含技术参数对比表、竞品市场份额、差异化竞争策略</li>
+</ul>
+
+  </div>
+</section>
+
+<section id="sec-9" class="content-section">
+  <div class="section-header">
+    <h2 class="section-title">项目与方案</h2>
+    <div style="font-size:13px;color:var(--text-dim);font-family:var(--font-mono);margin-bottom:16px">原始模块：10 · 子模块：设计方案模板 · 投标文件 · 国网项目流程 · 项目归档 · 技术报价</div>
+  </div>
+  <div class="section-body">
+    <h1>项目与方案</h1>
+<blockquote>
+<p>原始模块：10 · 子模块：设计方案模板 · 投标文件 · 国网项目流程 · 项目归档 · 技术报价</p>
+</blockquote>
+<h2>概述</h2>
+<p>电气工程项目管理与商务运作的主要知识，共 <strong>6</strong> 个条目。</p>
+<p><strong>关联页面</strong>：<a href="%E8%A7%84%E8%8C%83%E4%B8%8E%E6%A0%87%E5%87%86.md">规范与标准</a> · <a href="%E4%BA%A7%E5%93%81%E7%9F%A5%E8%AF%86%E5%BA%93.md">产品知识库</a> · <a href="%E7%94%B5%E8%83%BD%E8%B4%A8%E9%87%8F%E6%B2%BB%E7%90%86.md">电能质量治理</a> · <a href="%E5%B7%A5%E4%B8%9A%E7%94%B5%E6%B0%94%E6%88%90%E5%A5%97.md">工业电气成套</a> · <a href="%E7%94%B5%E6%B0%94%E8%87%AA%E5%8A%A8%E5%8C%96.md">电气自动化</a> · <a href="%E5%BC%B1%E7%94%B5%E4%B8%8E%E6%99%BA%E8%83%BD%E5%8C%96.md">弱电与智能化</a></p>
+<hr>
+<h2>10.1 设计方案模板（2 条目）</h2>
+<h3>技术方案编制要点</h3>
+<p><strong>ID</strong>: 3002 | <strong>标签</strong>: <code>技术方案</code>, <code>设计</code></p>
+<p><strong>技术方案标准结构</strong>（电气工程类）：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>编制技巧</strong>：</p>
+<ul>
+<li>方案结构对标招标文件/用户需求书的<strong>评分点</strong>，逐一响应不遗漏</li>
+<li>技术亮点突出<strong>3~5个</strong>关键差异化优势（不必贪多）</li>
+<li>用<strong>对比表</strong>展示方案选型依据（如A型号 vs B型号对比选型论证）</li>
+<li><strong>风险识别</strong>提前暴露：供电可靠性分析、施工难点预判、过渡方案设计</li>
+</ul>
+<p><strong>常见错误</strong>：</p>
+<ul>
+<li>照抄标准规范不结合具体项目（专家一眼看穿）</li>
+<li>设备参数只罗列不解释选择理由</li>
+<li>缺少备选方案和可行性与经济性论证</li>
+</ul>
+<p>→ 关联：<a href="%E8%A7%84%E8%8C%83%E4%B8%8E%E6%A0%87%E5%87%86.md">规范与标准</a> — 引用GB/DL标准</p>
+<hr>
+<h3>电气施工图设计流程</h3>
+<p><strong>ID</strong>: 3004 | <strong>标签</strong>: <code>施工图</code>, <code>设计流程</code></p>
+<p><strong>设计阶段划分与交付物</strong>：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>施工图图纸目录</strong>（典型电气专业）：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>设计深度的三个层级</strong>（住建部《建筑工程设计文件编制深度规定》）：</p>
+<ul>
+<li><strong>扩初（方案深度）</strong>：确定主要指标和方案可行性</li>
+<li><strong>施工图（施工深度）</strong>：每台设备定位、每根电缆路径、每个安装大样</li>
+<li><strong>深化设计（竣工深化）</strong>：施工方/供货方根据现场细化图纸</li>
+</ul>
+<p><strong>设计质量控制</strong>：</p>
+<ul>
+<li><strong>三级校审</strong>：设计→校对→审核→审定（签字盖章责任制）</li>
+<li>设计变更：<strong>变更通知单</strong>经原审核人签字，重大变更需重新图审</li>
+<li>图纸版本控制：修订版号+日期（RevA→RevB→RevC）</li>
+</ul>
+<p>→ 关联：<a href="%E8%A7%84%E8%8C%83%E4%B8%8E%E6%A0%87%E5%87%86.md">规范与标准</a> §8.6 GB/T 4728制图标准</p>
+<hr>
+<h2>10.2 投标文件（1 条目）</h2>
+<h3>商务标书编制</h3>
+<p><strong>ID</strong>: 3003 | <strong>标签</strong>: <code>投标</code>, <code>商务标</code></p>
+<p><strong>投标文件组成（三卷）</strong>：</p>
+<p><strong>第一卷 商务标</strong>（资格证明文件）：</p>
+<ul>
+<li>投标函+法定代表人授权委托书</li>
+<li>营业执照/资质证书（<strong>电力工程施工总承包</strong>/承装(修、试)电力设施许可证等）</li>
+<li>业绩证明：近3~5年同类项目合同+竣工验收证明（重点：<strong>金额匹配</strong>、<strong>技术路线匹配</strong>）</li>
+<li>财务状况：审计报告、银行资信证明、纳税记录</li>
+<li>项目经理及技术人员资格证书（注册电气工程师/建造师/安全员）</li>
+</ul>
+<p><strong>第三卷 技术标</strong>（与技术方案合并编制）：</p>
+<ul>
+<li>对招标文件的<strong>逐条响应</strong>（&quot;★&quot;号条款的偏离被视为废标）</li>
+<li>设备选型技术参数表（逐项填列）</li>
+<li>施工组织设计/供货计划/安装调试方案</li>
+<li>质量保证/售后服务承诺（质保期、响应时间、备件保障）</li>
+</ul>
+<p><strong>第二卷 报价标</strong>：</p>
+<ul>
+<li><strong>已标价工程量清单</strong>（与招标清单格式严格一致）</li>
+<li>设备价格表（主机+附件+备品备件）</li>
+<li>安装调试费、培训费、运保费分解</li>
+<li><strong>报价汇总表</strong>（含税/不含税）</li>
+</ul>
+<p><strong>评分要点分析</strong>（国网/南网<strong>综合评分法</strong>常用权重）：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><hr>
+<h2>10.3 国网项目流程（1 条目）</h2>
+<h3>国网招投标流程</h3>
+<p><strong>ID</strong>: 3001 | <strong>标签</strong>: <code>国网</code>, <code>招投标</code>, <code>ECP</code></p>
+<p><strong>国网电子商务平台ECP2.0操作全流程</strong>：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>ECP2.0关键功能</strong>：</p>
+<ul>
+<li><strong>供应商资质能力核实</strong>（一纸证明）：年度核实，结果共享</li>
+<li><strong>电子投标</strong>：加密上传（CA证书+RSA加密），开标时解密</li>
+<li><strong>远程异地评标</strong>：主会场+分会场视频连线</li>
+</ul>
+<p><strong>评标方法</strong>：</p>
+<ul>
+<li><strong>综合评分法</strong>（主流）：技术分+商务分+价格分（按权重加权）</li>
+<li><strong>经评审的最低投标价法</strong>：技术商务合格，<strong>最低价中标</strong>（适用于标准化程度高的产品）</li>
+<li><strong>国网重点管控</strong>：<strong>&quot;三不&quot;原则</strong>（不打招呼、不递条子、不围标串标），违法行为将被列入<strong>黑名单</strong>（全网禁入1~3年）</li>
+</ul>
+<p><strong>项目执行关键节点</strong>：</p>
+<ul>
+<li>技术联络会（合同签订后）：确认技术细节、接口、提资进度</li>
+<li>设计确认（土建/安装前）：确保安装条件与设备匹配</li>
+<li>出厂验收（FAT）：关键设备<strong>出厂前必须验收</strong>（含型式试验报告核查）</li>
+<li>现场验收（SAT）：到货验收+安装调试+竣工验收</li>
+</ul>
+<p>→ 关联：<a href="%E8%A7%84%E8%8C%83%E4%B8%8E%E6%A0%87%E5%87%86.md">规范与标准</a> §8.3 Q/GDW企标</p>
+<hr>
+<h2>10.4 项目归档（1 条目）</h2>
+<h3>EPC总承包模式</h3>
+<p><strong>ID</strong>: 3005 | <strong>标签</strong>: <code>EPC</code>, <code>总承包</code></p>
+<p><strong>EPC总承包组织架构</strong>：</p>
+<p>业主（项目法人）
+└── <strong>EPC总包方</strong>（设计+采购+施工一体化责任主体）
+    ├── 设计分包（可研/初设/施工图）
+    ├── 采购分包（设备招标/监造/催交）
+    └── 施工分包（土建/安装/调试）</p>
+<p><strong>各方责任划分</strong>：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>EPC合同关键条款</strong>：</p>
+<ul>
+<li><strong>固定总价</strong>（Lump Sum）：若非业主变更范围和条件，总价<strong>不可调</strong></li>
+<li>变更管理：设计变更→变更令→费用/工期调整（<strong>严格执行变更程序</strong>）</li>
+<li>里程碑付款：设计完成30%/设备到场30%/安装完成20%/验收10%/质保金10%</li>
+<li>质保期：通常<strong>2年</strong>（从竣工验收合格日起算）</li>
+<li>履约保函/预付款保函：合同金额的<strong>5%~10%</strong></li>
+</ul>
+<p><strong>EPC模式的适用范围与决策</strong>：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>EPC风险管理</strong>：</p>
+<ul>
+<li><strong>设计优化</strong>：EPC核心盈利手段——在设计阶段优化方案（降低造价，但必须满足功能要求）</li>
+<li><strong>设备集中采购</strong>：利用总包议价能力降低采购成本（批量折扣5%~15%）</li>
+<li><strong>工期管理</strong>：关键路径法(CPM)，<strong>最晚开工日</strong>和<strong>最晚交货日</strong>为硬约束</li>
+<li><strong>安全管理</strong>：总包负总责，**&quot;一票否决&quot;**制度（安全不达标不得开工）</li>
+</ul>
+<p><strong>常见EPC类型</strong>：</p>
+<ul>
+<li><strong>设计采购施工总承包</strong>（全EPC）：最完整的交钥匙工程</li>
+<li><strong>设计采购总承包(EP)</strong>：业主负责施工</li>
+<li><strong>设计施工总承包(DB)</strong>：业主负责采购</li>
+<li><strong>交钥匙工程(Turnkey)</strong>：EPC+试运行+人员培训，达到**&quot;一转钥匙就能生产&quot;**的标准</li>
+</ul>
+<hr>
+<h2>10.5 技术报价（1 条目）</h2>
+<h3>成本估算与报价</h3>
+<p><strong>ID</strong>: 3006 | <strong>标签</strong>: <code>成本</code>, <code>报价</code>, <code>清单计价</code></p>
+<p><strong>报价费用构成</strong>：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>计价方法对比</strong>：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>报价策略</strong>：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>成本估算方法</strong>：</p>
+<ul>
+<li><strong>详细估算法</strong>（精确度&gt;90%）：逐项计算设备/材料/工时/管理费</li>
+<li><strong>参数法</strong>（精确度70%~80%）：按&quot;每kVA造价&quot;、&quot;每回路造价&quot;等指标估算</li>
+<li><strong>类比法</strong>（精确度50%~60%）：参照历史同类项目价格按规模等比调整</li>
+</ul>
+<p><strong>设备定价基准</strong>（参考2025~2026年市场价）：</p>
+<div class="table-wrap"><table><thead>[object Object]</thead><tbody>undefined</tbody></table></div><p><strong>报价书格式要素</strong>：</p>
+<ul>
+<li>封面（项目名称+报价方+日期+签章）</li>
+<li>报价函（总价大写+小写，有效期至少<strong>30~60天</strong>）</li>
+<li>报价明细表（按设备清单逐项列明：名称/型号/数量/单价/总价）</li>
+<li>技术参数差异表（逐条响应）</li>
+<li>供货范围/服务承诺说明</li>
+</ul>
+<p>→ 关联：<a href="%E4%BA%A7%E5%93%81%E7%9F%A5%E8%AF%86%E5%BA%93.md">产品知识库</a> — 设备选型价格</p>
+<hr>
+<h2>Capture Notes</h2>
+<ul>
+<li>完整提取自原始 HTML 知识库，共 6 条，原文全部保留</li>
+<li>2026-06 大版本更新：全部 6 个条目扩展为详细技术说明，含流程表格、费用构成、定价参考和操作要点</li>
+</ul>
+
+  </div>
+</section>
+</main>
+
+<script>
+let totalEntries = 0;
+document.querySelectorAll('.content-section').forEach(s => {
+  totalEntries += (s.innerHTML.match(/ID:\s*\d+/g) || []).length;
+});
+document.getElementById('totalCount').textContent = totalEntries;
+
+function showSection(index) {
+  document.querySelectorAll('.content-section').forEach((s,i) => s.classList.toggle('active',i===index));
+  document.querySelectorAll('.nav-link').forEach((l,i) => l.classList.toggle('active',i===index));
+  history.replaceState(null,'','#sec-'+index);
+}
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('overlay').classList.toggle('open');
+}
+
+// Hash restore
+const m = window.location.hash.match(/sec-(\d+)/);
+showSection(m ? parseInt(m[1]) : 0);
+
+// Keyboard nav
+document.addEventListener('keydown', e => {
+  if(e.key==='ArrowRight'||e.key==='ArrowDown'){
+    const cur = document.querySelector('.content-section.active');
+    const next = cur.nextElementSibling;
+    if(next&&next.classList.contains('content-section')) showSection(parseInt(next.id.replace('sec-','')));
+  }
+  if(e.key==='ArrowLeft'||e.key==='ArrowUp'){
+    const cur = document.querySelector('.content-section.active');
+    const prev = cur.previousElementSibling;
+    if(prev&&prev.classList.contains('content-section')) showSection(parseInt(prev.id.replace('sec-','')));
+  }
+});
+</script>
+</body>
+</html>
